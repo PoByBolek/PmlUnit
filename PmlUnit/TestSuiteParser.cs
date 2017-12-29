@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace PmlUnit
@@ -45,6 +46,10 @@ namespace PmlUnit
                     string testCaseName;
                     if (IsTestCaseMethod(signature, out testCaseName))
                         result.TestCases.Add(new TestCase(testCaseName));
+                    else if (IsSetupMethod(signature))
+                        result.HasSetUpMethod = true;
+                    else if (IsTearDownMethod(signature))
+                        result.HasTearDownMethod = true;
                 }
             }
 
@@ -56,30 +61,61 @@ namespace PmlUnit
 
         private static bool IsTestCaseMethod(string signature, out string testCaseName)
         {
+            string[] argumentTypes;
+            testCaseName = ParseSignature(signature, out argumentTypes);
+            if (!testCaseName.StartsWith("test", StringComparison.OrdinalIgnoreCase))
+                return false;
+            if (argumentTypes.Length != 1)
+                return false;
+
+            return argumentTypes[0].Equals("PmlAssert", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsSetupMethod(string signature)
+        {
+            string[] argumentTypes;
+            var methodName = ParseSignature(signature, out argumentTypes);
+            return methodName.Equals("setUp", StringComparison.OrdinalIgnoreCase)
+                && argumentTypes.Length == 0;
+        }
+
+        private static bool IsTearDownMethod(string signature)
+        {
+            string[] argumentTypes;
+            var methodName = ParseSignature(signature, out argumentTypes);
+            return methodName.Equals("tearDown", StringComparison.OrdinalIgnoreCase)
+                && argumentTypes.Length == 0;
+        }
+
+        private static string ParseSignature(string signature, out string[] argumentTypes)
+        {
             var startIndex = signature.IndexOf('(');
             var endIndex = signature.IndexOf(')');
             if (startIndex < 0 || endIndex < 0 || startIndex > endIndex)
                 throw new ParserException();
 
-            testCaseName = signature.Substring(0, startIndex);
-            if (!testCaseName.StartsWith("test", StringComparison.OrdinalIgnoreCase))
-                return false;
-
-            var parameterString = signature
+            var methodName = signature.Substring(0, startIndex).Trim();
+            var argumentString = signature
                 .Substring(startIndex + 1, endIndex - startIndex - 1)
                 .Trim();
-            if (string.IsNullOrEmpty(parameterString))
-                return false;
+            if (string.IsNullOrEmpty(argumentString))
+            {
+                argumentTypes = new string[0];
+                return methodName;
+            }
 
-            var parameters = parameterString.Split(',');
-            if (parameters.Length != 1)
-                return false;
+            argumentTypes = argumentString.Split(',').Select(
+                arg => ParseArgumentType(arg)
+            ).ToArray();
+            return methodName;
+        }
 
-            var isIndex = parameters[0].IndexOf(" is ", StringComparison.OrdinalIgnoreCase);
+        private static string ParseArgumentType(string argument)
+        {
+            var isIndex = argument.IndexOf(" is ", StringComparison.OrdinalIgnoreCase);
             if (isIndex < 0)
                 throw new ParserException();
-            var parameterType = parameters[0].Substring(isIndex + 4).Trim();
-            return parameterType.Equals("PmlAssert", StringComparison.OrdinalIgnoreCase);
+            return argument.Substring(isIndex + 4).Trim();
         }
 
         private static IEnumerable<string> ReadAllLines(TextReader reader)

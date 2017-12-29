@@ -150,6 +150,30 @@ endmethod");
             Assert.AreEqual("testMethodB", suite.TestCases[1].Name);
         }
 
+        [TestMethod]
+        public void Parse_ShouldFindSetUpMethod()
+        {
+            var suite = Parse(@"
+define object TestSuite
+endobject
+
+define method .setUp()
+endmethod");
+            Assert.IsTrue(suite.HasSetUpMethod);
+        }
+
+        [TestMethod]
+        public void Parse_ShouldFindTearDownMethod()
+        {
+            var suite = Parse(@"
+define object TestSuite
+endobject
+
+define method .tearDown()
+endmethod");
+            Assert.IsTrue(suite.HasTearDownMethod);
+        }
+
         private static TestSuite Parse(string objectDefinition)
         {
             var parser = new TestSuiteParser();
