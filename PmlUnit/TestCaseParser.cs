@@ -6,17 +6,17 @@ using System.Text.RegularExpressions;
 
 namespace PmlUnit
 {
-    class TestSuiteParser
+    class TestCaseParser
     {
         private static readonly Regex WhitespaceRegex = new Regex(@"\s+");
 
-        public TestSuite Parse(TextReader reader)
+        public TestCase Parse(TextReader reader)
         {
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
 
             bool inComment = false;
-            TestSuite result = null;
+            TestCase result = null;
 
             foreach (string line in ReadAllLines(reader))
             {
@@ -36,7 +36,7 @@ namespace PmlUnit
                 {
                     if (result != null)
                         throw new ParserException();
-                    result = new TestSuite(sanitized.Substring(14));
+                    result = new TestCase(sanitized.Substring(14));
                 }
                 else if (sanitized.StartsWith("define method .", StringComparison.OrdinalIgnoreCase))
                 {
@@ -45,11 +45,11 @@ namespace PmlUnit
                     var signature = sanitized.Substring(15);
                     string testCaseName;
                     if (IsTestCaseMethod(signature, out testCaseName))
-                        result.TestCases.Add(new TestCase(testCaseName));
+                        result.Tests.Add(new Test(testCaseName));
                     else if (IsSetupMethod(signature))
-                        result.HasSetUpMethod = true;
+                        result.HasSetUp = true;
                     else if (IsTearDownMethod(signature))
-                        result.HasTearDownMethod = true;
+                        result.HasTearDown = true;
                 }
             }
 
