@@ -16,7 +16,7 @@ namespace PmlUnit
                 throw new ArgumentNullException(nameof(reader));
 
             bool inComment = false;
-            TestCase result = null;
+            TestCaseBuilder result = null;
 
             foreach (string line in ReadAllLines(reader))
             {
@@ -36,7 +36,7 @@ namespace PmlUnit
                 {
                     if (result != null)
                         throw new ParserException();
-                    result = new TestCase(sanitized.Substring(14));
+                    result = new TestCaseBuilder(sanitized.Substring(14));
                 }
                 else if (sanitized.StartsWith("define method .", StringComparison.OrdinalIgnoreCase))
                 {
@@ -45,7 +45,7 @@ namespace PmlUnit
                     var signature = sanitized.Substring(15);
                     string testCaseName;
                     if (IsTestCaseMethod(signature, out testCaseName))
-                        result.Tests.Add(new Test(testCaseName));
+                        result.AddTest(testCaseName);
                     else if (IsSetupMethod(signature))
                         result.HasSetUp = true;
                     else if (IsTearDownMethod(signature))
@@ -56,7 +56,7 @@ namespace PmlUnit
             if (result == null)
                 throw new ParserException();
             else
-                return result;
+                return result.Build();
         }
 
         private static bool IsTestCaseMethod(string signature, out string testCaseName)
