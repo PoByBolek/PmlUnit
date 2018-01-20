@@ -3,19 +3,16 @@ using System.Collections;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using Aveva.PDMS.PMLNet;
 
 namespace PmlUnit
 {
     class TestRunner : IDisposable
     {
-        private readonly PMLNetAny PmlTestRunner;
-        private bool Disposed;
+        private PmlProxy PmlTestRunner;
 
         public TestRunner()
         {
-            PmlTestRunner = PMLNetAny.createInstance("PmlTestRunner", new object[0], 0);
-            Disposed = false;
+            PmlTestRunner = new PmlProxy("PmlTestRunner");
         }
 
         ~TestRunner()
@@ -31,21 +28,29 @@ namespace PmlUnit
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing && !Disposed)
-            {
+            if (PmlTestRunner == null)
+                return;
+
+            if (disposing)
                 PmlTestRunner.Dispose();
-                Disposed = true;
-            }
+
+            PmlTestRunner = null;
         }
 
         public void Run(TestCase testCase)
         {
+            if (PmlTestRunner == null)
+                throw new ObjectDisposedException(nameof(TestRunner));
+
             foreach (var test in testCase.Tests)
                 Run(test);
         }
 
         public TestResult Run(Test test)
         {
+            if (PmlTestRunner == null)
+                throw new ObjectDisposedException(nameof(TestRunner));
+
             var watch = Stopwatch.StartNew();
             try
             {
