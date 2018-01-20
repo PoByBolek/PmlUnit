@@ -1,52 +1,52 @@
 ﻿using System;
 using System.IO;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace PmlUnit.Test
+using NUnit.Framework;
+
+namespace PmlUnit.Tests
 {
-    [TestClass]
+    [TestFixture]
+    [TestOf(typeof(TestCaseParser))]
     public class TestCaseParserTest
     {
-        [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [Test]
         public void Parse_ShouldCheckForNullReader()
         {
             var parser = new TestCaseParser();
-            parser.Parse(null);
+            Assert.Throws<ArgumentNullException>(() => parser.Parse(null));
         }
 
-        [TestMethod]
+        [Test]
         public void Parse_ShouldFindTestSuiteName()
         {
             var testCase = Parse(@"define object TestCase
 endobject");
-            Assert.AreEqual("TestCase", testCase.Name);
+            Assert.That(testCase.Name, Is.EqualTo("TestCase"));
         }
 
-        [TestMethod]
+        [Test]
         public void Parse_ShouldBeCaseInsensitiveWhenSearchingForTestSuiteName()
         {
             var testCase = Parse(@"DEfinE OBJeCt CaseInsensitive
 endobject");
-            Assert.AreEqual("CaseInsensitive", testCase.Name);
+            Assert.That(testCase.Name, Is.EqualTo("CaseInsensitive"));
         }
 
-        [TestMethod]
+        [Test]
         public void Parse_ShouldIgnoreAdditionalWhitespaceWhenSearchingForTestSuiteName()
         {
             var testCase = Parse(@"   define    object   MoreWhitespace    
 endobject");
-            Assert.AreEqual("MoreWhitespace", testCase.Name);
+            Assert.That(testCase.Name, Is.EqualTo("MoreWhitespace"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ParserException))]
+        [Test]
         public void Parse_ShouldThrowExceptionWithoutAnObjectDefinition()
         {
-            Parse("");
+            Assert.Throws<ParserException>(() => Parse(""));
         }
 
-        [TestMethod]
+        [Test]
         public void Parse_ShouldIgnoreCommentedObjectDefinitions()
         {
             var testCase = Parse(@"$(
@@ -54,22 +54,21 @@ define object IgnoreThisOne
 $)
 define object TakeThisOneInstead
 endobject");
-            Assert.AreEqual("TakeThisOneInstead", testCase.Name);
+            Assert.That(testCase.Name, Is.EqualTo("TakeThisOneInstead"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ParserException))]
+        [Test]
         public void Parse_ShouldThrowExceptionWithMultipleObjectDefinitions()
         {
-            Parse(@"
+            Assert.Throws<ParserException>(() => Parse(@"
 define object One
 endobject
 
 define object Two
-endobject");
+endobject"));
         }
 
-        [TestMethod]
+        [Test]
         public void Parse_ShouldFindOneTestCase()
         {
             var testCase = Parse(@"
@@ -78,24 +77,23 @@ endobject
 
 define method .testMethodA(!assert is PmlAssert)
 endmethod");
-            Assert.AreEqual(1, testCase.Tests.Count);
-            Assert.AreEqual("testMethodA", testCase.Tests[0].Name);
+            Assert.That(testCase.Tests.Count, Is.EqualTo(1));
+            Assert.That(testCase.Tests[0].Name, Is.EqualTo("testMethodA"));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(ParserException))]
+        [Test]
         public void Parse_ShouldThrowExceptionForMethodsBeforeObjectDefinition()
         {
-            Parse(@"
+            Assert.Throws<ParserException>(() => Parse(@"
 define method .testMethod(!assert is PmlAssert)
 endmethod
 
 
 define object TestSuite
-endobject");
+endobject"));
         }
 
-        [TestMethod]
+        [Test]
         public void Parse_ShouldIgnoreMethodsThatDoNotStartWithTest()
         {
             var testCase = Parse(@"
@@ -105,10 +103,10 @@ endobject
 
 define method .otherMethod(!assert is PmlAssert)
 endmethod");
-            Assert.AreEqual(0, testCase.Tests.Count);
+            Assert.That(testCase.Tests.Count, Is.EqualTo(0));
         }
 
-        [TestMethod]
+        [Test]
         public void Parse_ShouldIgnoreMethodsWithIncompatibleSignature()
         {
             var testCase = Parse(@"
@@ -117,10 +115,10 @@ endobject
 
 define method .testMethod(!foo is Real)
 endmethod");
-            Assert.AreEqual(0, testCase.Tests.Count);
+            Assert.That(testCase.Tests.Count, Is.EqualTo(0));
         }
 
-        [TestMethod]
+        [Test]
         public void Parse_ShouldNotConsiderArgumentNamesWhenDeterminingCompatibleMethodSignatures()
         {
             var testCase = Parse(@"
@@ -133,7 +131,7 @@ endmethod");
             Assert.AreEqual("testMethod", testCase.Tests[0].Name);
         }
 
-        [TestMethod]
+        [Test]
         public void Parse_ShouldFindMultipleTestCases()
         {
             var testCase = Parse(@"
@@ -145,12 +143,12 @@ endmethod
 
 define method .testMethodB(!assert is PmlAssert)
 endmethod");
-            Assert.AreEqual(2, testCase.Tests.Count);
-            Assert.AreEqual("testMethodA", testCase.Tests[0].Name);
-            Assert.AreEqual("testMethodB", testCase.Tests[1].Name);
+            Assert.That(testCase.Tests.Count, Is.EqualTo(2));
+            Assert.That(testCase.Tests[0].Name, Is.EqualTo("testMethodA"));
+            Assert.That(testCase.Tests[1].Name, Is.EqualTo("testMethodB"));
         }
 
-        [TestMethod]
+        [Test]
         public void Parse_ShouldFindSetUpMethod()
         {
             var testCase = Parse(@"
@@ -159,10 +157,10 @@ endobject
 
 define method .setUp()
 endmethod");
-            Assert.IsTrue(testCase.HasSetUp);
+            Assert.That(testCase.HasSetUp);
         }
 
-        [TestMethod]
+        [Test]
         public void Parse_ShouldFindTearDownMethod()
         {
             var testCase = Parse(@"
@@ -171,7 +169,7 @@ endobject
 
 define method .tearDown()
 endmethod");
-            Assert.IsTrue(testCase.HasTearDown);
+            Assert.That(testCase.HasTearDown);
         }
 
         private static TestCase Parse(string objectDefinition)
