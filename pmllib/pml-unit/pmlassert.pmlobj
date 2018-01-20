@@ -1,0 +1,26 @@
+define object PmlAssert
+endobject
+
+
+define method .equal(!actual is Any, !expected is Any)
+
+    !result = !actual eq !expected
+    if (not !result) then
+        !this.fail('Expected ' & !actual & ' to equal ' & !expected)
+    endif
+
+endmethod
+
+
+define method .fail()
+
+    !this.fail('Failed')
+
+endmethod
+
+
+define method .fail(!message is String)
+
+    !!messageFile.error(196, 1, !message)
+
+endmethod

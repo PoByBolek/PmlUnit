@@ -1,0 +1,43 @@
+-- This file only exists because raising errors from PML to .NET is not possible
+-- in PDMS 12.1. However, returning an array that contains the error message
+-- is possible.
+define object PmlTestRunner
+endobject
+
+
+define method .run(!testCaseName is String, !testName is String, !hasSetup is Boolean, !hasTearDown is Boolean) is Any
+
+    !result = object Array()
+
+    !this.runInternal(!testCaseName, !testName, !hasSetup, !hasTearDown)
+    handle ANY
+        !result.append(!!error.text)
+        !result.append(!!error.line)
+        !result.append(!!error.command)
+        !result.appendArray(!!error.callstack)
+    endhandle
+
+    return !result
+
+endmethod
+
+
+define method .runInternal(!testCaseName is String, !testName is String, !hasSetup is Boolean, !hasTearDown is Boolean)
+
+    !testCase = object $!<testCaseName>()
+    if (!hasSetup) then
+        !testCase.setup()
+    endif
+    !testCase.$!<testName>(object PmlAssert())
+    handle ANY
+        if (!hasTearDown) then
+            !testCase.tearDown()
+        endif
+        return error
+    elsehandle NONE
+        if (!hasTearDown) then
+            !testCase.tearDown()
+        endif
+    endhandle
+
+endmethod
