@@ -1,13 +1,14 @@
 ﻿using System;
+
 using Aveva.PDMS.PMLNet;
 
 namespace PmlUnit
 {
-    class PmlProxy : IDisposable
+    class PmlObjectProxy : ObjectProxy, IDisposable
     {
         private PMLNetAny Object;
 
-        public PmlProxy(string objectName, params object[] arguments)
+        public PmlObjectProxy(string objectName, params object[] arguments)
         {
             if (string.IsNullOrEmpty(objectName))
                 throw new ArgumentException(nameof(objectName));
@@ -16,12 +17,12 @@ namespace PmlUnit
             Object = PMLNetAny.createInstance(objectName, arguments, arguments.Length);
         }
 
-        private PmlProxy(PMLNetAny obj)
+        private PmlObjectProxy(PMLNetAny obj)
         {
             Object = obj;
         }
 
-        ~PmlProxy()
+        ~PmlObjectProxy()
         {
             GC.SuppressFinalize(this);
             Dispose(false);
@@ -32,7 +33,7 @@ namespace PmlUnit
             if (string.IsNullOrEmpty(method))
                 throw new ArgumentNullException(nameof(method));
             if (Object == null)
-                throw new ObjectDisposedException(nameof(PmlProxy));
+                throw new ObjectDisposedException(nameof(PmlObjectProxy));
 
             arguments = arguments ?? new object[0];
             object result = null;
@@ -42,7 +43,7 @@ namespace PmlUnit
             if (any == null)
                 return result;
             else
-                return new PmlProxy(any);
+                return new PmlObjectProxy(any);
         }
 
         public void Dispose()

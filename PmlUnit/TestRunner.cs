@@ -8,11 +8,14 @@ namespace PmlUnit
 {
     class TestRunner : IDisposable
     {
-        private PmlProxy PmlTestRunner;
+        private ObjectProxy RunnerProxy;
 
-        public TestRunner()
+        public TestRunner(ObjectProxy proxy)
         {
-            PmlTestRunner = new PmlProxy("PmlTestRunner");
+            if (proxy == null)
+                throw new ArgumentNullException(nameof(proxy));
+
+            RunnerProxy = proxy;
         }
 
         ~TestRunner()
@@ -28,18 +31,18 @@ namespace PmlUnit
 
         protected virtual void Dispose(bool disposing)
         {
-            if (PmlTestRunner == null)
+            if (RunnerProxy == null)
                 return;
 
             if (disposing)
-                PmlTestRunner.Dispose();
+                RunnerProxy.Dispose();
 
-            PmlTestRunner = null;
+            RunnerProxy = null;
         }
 
         public void Run(TestCase testCase)
         {
-            if (PmlTestRunner == null)
+            if (RunnerProxy == null)
                 throw new ObjectDisposedException(nameof(TestRunner));
 
             foreach (var test in testCase.Tests)
@@ -48,14 +51,14 @@ namespace PmlUnit
 
         public TestResult Run(Test test)
         {
-            if (PmlTestRunner == null)
+            if (RunnerProxy == null)
                 throw new ObjectDisposedException(nameof(TestRunner));
 
             var watch = Stopwatch.StartNew();
             try
             {
                 var testCase = test.TestCase;
-                var result = PmlTestRunner.Invoke(
+                var result = RunnerProxy.Invoke(
                     "run", testCase.Name, test.Name, testCase.HasSetUp, testCase.HasTearDown
                 );
                 watch.Stop();
