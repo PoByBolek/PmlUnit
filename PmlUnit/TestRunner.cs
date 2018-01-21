@@ -21,7 +21,7 @@ namespace PmlUnit
                 throw new ArgumentNullException(nameof(clock));
 
             Clock = clock;
-            RunnerProxy = new PmlObjectProxy("PmlObjectProxy");
+            RunnerProxy = new PmlObjectProxy("PmlTestRunner");
         }
 
         public TestRunner(ObjectProxy proxy)
