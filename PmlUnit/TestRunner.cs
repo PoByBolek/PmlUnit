@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -8,13 +7,40 @@ namespace PmlUnit
 {
     class TestRunner : IDisposable
     {
+        private readonly Clock Clock;
         private ObjectProxy RunnerProxy;
+
+        public TestRunner()
+            : this(new SystemClock())
+        {
+        }
+
+        public TestRunner(Clock clock)
+        {
+            if (clock == null)
+                throw new ArgumentNullException(nameof(clock));
+
+            Clock = clock;
+            RunnerProxy = new PmlObjectProxy("PmlObjectProxy");
+        }
 
         public TestRunner(ObjectProxy proxy)
         {
             if (proxy == null)
                 throw new ArgumentNullException(nameof(proxy));
 
+            Clock = new SystemClock();
+            RunnerProxy = proxy;
+        }
+
+        public TestRunner(ObjectProxy proxy, Clock clock)
+        {
+            if (proxy == null)
+                throw new ArgumentNullException(nameof(proxy));
+            if (clock == null)
+                throw new ArgumentNullException(nameof(clock));
+
+            Clock = clock;
             RunnerProxy = proxy;
         }
 
@@ -54,20 +80,20 @@ namespace PmlUnit
             if (RunnerProxy == null)
                 throw new ObjectDisposedException(nameof(TestRunner));
 
-            var watch = Stopwatch.StartNew();
+            var start = Clock.CurrentInstant;
             try
             {
                 var testCase = test.TestCase;
                 var result = RunnerProxy.Invoke(
                     "run", testCase.Name, test.Name, testCase.HasSetUp, testCase.HasTearDown
                 );
-                watch.Stop();
-                return new TestResult(watch.Elapsed, UnmarshalResult(result));
+                var elapsed = Clock.CurrentInstant - start;
+                return new TestResult(elapsed, UnmarshalResult(result));
             }
             catch (Exception error)
             {
-                watch.Stop();
-                return new TestResult(watch.Elapsed, error);
+                var elapsed = Clock.CurrentInstant - start;
+                return new TestResult(elapsed, error);
             }
         }
 
@@ -87,9 +113,7 @@ namespace PmlUnit
 
             var disposable = result as IDisposable;
             if (disposable != null)
-            {
                 disposable.Dispose();
-            }
 
             return null;
         }

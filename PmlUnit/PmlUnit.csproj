@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Clock.cs" />
     <Compile Include="ObjectProxy.cs" />
     <Compile Include="ParserException.cs" />
     <Compile Include="PmlObjectProxy.cs" />
