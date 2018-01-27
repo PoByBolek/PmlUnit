@@ -50,8 +50,10 @@
     <Compile Include="TestCase.cs" />
     <Compile Include="TestCaseBuilder.cs" />
     <Compile Include="TestCaseParser.cs" />
+    <Compile Include="TestCaseProvider.cs" />
     <Compile Include="TestResult.cs" />
     <Compile Include="TestRunner.cs" />
+    <Compile Include="TextReaderExtensions.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

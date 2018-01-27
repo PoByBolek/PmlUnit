@@ -73,8 +73,9 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="IndexFileTestCaseProviderTest.cs" />
+    <Compile Include="SimpleTestCaseParserTest.cs" />
     <Compile Include="TestCaseBuilderTest.cs" />
-    <Compile Include="TestCaseParserTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestRunnerTest.cs" />
   </ItemGroup>

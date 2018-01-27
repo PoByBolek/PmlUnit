@@ -1,14 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace PmlUnit
 {
-    class TestCaseParser
+    interface TestCaseParser
+    {
+        TestCase Parse(string fileName);
+        TestCase Parse(TextReader reader);
+    }
+
+    class SimpleTestCaseParser : TestCaseParser
     {
         private static readonly Regex WhitespaceRegex = new Regex(@"\s+");
+
+        public TestCase Parse(string fileName)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                throw new ArgumentNullException(nameof(fileName));
+
+            using (var reader = new StreamReader(fileName, Encoding.UTF8))
+            {
+                return Parse(reader);
+            }
+        }
 
         public TestCase Parse(TextReader reader)
         {
@@ -18,7 +35,7 @@ namespace PmlUnit
             bool inComment = false;
             TestCaseBuilder result = null;
 
-            foreach (string line in ReadAllLines(reader))
+            foreach (string line in reader.ReadAllLines())
             {
                 string sanitized = WhitespaceRegex.Replace(line, " ").Trim();
                 if (inComment)
@@ -116,16 +133,6 @@ namespace PmlUnit
             if (isIndex < 0)
                 throw new ParserException();
             return argument.Substring(isIndex + 4).Trim();
-        }
-
-        private static IEnumerable<string> ReadAllLines(TextReader reader)
-        {
-            string line = reader.ReadLine();
-            while (line != null)
-            {
-                yield return line;
-                line = reader.ReadLine();
-            }
         }
     }
 }

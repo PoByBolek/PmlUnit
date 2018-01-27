@@ -6,14 +6,16 @@ using NUnit.Framework;
 namespace PmlUnit.Tests
 {
     [TestFixture]
-    [TestOf(typeof(TestCaseParser))]
-    public class TestCaseParserTest
+    [TestOf(typeof(SimpleTestCaseParser))]
+    public class SimpleTestCaseParserTest
     {
         [Test]
         public void Parse_ShouldCheckForNullReader()
         {
-            var parser = new TestCaseParser();
-            Assert.Throws<ArgumentNullException>(() => parser.Parse(null));
+            var parser = new SimpleTestCaseParser();
+            Assert.Throws<ArgumentNullException>(() => parser.Parse((TextReader)null));
+            Assert.Throws<ArgumentNullException>(() => parser.Parse((string)null));
+            Assert.Throws<ArgumentNullException>(() => parser.Parse(""));
         }
 
         [Test]
@@ -174,7 +176,7 @@ endmethod");
 
         private static TestCase Parse(string objectDefinition)
         {
-            var parser = new TestCaseParser();
+            var parser = new SimpleTestCaseParser();
             using (var reader = new StringReader(objectDefinition))
             {
                 return parser.Parse(reader);
