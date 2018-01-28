@@ -30,11 +30,19 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Aveva.ApplicationFramework">
+      <HintPath>..\lib\Aveva.ApplicationFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="Aveva.ApplicationFramework.Presentation">
+      <HintPath>..\lib\Aveva.ApplicationFramework.Presentation.dll</HintPath>
+    </Reference>
     <Reference Include="PMLNet">
       <HintPath>..\lib\PMLNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Data" />
@@ -45,7 +53,10 @@
     <Compile Include="ObjectProxy.cs" />
     <Compile Include="ParserException.cs" />
     <Compile Include="PmlObjectProxy.cs" />
+    <Compile Include="PmlUnitAddin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServiceManagerExtensions.cs" />
+    <Compile Include="ShowTestRunnerCommand.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="TestCase.cs" />
     <Compile Include="TestCaseBuilder.cs" />
@@ -53,7 +64,21 @@
     <Compile Include="TestCaseProvider.cs" />
     <Compile Include="TestResult.cs" />
     <Compile Include="TestRunner.cs" />
+    <Compile Include="TestRunnerControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TestRunnerControl.Designer.cs">
+      <DependentUpon>TestRunnerControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="TextReaderExtensions.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="TestRunnerControl.resx">
+      <DependentUpon>TestRunnerControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PmlUnitAddin.uic">
+      <DependentUpon>PmlUnitAddin.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
