@@ -5,7 +5,24 @@ define object PmlTestRunner
 endobject
 
 
-define method .run(!testCaseName is String, !testName is String, !hasSetup is Boolean, !hasTearDown is Boolean) is Any
+define method .reload(!testCaseName is String) is Array
+
+    !result = object Array()
+
+    pml reload object $!<testCaseName>
+    handle ANY
+        !result.append(!!error.text)
+        !result.append(!!error.line)
+        !result.append(!!error.command)
+        !result.appendArray(!!error.callstack)
+    endhandle
+
+    return !result
+
+endmethod
+
+
+define method .run(!testCaseName is String, !testName is String, !hasSetup is Boolean, !hasTearDown is Boolean) is Array
 
     !result = object Array()
 

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace PmlUnit
@@ -33,8 +35,14 @@ namespace PmlUnit
 
         public void LoadTests()
         {
+            SetTests(Provider.GetTestCases());
+        }
+
+        private void SetTests(IEnumerable<TestCase> testCases)
+        {
             TestView.Items.Clear();
-            foreach (var testCase in Provider.GetTestCases())
+            TestView.Groups.Clear();
+            foreach (var testCase in testCases)
             {
                 var group = TestView.Groups.Add(testCase.Name, testCase.Name);
                 foreach (var test in testCase.Tests)
@@ -93,8 +101,22 @@ namespace PmlUnit
 
         private void OnRefreshLinkClick(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            LoadTests();
+            SetTests(Provider.GetTestCases().Select(testCase => Reload(testCase)));
         }
 
+        private TestCase Reload(TestCase testCase)
+        {
+            try
+            {
+                Runner.Reload(testCase);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Failed to reload test case {0}", testCase.Name);
+                Console.WriteLine(e);
+            }
+
+            return testCase;
+        }
     }
 }

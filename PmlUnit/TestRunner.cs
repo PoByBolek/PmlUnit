@@ -66,6 +66,17 @@ namespace PmlUnit
             RunnerProxy = null;
         }
 
+        public void Reload(TestCase testCase)
+        {
+            if (RunnerProxy == null)
+                throw new ObjectDisposedException(nameof(TestRunner));
+
+            var result = RunnerProxy.Invoke("reload", testCase.Name);
+            var exception = UnmarshalException(result);
+            if (exception != null)
+                throw exception;
+        }
+
         public void Run(TestCase testCase)
         {
             if (RunnerProxy == null)
@@ -88,7 +99,7 @@ namespace PmlUnit
                     "run", testCase.Name, test.Name, testCase.HasSetUp, testCase.HasTearDown
                 );
                 var elapsed = Clock.CurrentInstant - start;
-                return new TestResult(elapsed, UnmarshalResult(result));
+                return new TestResult(elapsed, UnmarshalException(result));
             }
             catch (Exception error)
             {
@@ -97,7 +108,7 @@ namespace PmlUnit
             }
         }
 
-        private static Exception UnmarshalResult(object result)
+        private static Exception UnmarshalException(object result)
         {
             var stackTrace = result as Hashtable;
             if (stackTrace != null && stackTrace.Count > 0)
