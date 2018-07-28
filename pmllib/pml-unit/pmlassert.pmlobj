@@ -2,19 +2,153 @@ define object PmlAssert
 endobject
 
 
-define method .equal(!actual is Any, !expected is Any)
+define method .equal(!left is Any, !right is Any)
 
-    !result = !actual eq !expected
-    if (not !result) then
-        !this.fail('Expected ' & !actual & ' to equal ' & !expected)
+    !this.equal(!left, !right, 'Equality check failed.')
+
+endmethod
+
+
+define method .equal(!left is Any, !right is Any, !message is String)
+
+    !this.isTrue(!left eq !right, !message)
+
+endmethod
+
+
+define method .notEqual(!left is Any, !right is Any)
+
+    !this.notEqual(!left, !right, 'Inequality check failed.')
+
+endmethod
+
+
+define method .notEqual(!left is Any, !right is Any, !message is String)
+
+    !this.isTrue(!left ne !right, !message)
+
+endmethod
+
+
+define method .lessThan(!left is Any, !right is Any)
+
+    !this.lessThan(!left, !right, 'Less than check failed.')
+
+endmethod
+
+
+define method .lessThan(!left is Any, !right is Any, !message is String)
+
+    !this.isTrue(!left lt !right, !message)
+
+endmethod
+
+
+define method .lessThanOrEqual(!left is Any, !right is Any)
+
+    !this.lessThanOrEqual(!left, !right, 'Less than or equal check failed.')
+
+endmethod
+
+
+define method .lessThanOrEqual(!left is Any, !right is Any, !message is String)
+
+    !this.isTrue(!left le !right, !message)
+
+endmethod
+
+
+define method .greaterThanOrEqual(!left is Any, !right is Any)
+
+    !this.greaterThanOrEqual(!left, !right, 'Greater than or equal check failed.')
+
+endmethod
+
+
+define method .greaterThanOrEqual(!left is Any, !right is Any, !message is String)
+
+    !this.isTrue(!left ge !right, !message)
+
+endmethod
+
+
+define method .greaterThan(!left is Any, !right is Any)
+
+    !this.greaterThan(!left, !right, 'Greater than check failed.')
+
+endmethod
+
+
+define method .greaterThan(!left is Any, !right is Any, !message is String)
+
+    !this.isTrue(!left gt !right, !message)
+
+endmethod
+
+
+define method .isTrue(!value is Boolean)
+
+    !this.isTrue(!value, 'Value is not true.')
+
+endmethod
+
+
+define method .isTrue(!value is Boolean, !message is String)
+
+    if (!value.unset() or not !value) then
+        !this.fail(!message)
     endif
+
+endmethod
+
+
+define method .isTrue(!value is Any)
+
+    !this.isTrue(!value, 'Value is not true.')
+
+endmethod
+
+
+define method .isTrue(!value is Any, !message is String)
+
+    !this.fail(!message)
+
+endmethod
+
+
+define method .isFalse(!value is Boolean)
+
+    !this.isFalse(!value, 'Value is not false.')
+
+endmethod
+
+
+define method .isFalse(!value is Boolean, !message is String)
+
+    if (!value.unset() or !value) then
+        !this.fail(!message)
+    endif
+
+endmethod
+
+
+define method .isFalse(!value is Any)
+
+    !this.isFalse(!value, 'Value is not false.')
+
+endmethod
+
+
+define method .isFalse(!value is Any, !message is String)
+
+    !this.fail(!message)
 
 endmethod
 
 
 define method .fail()
 
-    !this.fail('Failed')
+    !this.fail('Test Failed.')
 
 endmethod
 

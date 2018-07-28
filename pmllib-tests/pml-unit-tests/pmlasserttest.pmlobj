@@ -1,0 +1,211 @@
+define object PmlAssertTest
+endobject
+
+
+define method .testEqual(!assert is PmlAssert)
+
+    !assert.equal(0, 3 * 0)
+    !assert.equal(1 + 1, 2)
+    !assert.equal(2, object Real('2'))
+    !assert.equal(3, 4 - 1)
+
+    !assert.equal('', '')
+    !assert.equal('equal', 'equal')
+    !assert.equal(object String(), object String())
+
+    !assert.equal(true, true)
+    !assert.equal(false, false)
+    !assert.equal(object Boolean(), object Boolean())
+
+    !assert.equal(object Array(), object Array())
+    !assert.equal(object DateTime(2018, 7, 28), object DateTime(2018, 7, 28))
+    !assert.equal(object Direction('N WRT /*'), object Direction('N WRT /*'))
+    !assert.equal(object Orientation('Y is N and Z is U WRT /*'), object Orientation('X is E and Y is N WRT /*'))
+    !assert.equal(object Position('E 0 N 0 U 0 WRT /*'), object Position('W 0 S 0 D 0 WRT /*'))
+
+    !world = /*
+    !assert.equal(object DbRef('/*'), !world)
+    !assert.equal(object DbRef(), NULREF)
+    !assert.equal(NULREF, NULREF)
+
+endmethod
+
+
+define method .testEqualWithUnequalValues(!assert is PmlAssert)
+
+    !assert.equal(0, 1)
+    handle (196,1)
+    elsehandle NONE
+        !assert.fail('Comparing unequal numbers should fail')
+    endhandle
+
+    !assert.equal('left', 'right')
+    handle (196,1)
+    elsehandle NONE
+        !assert.fail('Comparing unequal strings should fail')
+    endhandle
+
+    !assert.equal(true, false)
+    handle (196,1)
+    elsehandle NONE
+        !assert.fail('Comparing unequal booleans should fail')
+    endhandle
+
+    !assert.equal(object DateTime(2018, 7, 28, 19, 50), object DateTime(2018, 7, 28, 19, 55))
+    handle (196,1)
+    elsehandle NONE
+        !assert.fail('Comparing unequal dates should fail')
+    endhandle
+
+endmethod
+
+
+define method .testEqualWithUnsupportedTypes(!assert is PmlAssert)
+
+    !assert.equal(0, '0')
+    handle (2,779) $* method not found; cannot compare Real to String
+    elsehandle NONE
+        !assert.fail('Expected error (2,779)')
+    endhandle
+
+    !assert.equal(object Real(), object String())
+    handle (2,779) $* method not found; cannot compare Real to String
+    elsehandle NONE
+        !assert.fail('Expected error (2,779)')
+    endhandle
+
+endmethod
+
+
+define method .testNotEqual(!assert is PmlAssert)
+
+    !assert.notEqual(0, 1)
+    !assert.notEqual(1, object Real())
+    !assert.notEqual(object Real(), 2)
+
+    !assert.notEqual('left', 'right')
+    !assert.notEqual('', object String())
+    !assert.notEqual(object String(), '')
+
+endmethod
+
+
+define method .testNotEqualWithEqualValues(!assert is PmlAssert)
+
+    !assert.notEqual(0, 0)
+    handle (196,1)
+    elsehandle NONE
+        !assert.fail('Comparing equal numbers should fail')
+    endhandle
+
+    !assert.notEqual('left', 'left')
+    handle (196,1)
+    elsehandle NONE
+        !assert.fail('Comparing equal strings should fail')
+    endhandle
+
+    !assert.notEqual(true, true)
+    handle (196,1)
+    elsehandle NONE
+        !assert.fail('Comparing equal booleans should fail')
+    endhandle
+
+    !assert.notEqual(object DateTime(2018, 7, 28, 19, 50), object DateTime(2018, 7, 28, 19, 50))
+    handle (196,1)
+    elsehandle NONE
+        !assert.fail('Comparing equal dates should fail')
+    endhandle
+
+endmethod
+
+
+define method .testNotEqualWithUnsupportedTypes(!assert is PmlAssert)
+
+    -- Although the number zero and the string '0' are definitely not equal
+    -- this should still raise a (2,779) to reveal potential bugs in test code.
+
+    !assert.notEqual(0, '0')
+    handle (2,779) $* method not found; cannot compare Real to String
+    elsehandle NONE
+        !assert.fail('Expected error (2,779)')
+    endhandle
+
+    !assert.notEqual(object Real(), object String())
+    handle (2,779) $* method not found; cannot compare Real to String
+    elsehandle NONE
+        !assert.fail('Expected error (2,779)')
+    endhandle
+
+endmethod
+
+
+define method .testLessThan(!assert is PmlAssert)
+
+    !assert.lessThan(3, 4)
+    !assert.lessThan(1.2, 3.4)
+
+    !assert.lessThan(3, 3)
+    handle (196,1)
+    elsehandle NONE
+        !assert.fail('3 should not be less than 3')
+    endhandle
+
+    !assert.lessThan(4, 3)
+    handle (196,1)
+    elsehandle NONE
+        !assert.fail('4 should not be less than 3')
+    endhandle
+
+endmethod
+
+
+define method .testLessThanOrEqual(!assert is PmlAssert)
+
+    !assert.lessThanOrEqual(3, 3)
+    !assert.lessThanOrEqual(3, 4)
+    !assert.lessThanOrEqual(1.2, 1.2)
+    !assert.lessThanOrEqual(1.2, 3.4)
+
+    !assert.lessThanOrEqual(4, 3)
+    handle (196,1)
+    elsehandle NONE
+        !assert.fail('4 should not be less than or equal to 3')
+    endhandle
+
+endmethod
+
+
+define method .testGreaterThanOrEqual(!assert is PmlAssert)
+
+    !assert.greaterThanOrEqual(3, 3)
+    !assert.greaterThanOrEqual(4, 3)
+    !assert.greaterThanOrEqual(2.1, 2.1)
+    !assert.greaterThanOrEqual(4.3, 2.1)
+
+    !assert.greaterThanOrEqual(3, 4)
+    handle (196,1)
+    elsehandle NONE
+        !assert.fail('3 should not be greater than or equal to 4')
+    endhandle
+
+endmethod
+
+
+define method .testGreaterThan(!assert is PmlAssert)
+
+    !assert.greaterThan(4, 3)
+    !assert.greaterThan(4.3, 2.1)
+
+    !assert.greaterThan(3, 3)
+    handle (196,1)
+    elsehandle NONE
+        !assert.fail('3 should not be greater than 3')
+    endhandle
+
+    !assert.greaterThan(3, 4)
+    handle (196,1)
+    elsehandle NONE
+        !assert.fail('3 should not be greater than 4')
+    endhandle
+
+endmethod
