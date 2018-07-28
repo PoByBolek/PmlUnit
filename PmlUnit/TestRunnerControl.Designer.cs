@@ -16,10 +16,12 @@
         private void InitializeComponent()
         {
             System.Windows.Forms.LinkLabel linkLabel1;
+            System.Windows.Forms.LinkLabel linkLabel2;
             this.TestView = new System.Windows.Forms.ListView();
             this.TestNameColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ExecutionTimeColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             linkLabel1 = new System.Windows.Forms.LinkLabel();
+            linkLabel2 = new System.Windows.Forms.LinkLabel();
             this.SuspendLayout();
             // 
             // linkLabel1
@@ -33,6 +35,17 @@
             linkLabel1.TabStop = true;
             linkLabel1.Text = "Run all";
             linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnRunAllLinkClick);
+            // 
+            // linkLabel2
+            // 
+            linkLabel2.AutoSize = true;
+            linkLabel2.Location = new System.Drawing.Point(49, 3);
+            linkLabel2.Name = "linkLabel2";
+            linkLabel2.Size = new System.Drawing.Size(44, 13);
+            linkLabel2.TabIndex = 1;
+            linkLabel2.TabStop = true;
+            linkLabel2.Text = "Refresh";
+            linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnRefreshLinkClick);
             // 
             // TestView
             // 
@@ -49,7 +62,7 @@
             this.TestView.Location = new System.Drawing.Point(0, 22);
             this.TestView.Name = "TestView";
             this.TestView.Size = new System.Drawing.Size(150, 128);
-            this.TestView.TabIndex = 1;
+            this.TestView.TabIndex = 2;
             this.TestView.UseCompatibleStateImageBehavior = false;
             this.TestView.View = System.Windows.Forms.View.Details;
             // 
@@ -67,6 +80,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
             this.Controls.Add(linkLabel1);
+            this.Controls.Add(linkLabel2);
             this.Controls.Add(this.TestView);
             this.Name = "TestRunnerControl";
             this.SizeChanged += new System.EventHandler(this.OnSizeChanged);

@@ -90,5 +90,11 @@ namespace PmlUnit
             else
                 return Convert.ToInt64(millis) + " ms";
         }
+
+        private void OnRefreshLinkClick(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            LoadTests();
+        }
+
     }
 }
