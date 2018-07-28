@@ -78,6 +78,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="PmlUnitAddin.uic">
       <DependentUpon>PmlUnitAddin.cs</DependentUpon>
+      <LogicalName>PmlUnit.PmlUnitAddin.uic</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

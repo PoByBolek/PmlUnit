@@ -32,7 +32,18 @@ namespace PmlUnit
 
         private static Stream GetCustomizationFileStream()
         {
-            return typeof(PmlUnitAddin).Assembly.GetManifestResourceStream("PmlUnit.PmlUnitAddin.uic");
+            var assembly = typeof(PmlUnitAddin).Assembly;
+            // Visual Studio (or MSBuild?) seems to give the resource different names from time to time...
+            var resourceNames = new string[] { "PmlUnit.PmlUnitAddin.uic", "PmlUnit.PmlUnitAddin" };
+
+            foreach (var resource in resourceNames)
+            {
+                var result = assembly.GetManifestResourceStream(resource);
+                if (result != null)
+                    return result;
+            }
+
+            return null;
         }
 
         public void Stop()
