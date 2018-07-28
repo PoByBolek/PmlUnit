@@ -66,15 +66,14 @@ namespace PmlUnit
             RunnerProxy = null;
         }
 
+        public void RefreshIndex()
+        {
+            InvokePmlMethod("refreshIndex");
+        }
+
         public void Reload(TestCase testCase)
         {
-            if (RunnerProxy == null)
-                throw new ObjectDisposedException(nameof(TestRunner));
-
-            var result = RunnerProxy.Invoke("reload", testCase.Name);
-            var exception = UnmarshalException(result);
-            if (exception != null)
-                throw exception;
+            InvokePmlMethod("reload", testCase.Name);
         }
 
         public void Run(TestCase testCase)
@@ -106,6 +105,17 @@ namespace PmlUnit
                 var elapsed = Clock.CurrentInstant - start;
                 return new TestResult(elapsed, error);
             }
+        }
+
+        private void InvokePmlMethod(string method, params object[] arguments)
+        {
+            if (RunnerProxy == null)
+                throw new ArgumentNullException(nameof(TestRunner));
+
+            var result = RunnerProxy.Invoke(method, arguments);
+            var exception = UnmarshalException(result);
+            if (exception != null)
+                throw exception;
         }
 
         private static Exception UnmarshalException(object result)

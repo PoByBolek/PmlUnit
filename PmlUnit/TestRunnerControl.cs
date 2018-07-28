@@ -101,6 +101,7 @@ namespace PmlUnit
 
         private void OnRefreshLinkClick(object sender, LinkLabelLinkClickedEventArgs e)
         {
+            Runner.RefreshIndex();
             SetTests(Provider.GetTestCases().Select(testCase => Reload(testCase)));
         }
 

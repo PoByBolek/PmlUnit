@@ -5,16 +5,25 @@ define object PmlTestRunner
 endobject
 
 
-define method .reload(!testCaseName is String) is Array
+define method .refreshIndex() is Array
 
-    !result = object Array()
+    pml index
+    handle ANY
+        return !this.marshalError()
+    elsehandle NONE
+        return object Array()
+    endhandle
+
+endmethod
+
+
+define method .reload(!testCaseName is String) is Array
 
     pml reload object $!<testCaseName>
     handle ANY
-        !result.append(!!error.text)
-        !result.append(!!error.line)
-        !result.append(!!error.command)
-        !result.appendArray(!!error.callstack)
+        return !this.marshalError()
+    elsehandle NONE
+        return object Array()
     endhandle
 
     return !result
@@ -24,14 +33,11 @@ endmethod
 
 define method .run(!testCaseName is String, !testName is String, !hasSetup is Boolean, !hasTearDown is Boolean) is Array
 
-    !result = object Array()
-
     !this.runInternal(!testCaseName, !testName, !hasSetup, !hasTearDown)
     handle ANY
-        !result.append(!!error.text)
-        !result.append(!!error.line)
-        !result.append(!!error.command)
-        !result.appendArray(!!error.callstack)
+        return !this.marshalError()
+    elsehandle NONE
+        return object Array()
     endhandle
 
     return !result
@@ -56,5 +62,17 @@ define method .runInternal(!testCaseName is String, !testName is String, !hasSet
             !testCase.tearDown()
         endif
     endhandle
+
+endmethod
+
+
+define method .marshalError() is Array
+
+    !result = object Array()
+    !result.append(!!error.text)
+    !result.append(!!error.line)
+    !result.append(!!error.command)
+    !result.appendArray(!!error.callstack)
+    return !result
 
 endmethod
