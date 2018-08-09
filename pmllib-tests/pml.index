@@ -1,2 +1,4 @@
 /pml-unit-tests/
 pmlasserttest.pmlobj
+pmltestcyclehelper.pmlobj
+pmltestrunnertest.pmlobj

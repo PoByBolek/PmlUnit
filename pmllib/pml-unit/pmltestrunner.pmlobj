@@ -26,8 +26,6 @@ define method .reload(!testCaseName is String) is Array
         return object Array()
     endhandle
 
-    return !result
-
 endmethod
 
 
@@ -39,8 +37,6 @@ define method .run(!testCaseName is String, !testName is String, !hasSetup is Bo
     elsehandle NONE
         return object Array()
     endhandle
-
-    return !result
 
 endmethod
 

@@ -1,0 +1,66 @@
+define object PmlTestCycleHelper
+endobject
+
+
+define method .pmlTestCycleHelper()
+
+    if (defined(!!pmlUnitHelperFailConstructor) and !!pmlUnitHelperFailConstructor) then
+        !!pmlUnitHelperFailConstructor = false
+        !this.noSuchMethod()
+    endif
+
+    if (defined(!!pmlUnitHelperConstructorCompleted)) then
+        !!pmlUnitHelperConstructorCompleted = !!pmlUnitHelperConstructorCompleted + 1
+    else
+        !!pmlUnitHelperConstructorCompleted = 1
+    endif
+
+endmethod
+
+
+define method .setUp()
+
+    if (defined(!!pmlUnitHelperFailSetUp) and !!pmlUnitHelperFailSetUp) then
+        !!pmlUnitHelperFailSetUp = false
+        !this.noSuchMethod()
+    endif
+
+    if (defined(!!pmlUnitHelperSetUpCompleted)) then
+        !!pmlUnitHelperSetUpCompleted = !!pmlUnitHelperSetUpCompleted + 1
+    else
+        !!pmlUnitHelperSetUpCompleted = 1
+    endif
+
+endmethod
+
+
+define method .tearDown()
+
+    if (defined(!!pmlUnitHelperFailTearDown) and !!pmlUnitHelperFailTearDown) then
+        !!pmlUnitHelperFailTearDown = false
+        !this.noSuchMethod()
+    endif
+
+    if (defined(!!pmlUnitHelperTearDownCompleted)) then
+        !!pmlUnitHelperTearDownCompleted = !!pmlUnitHelperTearDownCompleted + 1
+    else
+        !!pmlUnitHelperTearDownCompleted = 1
+    endif
+
+endmethod
+
+
+define method .testSomething(!assert is PmlAssert)
+
+    if (defined(!!pmlUnitHelperFailTestMethod) and !!pmlUnitHelperFailTestMethod) then
+        !!pmlUnitHelperFailTestMethod = false
+        !this.noSuchMethod()
+    endif
+
+    if (defined(!!pmlUnitHelperTestMethodCompleted)) then
+        !!pmlUnitHelperTestMethodCompleted = !!pmlUnitHelperTestMethodCompleted + 1
+    else
+        !!pmlUnitHelperTestMethodCompleted = 1
+    endif
+
+endmethod

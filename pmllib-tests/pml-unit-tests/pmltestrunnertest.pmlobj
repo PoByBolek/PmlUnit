@@ -1,0 +1,152 @@
+define object PmlTestRunnerTest
+endobject
+
+
+define method .testRunCallsConstructor(!assert is PmlAssert)
+
+    !this.run(false, false)
+    !assert.equal(!!pmlUnitHelperConstructorCompleted, 1, 'Should have run the helper constructor once')
+
+endmethod
+
+
+define method .testRunCallsSetUp(!assert is PmlAssert)
+
+    !this.run(false, false)
+    !assert.equal(!!pmlUnitHelperSetUpCompleted, 0, 'Should not have called the helper setUp method')
+
+    !this.run(true, false)
+    !assert.equal(!!pmlUnitHelperSetUpCompleted, 1, 'Should have called the helper setUp method once')
+
+endmethod
+
+
+define method .testRunCallsTearDown(!assert is PmlAssert)
+
+    !!pmlUnitHelperTearDownCompleted = 0
+    !this.run(false, false)
+    !assert.equal(!!pmlUnitHelperTearDownCompleted, 0, 'Should not have called the helper tearDown method')
+
+    !this.run(false, true)
+    !assert.equal(!!pmlUnitHelperTearDownCompleted, 1, 'Should have called the helper tearDown method once')
+
+endmethod
+
+
+define method .testRunCallsSpecifiedMethod(!assert is PmlAssert)
+
+    !this.run(false, false)
+    !assert.equal(!!pmlUnitHelperTestMethodCompleted, 1, 'Should have called the helper test method once')
+
+endmethod
+
+
+define method .testShouldReturnEmptyArrayForSuccessfulRuns(!assert is PmlAssert)
+
+    !result = !this.run(true, true)
+    !assert.instanceOf(!result, 'ARRAY')
+    !assert.isTrue(!result.empty(), 'Should return an empty array for successful runs')
+
+    !result = !this.run(false, true)
+    !assert.instanceOf(!result, 'ARRAY')
+    !assert.isTrue(!result.empty(), 'Should return an empty array for successful runs')
+
+    !result = !this.run(true, false)
+    !assert.instanceOf(!result, 'ARRAY')
+    !assert.isTrue(!result.empty(), 'Should return an empty array for successful runs')
+
+    !result = !this.run(false, false)
+    !assert.instanceOf(!result, 'ARRAY')
+    !assert.isTrue(!result.empty(), 'Should return an empty array for successful runs')
+
+endmethod
+
+
+define method .testShouldReturnArrayWithStackTraceForFailedRuns(!assert is PmlAssert)
+
+    !!pmlUnitHelperFailTestMethod = true
+    !result = !this.run(true, true)
+    !assert.instanceOf(!result, 'ARRAY')
+    !assert.isFalse(!result.empty(), 'Should return an array with a stack trace for failed runs')
+
+    !!pmlUnitHelperFailTestMethod = true
+    !result = !this.run(false, true)
+    !assert.instanceOf(!result, 'ARRAY')
+    !assert.isFalse(!result.empty(), 'Should return an array with a stack trace for failed runs')
+
+    !!pmlUnitHelperFailTestMethod = true
+    !result = !this.run(true, false)
+    !assert.instanceOf(!result, 'ARRAY')
+    !assert.isFalse(!result.empty(), 'Should return an array with a stack trace for failed runs')
+
+    !!pmlUnitHelperFailTestMethod = true
+    !result = !this.run(false, false)
+    !assert.instanceOf(!result, 'ARRAY')
+    !assert.isFalse(!result.empty(), 'Should return an array with a stack trace for failed runs')
+
+endmethod
+
+
+define method .testErrorInConstructor(!assert is PmlAssert)
+
+    !!pmlUnitHelperFailConstructor = true
+    !result = !this.run(true, true)
+    !assert.isFalse(!result.empty(), 'Should return errors in the constructor')
+    !assert.equal(!!pmlUnitHelperConstructorCompleted, 0, 'Should not have completed the helper constructor')
+    !assert.equal(!!pmlUnitHelperSetUpCompleted, 0, 'Should not have completed the helper setUp method')
+    !assert.equal(!!pmlUnitHelperTestMethodCompleted, 0, 'Should not have completed the helper test method')
+    !assert.equal(!!pmlUnitHelperTearDownCompleted, 0, 'Should not have completed the helper tearDown method')
+
+endmethod
+
+
+define method .testErrorInSetUp(!assert is PmlAssert)
+
+    !!pmlUnitHelperFailSetUp = true
+    !result = !this.run(true, true)
+    !assert.isFalse(!result.empty(), 'Should return errors in the setUp method')
+    !assert.equal(!!pmlUnitHelperConstructorCompleted, 1, 'Should have completed the helper constructor')
+    !assert.equal(!!pmlUnitHelperSetUpCompleted, 0, 'Should not have completed the helper setUp method')
+    !assert.equal(!!pmlUnitHelperTestMethodCompleted, 0, 'Should not have completed the helper test method')
+    !assert.equal(!!pmlUnitHelperTearDownCompleted, 0, 'Should not have completed the helper tearDown method')
+
+endmethod
+
+
+define method .testErrorInTestMethod(!assert is PmlAssert)
+
+    !!pmlUnitHelperFailTestMethod = true
+    !result = !this.run(true, true)
+    !assert.isFalse(!result.empty(), 'Should return errors in the test method')
+    !assert.equal(!!pmlUnitHelperConstructorCompleted, 1, 'Should have completed the helper constructor')
+    !assert.equal(!!pmlUnitHelperSetUpCompleted, 1, 'Should have completed the helper setUp method')
+    !assert.equal(!!pmlUnitHelperTestMethodCompleted, 0, 'Should not have completed the helper test method')
+    !assert.equal(!!pmlUnitHelperTearDownCompleted, 1, 'Should have completed the helper tearDown method')
+
+endmethod
+
+
+define method .testErrorInTearDown(!assert is PmlAssert)
+
+    !!pmlUnitHelperFailTearDown = true
+    !result = !this.run(true, true)
+    !assert.isFalse(!result.empty(), 'Should return errors in the tearDown method')
+    !assert.equal(!!pmlUnitHelperConstructorCompleted, 1, 'Should have completed the helper constructor')
+    !assert.equal(!!pmlUnitHelperSetUpCompleted, 1, 'Should have completed the helper setUp method')
+    !assert.equal(!!pmlUnitHelperTestMethodCompleted, 1, 'Should have completed the helper test method')
+    !assert.equal(!!pmlUnitHelperTearDownCompleted, 0, 'Should not have completed the helper tearDown method')
+
+endmethod
+
+
+define method .run(!setUp is Boolean, !tearDown is Boolean) is Array
+
+    !!pmlUnitHelperConstructorCompleted = 0
+    !!pmlUnitHelperSetUpCompleted = 0
+    !!pmlUnitHelperTestMethodCompleted = 0
+    !!pmlUnitHelperTearDownCompleted = 0
+
+    !runner = object PmlTestRunner()
+    return !runner.run('PmlTestCycleHelper', 'testSomething', !setUp, !tearDown)
+
+endmethod
