@@ -156,6 +156,12 @@ define method .testLessThan(!assert is PmlAssert)
         !assert.fail('4 should not be less than 3')
     endhandle
 
+    !assert.lessThan(4, '5')
+    handle (2,779) $* method not found; cannot copare Real to String
+    elsehandle NONE
+        !assert.fail('4 should not be less than |5|')
+    endhandle
+
 endmethod
 
 
@@ -172,6 +178,12 @@ define method .testLessThanOrEqual(!assert is PmlAssert)
         !assert.fail('4 should not be less than or equal to 3')
     endhandle
 
+    !assert.lessThanOrEqual(4, '5')
+    handle (2,779) $* method not found; cannot copare Real to String
+    elsehandle NONE
+        !assert.fail('4 should not be less than or equal to |5|')
+    endhandle
+
 endmethod
 
 
@@ -186,6 +198,12 @@ define method .testGreaterThanOrEqual(!assert is PmlAssert)
     handle (196,1)
     elsehandle NONE
         !assert.fail('3 should not be greater than or equal to 4')
+    endhandle
+
+    !assert.lessThan(4, '3')
+    handle (2,779) $* method not found; cannot copare Real to String
+    elsehandle NONE
+        !assert.fail('4 should not be greater than |3|')
     endhandle
 
 endmethod
@@ -206,6 +224,127 @@ define method .testGreaterThan(!assert is PmlAssert)
     handle (196,1)
     elsehandle NONE
         !assert.fail('3 should not be greater than 4')
+    endhandle
+
+    !assert.lessThan(4, '3')
+    handle (2,779) $* method not found; cannot copare Real to String
+    elsehandle NONE
+        !assert.fail('4 should not be greater than |3|')
+    endhandle
+
+endmethod
+
+
+define method .testIsSet(!assert is PmlAssert)
+
+    !assert.isSet(3)
+    !assert.isSet('')
+    !assert.isSet(true)
+    !assert.isSet(false)
+    !assert.isSet(object DateTime())
+    !assert.isSet(object Position('E 0 N 0 U 0 WRT /*'))
+    !assert.isSet(object Direction('N WRT /*'))
+    !assert.isSet(object Orientation('Y is N and Z is U WRT /*'))
+    !assert.isSet(object DbRef('/*'))
+
+endmethod
+
+
+define method .testIsUnset(!assert is PmlAssert)
+
+    !assert.isUnset(object Real())
+    !assert.isUnset(object String())
+    !assert.isUnset(object Boolean())
+    !assert.isUnset(object Position())
+    !assert.isUnset(object Direction())
+    !assert.isUnset(object Orientation())
+    !assert.isUnset(object DbRef())
+    !assert.isUnset(NULREF)
+    !assert.isUnset(!assert)
+
+endmethod
+
+
+define method .testIsTrue(!assert is PmlAssert)
+
+    !assert.isTrue(true)
+    !assert.isTrue(not false)
+    !assert.isTrue(object Boolean('true'))
+    !x = 2
+    !assert.isTrue(!x lt 3)
+
+    !assert.isTrue(false)
+    handle (196,1)
+    elsehandle NONE
+        !assert.fail('false should not be true')
+    endhandle
+
+    !assert.isTrue(object Boolean())
+    handle (196,1)
+    elsehandle NONE
+        !assert.fail('Boolean() should not be true')
+    endhandle
+
+    !assert.isTrue('true')
+    handle (2,779) $* method not found
+    elsehandle NONE
+        !assert.fail('Should not be able to assert truth for strings.')
+    endhandle
+
+endmethod
+
+
+define method .testIsFalse(!assert is PmlAssert)
+
+    !assert.isFalse(false)
+    !assert.isFalse(not true)
+    !assert.isFalse(object Boolean('false'))
+    !x = 'something'
+    !assert.isFalse(!x.upCase() eq 'ELSE')
+
+    !assert.isFalse(true)
+    handle (196,1)
+    elsehandle NONE
+        !assert.fail('false should not be true')
+    endhandle
+
+    !assert.isFalse(object Boolean())
+    handle (196,1)
+    elsehandle NONE
+        !assert.fail('Boolean() should not be false')
+    endhandle
+
+    !assert.isFalse('true')
+    handle (2,779) $* method not found
+    elsehandle NONE
+        !assert.fail('Should not be able to assert falseness for strings.')
+    endhandle
+
+endmethod
+
+
+define method .testFail(!assert is PmlAssert)
+
+    !assert.fail()
+    handle (196,1)
+    endhandle
+
+endmethod
+
+
+define method .testInstanceOf(!assert is PmlAssert)
+
+    !assert.instanceOf(3, 'REAL')
+    !assert.instanceOf('', 'STRING')
+    !assert.instanceOf(object DateTime(), 'DATETIME')
+    !assert.instanceOf(object Array(), 'ARRAY')
+    !assert.instanceOf(NULREF, 'DBREF')
+    !assert.instanceOf(!assert, 'PMLASSERT')
+
+    !assert.instanceOf(3, 'STRING')
+    handle (196,1)
+    elsehandle NONE
+        !assert.fail('3 should not be of type <STRING>')
     endhandle
 
 endmethod

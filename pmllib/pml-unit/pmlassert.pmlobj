@@ -86,6 +86,34 @@ define method .greaterThan(!left is Any, !right is Any, !message is String)
 endmethod
 
 
+define method .isSet(!value is Any)
+
+    !this.isSet(!value, 'Value is not set.')
+
+endmethod
+
+
+define method .isSet(!value is Any, !message is String)
+
+    !this.isTrue(!value.set(), !message)
+
+endmethod
+
+
+define method .isUnset(!value is Any)
+
+    !this.isUnset(!value, 'Value is set.')
+
+endmethod
+
+
+define method .isUnset(!value is Any, !message is String)
+
+    !this.isTrue(!value.unset(), !message)
+
+endmethod
+
+
 define method .isTrue(!value is Boolean)
 
     !this.isTrue(!value, 'Value is not true.')
@@ -98,20 +126,6 @@ define method .isTrue(!value is Boolean, !message is String)
     if (!value.unset() or not !value) then
         !this.fail(!message)
     endif
-
-endmethod
-
-
-define method .isTrue(!value is Any)
-
-    !this.isTrue(!value, 'Value is not true.')
-
-endmethod
-
-
-define method .isTrue(!value is Any, !message is String)
-
-    !this.fail(!message)
 
 endmethod
 
@@ -132,16 +146,16 @@ define method .isFalse(!value is Boolean, !message is String)
 endmethod
 
 
-define method .isFalse(!value is Any)
+define method .instanceOf(!object is Any, !objectType is String)
 
-    !this.isFalse(!value, 'Value is not false.')
+    !this.instanceOf(!object, !objectType, 'Expected object to be of type <$!<objectType>> but it is of type <' & !object.objectType() & '> instead.')
 
 endmethod
 
 
-define method .isFalse(!value is Any, !message is String)
+define method .instanceOf(!object is Any, !objectType is String, !message is String)
 
-    !this.fail(!message)
+    !this.equal(!object.objectType(), !objectType, !message)
 
 endmethod
 
