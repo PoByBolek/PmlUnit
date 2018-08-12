@@ -25,7 +25,7 @@
             this.ExecutionTimeColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.TestResultSplitContainer = new System.Windows.Forms.SplitContainer();
             this.TestResultLabel = new System.Windows.Forms.Label();
-            this.ExecutionProgressBar = new System.Windows.Forms.ProgressBar();
+            this.ExecutionProgressBar = new PmlUnit.ColorizedProgressBar();
             linkLabel1 = new System.Windows.Forms.LinkLabel();
             linkLabel2 = new System.Windows.Forms.LinkLabel();
             imageList1 = new System.Windows.Forms.ImageList(this.components);
@@ -38,8 +38,8 @@
             // 
             this.ExecutionProgressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.ExecutionProgressBar.BackColor = System.Drawing.Color.Transparent;
             this.ExecutionProgressBar.Location = new System.Drawing.Point(0, 0);
-            this.ExecutionProgressBar.Margin = new System.Windows.Forms.Padding(0, 0, 0, 3);
             this.ExecutionProgressBar.Name = "ExecutionProgressBar";
             this.ExecutionProgressBar.Size = new System.Drawing.Size(399, 10);
             this.ExecutionProgressBar.TabIndex = 0;
@@ -158,6 +158,6 @@
         private System.Windows.Forms.ColumnHeader ExecutionTimeColumn;
         private System.Windows.Forms.SplitContainer TestResultSplitContainer;
         private System.Windows.Forms.Label TestResultLabel;
-        private System.Windows.Forms.ProgressBar ExecutionProgressBar;
+        private ColorizedProgressBar ExecutionProgressBar;
     }
 }

@@ -50,6 +50,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Clock.cs" />
+    <Compile Include="ColorizedProgressBar.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="ColorizedProgressBar.Designer.cs">
+      <DependentUpon>ColorizedProgressBar.cs</DependentUpon>
+    </Compile>
     <Compile Include="ObjectProxy.cs" />
     <Compile Include="ParserException.cs" />
     <Compile Include="PmlObjectProxy.cs" />
@@ -73,6 +79,9 @@
     <Compile Include="TextReaderExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="ColorizedProgressBar.resx">
+      <DependentUpon>ColorizedProgressBar.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TestRunnerControl.resx">
       <DependentUpon>TestRunnerControl.cs</DependentUpon>
     </EmbeddedResource>

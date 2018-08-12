@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -76,6 +77,7 @@ namespace PmlUnit
 
             ExecutionProgressBar.Value = 0;
             ExecutionProgressBar.Maximum = TestView.Items.Count;
+            ExecutionProgressBar.Color = Color.Green;
 
             foreach (ListViewItem item in TestView.Items)
             {
@@ -89,6 +91,9 @@ namespace PmlUnit
                 item.SubItems[1].Text = FormatDuration(result.Duration);
 
                 ExecutionProgressBar.Increment(1);
+                if (!result.Success)
+                    ExecutionProgressBar.Color = Color.Red;
+
                 Application.DoEvents();
             }
 
