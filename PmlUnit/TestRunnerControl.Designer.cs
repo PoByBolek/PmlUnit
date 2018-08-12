@@ -15,8 +15,11 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.LinkLabel linkLabel1;
             System.Windows.Forms.LinkLabel linkLabel2;
+            System.Windows.Forms.ImageList imageList1;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TestRunnerControl));
             this.TestView = new System.Windows.Forms.ListView();
             this.TestNameColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ExecutionTimeColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -24,6 +27,7 @@
             this.TestResultLabel = new System.Windows.Forms.Label();
             linkLabel1 = new System.Windows.Forms.LinkLabel();
             linkLabel2 = new System.Windows.Forms.LinkLabel();
+            imageList1 = new System.Windows.Forms.ImageList(this.components);
             this.TestResultSplitContainer.Panel1.SuspendLayout();
             this.TestResultSplitContainer.Panel2.SuspendLayout();
             this.TestResultSplitContainer.SuspendLayout();
@@ -52,6 +56,14 @@
             linkLabel2.Text = "Refresh";
             linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnRefreshLinkClick);
             // 
+            // imageList1
+            // 
+            imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
+            imageList1.TransparentColor = System.Drawing.Color.Transparent;
+            imageList1.Images.SetKeyName(0, "Unknown");
+            imageList1.Images.SetKeyName(1, "Failure");
+            imageList1.Images.SetKeyName(2, "Success");
+            // 
             // TestView
             // 
             this.TestView.BorderStyle = System.Windows.Forms.BorderStyle.None;
@@ -65,6 +77,7 @@
             this.TestView.Location = new System.Drawing.Point(0, 0);
             this.TestView.Name = "TestView";
             this.TestView.Size = new System.Drawing.Size(167, 264);
+            this.TestView.SmallImageList = imageList1;
             this.TestView.TabIndex = 0;
             this.TestView.UseCompatibleStateImageBehavior = false;
             this.TestView.View = System.Windows.Forms.View.Details;

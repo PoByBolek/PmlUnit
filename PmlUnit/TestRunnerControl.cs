@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -51,6 +50,7 @@ namespace PmlUnit
                 foreach (var test in testCase.Tests)
                 {
                     var item = TestView.Items.Add(test.Name);
+                    item.ImageKey = "Unknown";
                     item.SubItems.Add("");
                     item.Tag = test;
                     item.Group = group;
@@ -79,7 +79,7 @@ namespace PmlUnit
                     continue;
 
                 var result = Runner.Run(test);
-                item.BackColor = result.Success ? Color.Green : Color.Red;
+                item.ImageKey = result.Success ? "Success" : "Failure";
                 item.SubItems[0].Tag = result;
                 item.SubItems[1].Text = FormatDuration(result.Duration);
             }
