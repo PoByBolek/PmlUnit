@@ -72,6 +72,11 @@ namespace PmlUnit
 
         private void OnRunAllLinkClick(object sender, LinkLabelLinkClickedEventArgs e)
         {
+            Enabled = false;
+
+            ExecutionProgressBar.Value = 0;
+            ExecutionProgressBar.Maximum = TestView.Items.Count;
+
             foreach (ListViewItem item in TestView.Items)
             {
                 var test = item.Tag as Test;
@@ -82,8 +87,12 @@ namespace PmlUnit
                 item.ImageKey = result.Success ? "Success" : "Failure";
                 item.SubItems[0].Tag = result;
                 item.SubItems[1].Text = FormatDuration(result.Duration);
+
+                ExecutionProgressBar.Increment(1);
+                Application.DoEvents();
             }
 
+            Enabled = true;
             ResetTestViewColumnWidths();
         }
 
