@@ -46,7 +46,8 @@ namespace PmlUnit
             TestView.Groups.Clear();
             foreach (var testCase in testCases)
             {
-                var group = TestView.Groups.Add(testCase.Name, testCase.Name);
+                var groupName = string.Format("{0} ({1})", testCase.Name, testCase.Tests.Count);
+                var group = TestView.Groups.Add(testCase.Name, groupName);
                 foreach (var test in testCase.Tests)
                 {
                     var item = TestView.Items.Add(test.Name);
