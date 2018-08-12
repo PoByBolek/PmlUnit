@@ -19,6 +19,8 @@ namespace PmlUnit
             Provider = provider;
             Runner = new TestRunner();
             InitializeComponent();
+            ResetTestViewColumnWidths();
+            ResetSplitContainerOrientation();
         }
 
         public TestRunnerControl(TestCaseProvider provider, TestRunner runner)
@@ -53,6 +55,8 @@ namespace PmlUnit
                     item.Group = group;
                 }
             }
+
+            ResetTestViewColumnWidths();
         }
 
         protected override void Dispose(bool disposing)
@@ -65,12 +69,6 @@ namespace PmlUnit
             base.Dispose(disposing);
         }
 
-        private void OnSizeChanged(object sender, EventArgs e)
-        {
-            ExecutionTimeColumn.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
-            TestNameColumn.Width = Math.Max(0, TestView.ClientSize.Width - ExecutionTimeColumn.Width);
-        }
-
         private void OnRunAllLinkClick(object sender, LinkLabelLinkClickedEventArgs e)
         {
             foreach (ListViewItem item in TestView.Items)
@@ -81,10 +79,11 @@ namespace PmlUnit
 
                 var result = Runner.Run(test);
                 item.BackColor = result.Success ? Color.Green : Color.Red;
+                item.SubItems[0].Tag = result;
                 item.SubItems[1].Text = FormatDuration(result.Duration);
             }
 
-            OnSizeChanged(sender, e);
+            ResetTestViewColumnWidths();
         }
 
         private static string FormatDuration(TimeSpan? duration)
@@ -118,6 +117,38 @@ namespace PmlUnit
             }
 
             return testCase;
+        }
+
+        private void OnSelectedIndexChanged(object sender, EventArgs e)
+        {
+            foreach (ListViewItem item in TestView.SelectedItems)
+            {
+                var result = item.SubItems[0].Tag as TestResult;
+                TestResultLabel.Text = result?.Error?.Message ?? "";
+            }
+        }
+
+        private void OnTestViewSizeChanged(object sender, EventArgs e)
+        {
+            ResetTestViewColumnWidths();
+        }
+
+        private void ResetTestViewColumnWidths()
+        {
+            ExecutionTimeColumn.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
+            TestNameColumn.Width = Math.Max(0, TestView.ClientSize.Width - ExecutionTimeColumn.Width);
+        }
+
+        private void OnSplitContainerSizeChanged(object sender, EventArgs e)
+        {
+            ResetSplitContainerOrientation();
+        }
+
+        private void ResetSplitContainerOrientation()
+        {
+            var size = TestResultSplitContainer.Size;
+            var orientation = size.Width > size.Height ? Orientation.Vertical : Orientation.Horizontal;
+            TestResultSplitContainer.Orientation = orientation;
         }
     }
 }

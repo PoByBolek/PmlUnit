@@ -20,8 +20,13 @@
             this.TestView = new System.Windows.Forms.ListView();
             this.TestNameColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ExecutionTimeColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.TestResultSplitContainer = new System.Windows.Forms.SplitContainer();
+            this.TestResultLabel = new System.Windows.Forms.Label();
             linkLabel1 = new System.Windows.Forms.LinkLabel();
             linkLabel2 = new System.Windows.Forms.LinkLabel();
+            this.TestResultSplitContainer.Panel1.SuspendLayout();
+            this.TestResultSplitContainer.Panel2.SuspendLayout();
+            this.TestResultSplitContainer.SuspendLayout();
             this.SuspendLayout();
             // 
             // linkLabel1
@@ -49,22 +54,22 @@
             // 
             // TestView
             // 
-            this.TestView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
             this.TestView.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.TestView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.TestNameColumn,
             this.ExecutionTimeColumn});
+            this.TestView.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TestView.FullRowSelect = true;
             this.TestView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
             this.TestView.HideSelection = false;
-            this.TestView.Location = new System.Drawing.Point(0, 22);
+            this.TestView.Location = new System.Drawing.Point(0, 0);
             this.TestView.Name = "TestView";
-            this.TestView.Size = new System.Drawing.Size(150, 128);
-            this.TestView.TabIndex = 2;
+            this.TestView.Size = new System.Drawing.Size(167, 264);
+            this.TestView.TabIndex = 0;
             this.TestView.UseCompatibleStateImageBehavior = false;
             this.TestView.View = System.Windows.Forms.View.Details;
+            this.TestView.SelectedIndexChanged += new System.EventHandler(this.OnSelectedIndexChanged);
+            this.TestView.SizeChanged += new System.EventHandler(this.OnTestViewSizeChanged);
             // 
             // TestNameColumn
             // 
@@ -74,16 +79,48 @@
             // 
             this.ExecutionTimeColumn.Text = "Time";
             // 
+            // TestResultSplitContainer
+            // 
+            this.TestResultSplitContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.TestResultSplitContainer.Location = new System.Drawing.Point(0, 22);
+            this.TestResultSplitContainer.Name = "TestResultSplitContainer";
+            // 
+            // TestResultSplitContainer.Panel1
+            // 
+            this.TestResultSplitContainer.Panel1.Controls.Add(this.TestView);
+            // 
+            // TestResultSplitContainer.Panel2
+            // 
+            this.TestResultSplitContainer.Panel2.Controls.Add(this.TestResultLabel);
+            this.TestResultSplitContainer.Size = new System.Drawing.Size(399, 264);
+            this.TestResultSplitContainer.SplitterDistance = 167;
+            this.TestResultSplitContainer.TabIndex = 2;
+            this.TestResultSplitContainer.SizeChanged += new System.EventHandler(this.OnSplitContainerSizeChanged);
+            // 
+            // TestResultLabel
+            // 
+            this.TestResultLabel.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.TestResultLabel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TestResultLabel.Location = new System.Drawing.Point(0, 0);
+            this.TestResultLabel.Name = "TestResultLabel";
+            this.TestResultLabel.Size = new System.Drawing.Size(228, 264);
+            this.TestResultLabel.TabIndex = 0;
+            // 
             // TestRunnerControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
+            this.Controls.Add(this.TestResultSplitContainer);
             this.Controls.Add(linkLabel1);
             this.Controls.Add(linkLabel2);
-            this.Controls.Add(this.TestView);
             this.Name = "TestRunnerControl";
-            this.SizeChanged += new System.EventHandler(this.OnSizeChanged);
+            this.Size = new System.Drawing.Size(399, 286);
+            this.TestResultSplitContainer.Panel1.ResumeLayout(false);
+            this.TestResultSplitContainer.Panel2.ResumeLayout(false);
+            this.TestResultSplitContainer.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -94,5 +131,7 @@
         private System.Windows.Forms.ListView TestView;
         private System.Windows.Forms.ColumnHeader TestNameColumn;
         private System.Windows.Forms.ColumnHeader ExecutionTimeColumn;
+        private System.Windows.Forms.SplitContainer TestResultSplitContainer;
+        private System.Windows.Forms.Label TestResultLabel;
     }
 }
