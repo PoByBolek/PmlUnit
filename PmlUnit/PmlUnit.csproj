@@ -56,6 +56,8 @@
     <Compile Include="ColorizedProgressBar.Designer.cs">
       <DependentUpon>ColorizedProgressBar.cs</DependentUpon>
     </Compile>
+    <Compile Include="EnvironmentVariableTestCaseProvider.cs" />
+    <Compile Include="IndexFileTestCaseProvider.cs" />
     <Compile Include="ObjectProxy.cs" />
     <Compile Include="ParserException.cs" />
     <Compile Include="PmlObjectProxy.cs" />
