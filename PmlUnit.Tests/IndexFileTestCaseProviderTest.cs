@@ -14,26 +14,29 @@ namespace PmlUnit.Tests
         [Test]
         public void Constructor_ShouldCheckForNullArguments()
         {
-            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider((TextReader)null, null));
-            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider((TextReader)null, ""));
-            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(Mock.Of<TextReader>(), null));
-            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(Mock.Of<TextReader>(), ""));
-            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider((TextReader)null, "asdf"));
+            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(null));
+            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(""));
+
+            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(null, (TextReader)null));
+            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider("", (TextReader)null));
+            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(null, Mock.Of<TextReader>()));
+            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider("", Mock.Of<TextReader>()));
+            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider("asdf", (TextReader)null));
 
             Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(null, null, null));
             Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(null, null, Mock.Of<TestCaseParser>()));
-            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(Mock.Of<TextReader>(), null, null));
-            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(Mock.Of<TextReader>(), null, Mock.Of<TestCaseParser>()));
+            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(null, Mock.Of<TextReader>(), null));
+            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(null, Mock.Of<TextReader>(), Mock.Of<TestCaseParser>()));
 
-            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(null, "", null));
-            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(null, "", Mock.Of<TestCaseParser>()));
-            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(Mock.Of<TextReader>(), "", null));
-            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(Mock.Of<TextReader>(), "", Mock.Of<TestCaseParser>()));
+            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider("", null, null));
+            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider("", null, Mock.Of<TestCaseParser>()));
+            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider("", Mock.Of<TextReader>(), null));
+            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider("", Mock.Of<TextReader>(), Mock.Of<TestCaseParser>()));
 
 
-            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(null, "foo", null));
-            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(null, "foo", Mock.Of<TestCaseParser>()));
-            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(Mock.Of<TextReader>(), "foo", null));
+            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider("foo", null, null));
+            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider("foo", null, Mock.Of<TestCaseParser>()));
+            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider("foo", Mock.Of<TextReader>(), null));
         }
 
         [Test]
@@ -41,7 +44,7 @@ namespace PmlUnit.Tests
         {
             using (var reader = new StringReader(""))
             {
-                var provider = new IndexFileTestCaseProvider(reader, "base/path/");
+                var provider = new IndexFileTestCaseProvider("base/path/", reader);
                 var result = provider.GetTestCases();
                 Assert.That(result, Is.Empty);
             }
@@ -58,7 +61,7 @@ namespace PmlUnit.Tests
 pmlrandomtest.pmlobj";
             using (var reader = new StringReader(indexFile))
             {
-                var provider = new IndexFileTestCaseProvider(reader, @"C:\testing", parser.Object);
+                var provider = new IndexFileTestCaseProvider(@"C:\testing", reader, parser.Object);
                 var result = provider.GetTestCases();
                 Assert.That(result.Count, Is.EqualTo(1));
                 Assert.That(result, Contains.Item(dummy));
@@ -83,7 +86,7 @@ pmlsecondtest.pmlobj
 pmlthirdtest.pmlobj";
             using (var reader = new StringReader(indexFile))
             {
-                var prodivder = new IndexFileTestCaseProvider(reader, @"C:\testing", parser.Object);
+                var prodivder = new IndexFileTestCaseProvider(@"C:\testing", reader, parser.Object);
                 var result = prodivder.GetTestCases();
                 Assert.That(result.Count, Is.EqualTo(1));
                 Assert.That(result, Contains.Item(dummy));
@@ -113,7 +116,7 @@ image.png
 somethingelse.txt";
             using (var reader = new StringReader(indexFile))
             {
-                var provider = new IndexFileTestCaseProvider(reader, @"C:\some\other", parser.Object);
+                var provider = new IndexFileTestCaseProvider(@"C:\some\other", reader, parser.Object);
                 provider.GetTestCases();
             }
         }
@@ -136,7 +139,7 @@ randomtest.pmlobj
 FoOtEsT.PmLoBj";
             using (var reader = new StringReader(indexFile))
             {
-                var provider = new IndexFileTestCaseProvider(reader, @"C:\some\other", parser.Object);
+                var provider = new IndexFileTestCaseProvider(@"C:\some\other", reader, parser.Object);
                 provider.GetTestCases();
             }
         }
@@ -163,7 +166,7 @@ thirdtest.pmlobj
 fourthtest.pmlobj";
             using (var reader = new StringReader(indexFile))
             {
-                var provider = new IndexFileTestCaseProvider(reader, @"C:\full\path\to", parser.Object);
+                var provider = new IndexFileTestCaseProvider(@"C:\full\path\to", reader, parser.Object);
                 provider.GetTestCases();
             }
 

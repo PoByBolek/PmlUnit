@@ -10,46 +10,57 @@ namespace PmlUnit
         private readonly TestCaseParser Parser;
         private readonly HashSet<string> PotentialTestCaseNames;
 
-        public IndexFileTestCaseProvider(string indexFilePath)
-            : this(indexFilePath, new SimpleTestCaseParser())
+        public IndexFileTestCaseProvider(string directoryName)
+            : this(directoryName, new SimpleTestCaseParser())
         {
         }
 
-        public IndexFileTestCaseProvider(string indexFilePath, TestCaseParser parser)
+        public IndexFileTestCaseProvider(string directoryName, TestCaseParser parser)
+            : this(directoryName, CreateIndexFileReader(directoryName), parser, closeReader: true)
         {
-            if (string.IsNullOrEmpty(indexFilePath))
-                throw new ArgumentNullException(nameof(indexFilePath));
-            if (parser == null)
-                throw new ArgumentNullException(nameof(parser));
+        }
 
-            string basePath = Path.GetDirectoryName(indexFilePath);
+        public IndexFileTestCaseProvider(string directoryName, TextReader reader)
+            : this(directoryName, reader, new SimpleTestCaseParser(), closeReader: false)
+        {
+        }
 
-            using (var reader = new StreamReader(indexFilePath, Encoding.UTF8))
+        public IndexFileTestCaseProvider(string directoryName, TextReader reader, TestCaseParser parser)
+            : this(directoryName, reader, parser, closeReader: false)
+        {
+        }
+
+        private IndexFileTestCaseProvider(string directoryName, TextReader reader, TestCaseParser parser, bool closeReader)
+        {
+            try
             {
+                if (string.IsNullOrEmpty(directoryName))
+                    throw new ArgumentNullException(nameof(directoryName));
+                if (reader == null)
+                    throw new ArgumentNullException(nameof(reader));
+                if (parser == null)
+                    throw new ArgumentNullException(nameof(parser));
+
                 Parser = parser;
-                PotentialTestCaseNames = FindPotentialTestCases(reader, basePath);
+                PotentialTestCaseNames = FindPotentialTestCases(directoryName, reader);
+            }
+            finally
+            {
+                if (closeReader && reader != null)
+                    reader.Close();
             }
         }
 
-        public IndexFileTestCaseProvider(TextReader reader, string basePath)
-            : this(reader, basePath, new SimpleTestCaseParser())
+        private static TextReader CreateIndexFileReader(string directoryName)
         {
+            if (string.IsNullOrEmpty(directoryName))
+                throw new ArgumentNullException(nameof(directoryName));
+
+            string path = Path.Combine(directoryName, "pml.index");
+            return new StreamReader(path, Encoding.UTF8);
         }
 
-        public IndexFileTestCaseProvider(TextReader reader, string basePath, TestCaseParser parser)
-        {
-            if (string.IsNullOrEmpty(basePath))
-                throw new ArgumentNullException(nameof(basePath));
-            if (reader == null)
-                throw new ArgumentNullException(nameof(reader));
-            if (parser == null)
-                throw new ArgumentNullException(nameof(parser));
-
-            Parser = parser;
-            PotentialTestCaseNames = FindPotentialTestCases(reader, basePath);
-        }
-
-        private static HashSet<string> FindPotentialTestCases(TextReader reader, string basePath)
+        private static HashSet<string> FindPotentialTestCases(string directoryName, TextReader reader)
         {
             var result = new HashSet<string>();
             string directory = null;
@@ -60,7 +71,7 @@ namespace PmlUnit
                 if (trimmed.StartsWith("/"))
                 {
                     // TODO: what happens when PDMS encounters "/../../" ?
-                    directory = Path.Combine(basePath, trimmed.Substring(1));
+                    directory = Path.Combine(directoryName, trimmed.Substring(1));
                     directory = directory.Replace('/', Path.DirectorySeparatorChar);
                 }
                 else if (directory != null && trimmed.EndsWith("test.pmlobj", StringComparison.OrdinalIgnoreCase))
