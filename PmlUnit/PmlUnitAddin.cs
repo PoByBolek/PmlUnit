@@ -18,9 +18,12 @@ namespace PmlUnit
 
         public void Start(ServiceManager serviceManager)
         {
-            var windowManager = serviceManager.GetService<WindowManager>();
+            serviceManager.AddService<TestCaseProvider>(
+                new EnvironmentVariableTestCaseProvider()
+            );
+
             var commandManager = serviceManager.GetService<CommandManager>();
-            commandManager.Commands.Add(new ShowTestRunnerCommand(windowManager));
+            commandManager.Commands.Add(new ShowTestRunnerCommand(serviceManager));
 
             var commandBarManager = serviceManager.GetService<CommandBarManager>();
             using (var stream = GetCustomizationFileStream())

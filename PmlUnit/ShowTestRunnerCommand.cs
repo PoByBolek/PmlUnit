@@ -1,4 +1,5 @@
 ﻿using System;
+using Aveva.ApplicationFramework;
 using Aveva.ApplicationFramework.Presentation;
 
 namespace PmlUnit
@@ -8,15 +9,22 @@ namespace PmlUnit
         private readonly DockedWindow Window;
         private readonly TestRunnerControl RunnerControl;
 
-        public ShowTestRunnerCommand(WindowManager windowManager)
+        public ShowTestRunnerCommand(ServiceManager serviceManager)
+            : this(serviceManager.GetService<WindowManager>(), serviceManager.GetService<TestCaseProvider>())
+        {
+        }
+
+        public ShowTestRunnerCommand(WindowManager windowManager, TestCaseProvider testCaseProvider)
         {
             if (windowManager == null)
                 throw new ArgumentNullException(nameof(windowManager));
-            
+            if (testCaseProvider == null)
+                throw new ArgumentNullException(nameof(testCaseProvider));
+
             ExecuteOnCheckedChange = false;
             Key = "PmlUnit.ShowTestRunnerCommand";
-            
-            RunnerControl = new TestRunnerControl(new EnvironmentVariableTestCaseProvider());
+
+            RunnerControl = new TestRunnerControl(testCaseProvider);
             try
             {
 
