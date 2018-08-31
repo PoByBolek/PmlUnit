@@ -23,13 +23,17 @@ namespace PmlUnit
             );
 
             var commandManager = serviceManager.GetService<CommandManager>();
-            commandManager.Commands.Add(new ShowTestRunnerCommand(serviceManager));
+            if (commandManager != null)
+                commandManager.Commands.Add(new ShowTestRunnerCommand(serviceManager));
 
             var commandBarManager = serviceManager.GetService<CommandBarManager>();
-            using (var stream = GetCustomizationFileStream())
+            if (commandBarManager != null)
             {
-                if (stream != null)
-                    commandBarManager.AddUICustomizationFromStream(stream, "PmlUnit");
+                using (var stream = GetCustomizationFileStream())
+                {
+                    if (stream != null)
+                        commandBarManager.AddUICustomizationFromStream(stream, "PmlUnit");
+                }
             }
         }
 
