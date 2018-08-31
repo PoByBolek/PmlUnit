@@ -73,6 +73,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="EnvironmentVariableTestCaseProviderTest.cs" />
     <Compile Include="IndexFileTestCaseProviderTest.cs" />
     <Compile Include="SimpleTestCaseParserTest.cs" />
     <Compile Include="TestCaseBuilderTest.cs" />

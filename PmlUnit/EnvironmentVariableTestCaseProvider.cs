@@ -6,6 +6,7 @@ namespace PmlUnit
 {
     class EnvironmentVariableTestCaseProvider : TestCaseProvider
     {
+        private readonly Func<string, TestCaseProvider> Factory;
         private readonly string[] Paths;
 
         public EnvironmentVariableTestCaseProvider()
@@ -14,10 +15,18 @@ namespace PmlUnit
         }
 
         public EnvironmentVariableTestCaseProvider(string variableName)
+            : this(variableName, CreateTestCaseProvider)
+        {
+        }
+
+        internal EnvironmentVariableTestCaseProvider(string variableName, Func<string, TestCaseProvider> factory)
         {
             if (string.IsNullOrEmpty(variableName))
                 throw new ArgumentNullException(nameof(variableName));
+            if (factory == null)
+                throw new ArgumentNullException(nameof(factory));
 
+            Factory = factory;
             var pmllib = Environment.GetEnvironmentVariable(variableName);
             if (string.IsNullOrEmpty(pmllib))
                 Paths = new string[0];
@@ -27,6 +36,11 @@ namespace PmlUnit
                 Paths = new string[] { pmllib };
             else
                 Paths = pmllib.Split(' ');
+        }
+
+        private static TestCaseProvider CreateTestCaseProvider(string directoryName)
+        {
+            return new IndexFileTestCaseProvider(directoryName);
         }
 
         public ICollection<TestCase> GetTestCases()
@@ -41,7 +55,7 @@ namespace PmlUnit
                 TestCaseProvider provider;
                 try
                 {
-                    provider = new IndexFileTestCaseProvider(Path.Combine(path, "pml.index"));
+                    provider = Factory(path);
                 }
                 catch (FileNotFoundException)
                 {
