@@ -85,6 +85,7 @@
     <Compile Include="EnvironmentVariableTestCaseProviderTest.cs" />
     <Compile Include="IndexFileTestCaseProviderTest.cs" />
     <Compile Include="PmlUnitAddinTest.cs" />
+    <Compile Include="ShowTestRunnerCommandTest.cs" />
     <Compile Include="SimpleTestCaseParserTest.cs" />
     <Compile Include="TestCaseBuilderTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
