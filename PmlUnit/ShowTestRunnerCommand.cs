@@ -10,21 +10,27 @@ namespace PmlUnit
         private readonly TestRunnerControl RunnerControl;
 
         public ShowTestRunnerCommand(ServiceManager serviceManager)
-            : this(serviceManager.GetService<WindowManager>(), serviceManager.GetService<TestCaseProvider>())
+            : this(
+                  serviceManager.GetService<WindowManager>(),
+                  serviceManager.GetService<TestCaseProvider>(),
+                  serviceManager.GetService<TestRunner>()
+            )
         {
         }
 
-        public ShowTestRunnerCommand(WindowManager windowManager, TestCaseProvider testCaseProvider)
+        public ShowTestRunnerCommand(WindowManager windowManager, TestCaseProvider testCaseProvider, TestRunner testRunner)
         {
             if (windowManager == null)
                 throw new ArgumentNullException(nameof(windowManager));
             if (testCaseProvider == null)
                 throw new ArgumentNullException(nameof(testCaseProvider));
+            if (testRunner == null)
+                throw new ArgumentNullException(nameof(testRunner));
 
             ExecuteOnCheckedChange = false;
             Key = "PmlUnit.ShowTestRunnerCommand";
 
-            RunnerControl = new TestRunnerControl(testCaseProvider);
+            RunnerControl = new TestRunnerControl(testCaseProvider, testRunner);
             try
             {
 

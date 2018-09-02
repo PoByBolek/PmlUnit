@@ -11,18 +11,6 @@ namespace PmlUnit
         private readonly TestCaseProvider Provider;
         private readonly TestRunner Runner;
 
-        public TestRunnerControl(TestCaseProvider provider)
-        {
-            if (provider == null)
-                throw new ArgumentNullException(nameof(provider));
-
-            Provider = provider;
-            Runner = new TestRunner();
-            InitializeComponent();
-            ResetTestViewColumnWidths();
-            ResetSplitContainerOrientation();
-        }
-
         public TestRunnerControl(TestCaseProvider provider, TestRunner runner)
         {
             if (provider == null)
@@ -33,6 +21,8 @@ namespace PmlUnit
             Provider = provider;
             Runner = runner;
             InitializeComponent();
+            ResetTestViewColumnWidths();
+            ResetSplitContainerOrientation();
         }
 
         public void LoadTests()

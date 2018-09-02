@@ -18,6 +18,21 @@ namespace PmlUnit
 
         public void Start(ServiceManager serviceManager)
         {
+            var testRunner = new TestRunner();
+            try
+            {
+                Start(serviceManager, testRunner);
+            }
+            catch
+            {
+                testRunner.Dispose();
+                throw;
+            }
+        }
+
+        internal void Start(ServiceManager serviceManager, TestRunner testRunner)
+        {
+            serviceManager.AddService(testRunner);
             serviceManager.AddService<TestCaseProvider>(
                 new EnvironmentVariableTestCaseProvider()
             );
