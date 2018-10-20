@@ -16,22 +16,33 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.LinkLabel linkLabel1;
-            System.Windows.Forms.LinkLabel linkLabel2;
+            System.Windows.Forms.LinkLabel runAllLinkLabel;
+            System.Windows.Forms.LinkLabel refreshLinkLabel;
             System.Windows.Forms.ImageList imageList1;
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TestRunnerControl));
+            System.Windows.Forms.ToolStripMenuItem failedTestsToolStripMenuItem;
+            System.Windows.Forms.ToolStripMenuItem notExecutedTestsToolStripMenuItem;
+            System.Windows.Forms.ToolStripMenuItem succeededTestsToolStripMenuItem;
+            System.Windows.Forms.ToolStripMenuItem selectedTestsToolStripMenuItem;
             this.TestView = new System.Windows.Forms.ListView();
             this.TestNameColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ExecutionTimeColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.TestResultSplitContainer = new System.Windows.Forms.SplitContainer();
             this.TestResultLabel = new System.Windows.Forms.Label();
             this.ExecutionProgressBar = new PmlUnit.ColorizedProgressBar();
-            linkLabel1 = new System.Windows.Forms.LinkLabel();
-            linkLabel2 = new System.Windows.Forms.LinkLabel();
+            this.RunLinkLabel = new System.Windows.Forms.LinkLabel();
+            this.RunContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            runAllLinkLabel = new System.Windows.Forms.LinkLabel();
+            refreshLinkLabel = new System.Windows.Forms.LinkLabel();
             imageList1 = new System.Windows.Forms.ImageList(this.components);
+            failedTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            notExecutedTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            succeededTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            selectedTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.TestResultSplitContainer.Panel1.SuspendLayout();
             this.TestResultSplitContainer.Panel2.SuspendLayout();
             this.TestResultSplitContainer.SuspendLayout();
+            this.RunContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // ExecutionProgressBar
@@ -44,28 +55,39 @@
             this.ExecutionProgressBar.Size = new System.Drawing.Size(399, 10);
             this.ExecutionProgressBar.TabIndex = 0;
             // 
-            // linkLabel1
+            // runAllLinkLabel
             // 
-            linkLabel1.AutoSize = true;
-            linkLabel1.Location = new System.Drawing.Point(1, 13);
-            linkLabel1.Margin = new System.Windows.Forms.Padding(3);
-            linkLabel1.Name = "linkLabel1";
-            linkLabel1.Size = new System.Drawing.Size(40, 13);
-            linkLabel1.TabIndex = 1;
-            linkLabel1.TabStop = true;
-            linkLabel1.Text = "Run all";
-            linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnRunAllLinkClick);
+            runAllLinkLabel.AutoSize = true;
+            runAllLinkLabel.Location = new System.Drawing.Point(1, 13);
+            runAllLinkLabel.Margin = new System.Windows.Forms.Padding(3);
+            runAllLinkLabel.Name = "runAllLinkLabel";
+            runAllLinkLabel.Size = new System.Drawing.Size(40, 13);
+            runAllLinkLabel.TabIndex = 1;
+            runAllLinkLabel.TabStop = true;
+            runAllLinkLabel.Text = "Run all";
+            runAllLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnRunAllLinkClick);
             // 
-            // linkLabel2
+            // RunLinkLabel
             // 
-            linkLabel2.AutoSize = true;
-            linkLabel2.Location = new System.Drawing.Point(47, 13);
-            linkLabel2.Name = "linkLabel2";
-            linkLabel2.Size = new System.Drawing.Size(44, 13);
-            linkLabel2.TabIndex = 2;
-            linkLabel2.TabStop = true;
-            linkLabel2.Text = "Refresh";
-            linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnRefreshLinkClick);
+            this.RunLinkLabel.AutoSize = true;
+            this.RunLinkLabel.Location = new System.Drawing.Point(47, 13);
+            this.RunLinkLabel.Name = "RunLinkLabel";
+            this.RunLinkLabel.Size = new System.Drawing.Size(36, 13);
+            this.RunLinkLabel.TabIndex = 2;
+            this.RunLinkLabel.TabStop = true;
+            this.RunLinkLabel.Text = "Run...";
+            this.RunLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnRunLinkClicked);
+            // 
+            // refreshLinkLabel
+            // 
+            refreshLinkLabel.AutoSize = true;
+            refreshLinkLabel.Location = new System.Drawing.Point(89, 13);
+            refreshLinkLabel.Name = "refreshLinkLabel";
+            refreshLinkLabel.Size = new System.Drawing.Size(44, 13);
+            refreshLinkLabel.TabIndex = 3;
+            refreshLinkLabel.TabStop = true;
+            refreshLinkLabel.Text = "Refresh";
+            refreshLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnRefreshLinkClick);
             // 
             // imageList1
             // 
@@ -74,6 +96,44 @@
             imageList1.Images.SetKeyName(0, "Unknown");
             imageList1.Images.SetKeyName(1, "Failure");
             imageList1.Images.SetKeyName(2, "Success");
+            // 
+            // RunContextMenu
+            // 
+            this.RunContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            failedTestsToolStripMenuItem,
+            notExecutedTestsToolStripMenuItem,
+            succeededTestsToolStripMenuItem,
+            selectedTestsToolStripMenuItem});
+            this.RunContextMenu.Name = "RunContextMenu";
+            this.RunContextMenu.Size = new System.Drawing.Size(174, 92);
+            // 
+            // failedTestsToolStripMenuItem
+            // 
+            failedTestsToolStripMenuItem.Name = "failedTestsToolStripMenuItem";
+            failedTestsToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
+            failedTestsToolStripMenuItem.Text = "Failed Tests";
+            failedTestsToolStripMenuItem.Click += new System.EventHandler(this.OnRunFailedTestsMenuItemClick);
+            // 
+            // notExecutedTestsToolStripMenuItem
+            // 
+            notExecutedTestsToolStripMenuItem.Name = "notExecutedTestsToolStripMenuItem";
+            notExecutedTestsToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
+            notExecutedTestsToolStripMenuItem.Text = "Not Executed Tests";
+            notExecutedTestsToolStripMenuItem.Click += new System.EventHandler(this.OnRunNotExecutedTestsMenuItemClick);
+            // 
+            // succeededTestsToolStripMenuItem
+            // 
+            succeededTestsToolStripMenuItem.Name = "succeededTestsToolStripMenuItem";
+            succeededTestsToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
+            succeededTestsToolStripMenuItem.Text = "Succeeded Tests";
+            succeededTestsToolStripMenuItem.Click += new System.EventHandler(this.OnRunSucceededTestsMenuItemClick);
+            // 
+            // selectedTestsToolStripMenuItem
+            // 
+            selectedTestsToolStripMenuItem.Name = "selectedTestsToolStripMenuItem";
+            selectedTestsToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
+            selectedTestsToolStripMenuItem.Text = "Selected Tests";
+            selectedTestsToolStripMenuItem.Click += new System.EventHandler(this.OnRunSelectedTestsMenuItemClick);
             // 
             // TestView
             // 
@@ -120,7 +180,7 @@
             this.TestResultSplitContainer.Panel2.Controls.Add(this.TestResultLabel);
             this.TestResultSplitContainer.Size = new System.Drawing.Size(399, 254);
             this.TestResultSplitContainer.SplitterDistance = 167;
-            this.TestResultSplitContainer.TabIndex = 3;
+            this.TestResultSplitContainer.TabIndex = 4;
             this.TestResultSplitContainer.SizeChanged += new System.EventHandler(this.OnSplitContainerSizeChanged);
             // 
             // TestResultLabel
@@ -137,15 +197,17 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
+            this.Controls.Add(this.RunLinkLabel);
             this.Controls.Add(this.ExecutionProgressBar);
             this.Controls.Add(this.TestResultSplitContainer);
-            this.Controls.Add(linkLabel1);
-            this.Controls.Add(linkLabel2);
+            this.Controls.Add(runAllLinkLabel);
+            this.Controls.Add(refreshLinkLabel);
             this.Name = "TestRunnerControl";
             this.Size = new System.Drawing.Size(399, 286);
             this.TestResultSplitContainer.Panel1.ResumeLayout(false);
             this.TestResultSplitContainer.Panel2.ResumeLayout(false);
             this.TestResultSplitContainer.ResumeLayout(false);
+            this.RunContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -159,5 +221,7 @@
         private System.Windows.Forms.SplitContainer TestResultSplitContainer;
         private System.Windows.Forms.Label TestResultLabel;
         private ColorizedProgressBar ExecutionProgressBar;
+        private System.Windows.Forms.LinkLabel RunLinkLabel;
+        private System.Windows.Forms.ContextMenuStrip RunContextMenu;
     }
 }

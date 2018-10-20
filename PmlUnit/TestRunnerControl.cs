@@ -41,9 +41,10 @@ namespace PmlUnit
                 foreach (var test in testCase.Tests)
                 {
                     var item = TestView.Items.Add(test.Name);
-                    item.ImageKey = "Unknown";
+                    var status = new TestStatus(test, item);
+                    item.Tag = status;
+                    item.ImageKey = status.ImageKey;
                     item.SubItems.Add("");
-                    item.Tag = test;
                     item.Group = group;
                 }
             }
@@ -63,25 +64,58 @@ namespace PmlUnit
 
         private void OnRunAllLinkClick(object sender, LinkLabelLinkClickedEventArgs e)
         {
+            Run(status => true);
+        }
+
+        private void OnRunLinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            RunContextMenu.Show(RunLinkLabel, new Point(0, RunLinkLabel.Height));
+        }
+
+        private void OnRunFailedTestsMenuItemClick(object sender, EventArgs e)
+        {
+            Run(status => status.Failed);
+        }
+
+        private void OnRunNotExecutedTestsMenuItemClick(object sender, EventArgs e)
+        {
+            Run(status => !status.HasRun);
+        }
+
+        private void OnRunSucceededTestsMenuItemClick(object sender, EventArgs e)
+        {
+            Run(status => status.Succeeded);
+        }
+
+        private void OnRunSelectedTestsMenuItemClick(object sender, EventArgs e)
+        {
+            Run(status => status.Item.Selected);
+        }
+
+        private void Run(Func<TestStatus, bool> predicate)
+        {
+            var toRun = new List<TestStatus>();
+            foreach (ListViewItem item in TestView.Items)
+            {
+                var status = item.Tag as TestStatus;
+                if (status != null && predicate(status))
+                    toRun.Add(status);
+            }
+
             Enabled = false;
 
             ExecutionProgressBar.Value = 0;
-            ExecutionProgressBar.Maximum = TestView.Items.Count;
+            ExecutionProgressBar.Maximum = toRun.Count;
             ExecutionProgressBar.Color = Color.Green;
 
-            foreach (ListViewItem item in TestView.Items)
+            foreach (var status in toRun)
             {
-                var test = item.Tag as Test;
-                if (test == null)
-                    continue;
-
-                var result = Runner.Run(test);
-                item.ImageKey = result.Success ? "Success" : "Failure";
-                item.SubItems[0].Tag = result;
-                item.SubItems[1].Text = FormatDuration(result.Duration);
+                status.Result = Runner.Run(status.Test);
+                status.Item.ImageKey = status.ImageKey;
+                status.Item.SubItems[1].Text = status.FormatDuration();
 
                 ExecutionProgressBar.Increment(1);
-                if (!result.Success)
+                if (status.Failed)
                     ExecutionProgressBar.Color = Color.Red;
 
                 Application.DoEvents();
@@ -89,18 +123,6 @@ namespace PmlUnit
 
             Enabled = true;
             ResetTestViewColumnWidths();
-        }
-
-        private static string FormatDuration(TimeSpan? duration)
-        {
-            if (duration == null)
-                return "";
-
-            var millis = duration.Value.TotalMilliseconds;
-            if (millis < 1)
-                return "< 1 ms";
-            else
-                return Convert.ToInt64(millis) + " ms";
         }
 
         private void OnRefreshLinkClick(object sender, LinkLabelLinkClickedEventArgs e)
@@ -154,6 +176,64 @@ namespace PmlUnit
             var size = TestResultSplitContainer.Size;
             var orientation = size.Width > size.Height ? Orientation.Vertical : Orientation.Horizontal;
             TestResultSplitContainer.Orientation = orientation;
+        }
+
+        private class TestStatus
+        {
+            public Test Test { get; }
+            public TestResult Result { get; set; }
+            public ListViewItem Item { get; }
+
+            public TestStatus(Test test, ListViewItem item)
+            {
+                if (test == null)
+                    throw new ArgumentNullException(nameof(test));
+                if (item == null)
+                    throw new ArgumentNullException(nameof(item));
+
+                Test = test;
+                Item = item;
+            }
+
+            public bool Succeeded
+            {
+                get { return Result != null && Result.Success; }
+            }
+
+            public bool Failed
+            {
+                get { return Result != null && !Result.Success; }
+            }
+
+            public bool HasRun
+            {
+                get { return Result != null; }
+            }
+
+            public string ImageKey
+            {
+                get
+                {
+                    if (Result == null)
+                        return "Unknown";
+                    else if (Result.Success)
+                        return "Success";
+                    else
+                        return "Failure";
+                }
+            }
+
+            public string FormatDuration()
+            {
+                if (Result == null)
+                    return "";
+
+                var millis = Result.Duration.TotalMilliseconds;
+                if (millis < 1)
+                    return "< 1 ms";
+                else
+                    return Convert.ToInt64(millis) + " ms";
+            }
         }
     }
 }
