@@ -147,7 +147,7 @@ namespace PmlUnit.Tests
         }
 
         [Test]
-        public void LoadsTestsWhenWindowCloses()
+        public void LoadsTestsWhenWindowOpens()
         {
             // Arrange
             var windowMock = new Mock<DockedWindow>();
