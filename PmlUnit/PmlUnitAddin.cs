@@ -18,7 +18,7 @@ namespace PmlUnit
 
         public void Start(ServiceManager serviceManager)
         {
-            var testRunner = new TestRunner();
+            var testRunner = new PmlTestRunner();
             try
             {
                 Start(serviceManager, testRunner);

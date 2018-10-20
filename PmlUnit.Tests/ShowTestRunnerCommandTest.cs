@@ -26,7 +26,7 @@ namespace PmlUnit.Tests
             serviceMock.Setup(manager => manager.GetService(typeof(WindowManager)))
                 .Returns(windowMock.Object);
             serviceMock.Setup(manager => manager.GetService(typeof(TestRunner)))
-                .Returns(new TestRunner(Mock.Of<ObjectProxy>()));
+                .Returns(Mock.Of<TestRunner>());
             serviceMock.Setup(manager => manager.GetService(typeof(TestCaseProvider)))
                 .Returns(Mock.Of<TestCaseProvider>());
             // Act
@@ -41,11 +41,11 @@ namespace PmlUnit.Tests
             Assert.Throws<ArgumentNullException>(() => new ShowTestRunnerCommand(null));
 
             Assert.Throws<ArgumentNullException>(() => new ShowTestRunnerCommand(null, null, null));
-            Assert.Throws<ArgumentNullException>(() => new ShowTestRunnerCommand(null, null, new TestRunner(Mock.Of<ObjectProxy>())));
+            Assert.Throws<ArgumentNullException>(() => new ShowTestRunnerCommand(null, null, Mock.Of<TestRunner>()));
             Assert.Throws<ArgumentNullException>(() => new ShowTestRunnerCommand(null, Mock.Of<TestCaseProvider>(), null));
             Assert.Throws<ArgumentNullException>(() => new ShowTestRunnerCommand(Mock.Of<WindowManager>(), null, null));
-            Assert.Throws<ArgumentNullException>(() => new ShowTestRunnerCommand(null, Mock.Of<TestCaseProvider>(), new TestRunner(Mock.Of<ObjectProxy>())));
-            Assert.Throws<ArgumentNullException>(() => new ShowTestRunnerCommand(Mock.Of<WindowManager>(), null, new TestRunner(Mock.Of<ObjectProxy>())));
+            Assert.Throws<ArgumentNullException>(() => new ShowTestRunnerCommand(null, Mock.Of<TestCaseProvider>(), Mock.Of<TestRunner>()));
+            Assert.Throws<ArgumentNullException>(() => new ShowTestRunnerCommand(Mock.Of<WindowManager>(), null, Mock.Of<TestRunner>()));
             Assert.Throws<ArgumentNullException>(() => new ShowTestRunnerCommand(Mock.Of<WindowManager>(), Mock.Of<TestCaseProvider>(), null));
         }
 
@@ -59,7 +59,7 @@ namespace PmlUnit.Tests
                 It.IsAny<Control>(), It.IsAny<DockedPosition>()
             )).Returns(Mock.Of<DockedWindow>());
             var expectedProvider = Mock.Of<TestCaseProvider>();
-            var expectedRunner = new TestRunner(Mock.Of<ObjectProxy>());
+            var expectedRunner = Mock.Of<TestRunner>();
             // Act
             var command = new ShowTestRunnerCommand(windowMock.Object, expectedProvider, expectedRunner);
             // Assert
@@ -88,7 +88,7 @@ namespace PmlUnit.Tests
             // Act
             var command = new ShowTestRunnerCommand(
                 windowMock.Object, Mock.Of<TestCaseProvider>(),
-                new TestRunner(Mock.Of<ObjectProxy>())
+                Mock.Of<TestRunner>()
             );
             // Assert
             windowMock.VerifyAll();
@@ -107,7 +107,7 @@ namespace PmlUnit.Tests
             // Act & Assert
             var command = new ShowTestRunnerCommand(
                 managerMock.Object, Mock.Of<TestCaseProvider>(),
-                new TestRunner(Mock.Of<ObjectProxy>())
+                Mock.Of<TestRunner>()
             );
             command.Checked = true;
             command.Execute();
@@ -135,7 +135,7 @@ namespace PmlUnit.Tests
             // Act
             var command = new ShowTestRunnerCommand(
                 managerMock.Object, providerMock.Object,
-                new TestRunner(Mock.Of<ObjectProxy>())
+                Mock.Of<TestRunner>()
             );
             // Assert
             command.Checked = false;
@@ -163,7 +163,7 @@ namespace PmlUnit.Tests
             // Act
             var command = new ShowTestRunnerCommand(
                 managerMock.Object, providerMock.Object,
-                new TestRunner(Mock.Of<ObjectProxy>())
+                Mock.Of<TestRunner>()
             );
             // Assert
             providerMock.Verify(provider => provider.GetTestCases(), Times.Never);

@@ -19,7 +19,7 @@ namespace PmlUnit.Tests
             var mock = new Mock<ServiceManager>();
             var addin = new PmlUnitAddin();
             // Act
-            addin.Start(mock.Object, new TestRunner(Mock.Of<ObjectProxy>()));
+            addin.Start(mock.Object, Mock.Of<TestRunner>());
             // Assert
             mock.Verify(manager => manager.AddService(
                 typeof(TestCaseProvider), It.IsNotNull<TestCaseProvider>()
@@ -31,7 +31,7 @@ namespace PmlUnit.Tests
         {
             // Arrange
             var mock = new Mock<ServiceManager>();
-            var runner = new TestRunner(Mock.Of<ObjectProxy>());
+            var runner = Mock.Of<TestRunner>();
             var addin = new PmlUnitAddin();
             // Act
             addin.Start(mock.Object, runner);
@@ -49,7 +49,7 @@ namespace PmlUnit.Tests
                 .Returns(commandBarMock.Object);
             var addin = new PmlUnitAddin();
             // Act
-            addin.Start(serviceMock.Object, new TestRunner(Mock.Of<ObjectProxy>()));
+            addin.Start(serviceMock.Object, Mock.Of<TestRunner>());
             // Assert
             commandBarMock.Verify(
                 manager => manager.AddUICustomizationFromStream(It.IsNotNull<Stream>(), "PmlUnit")
@@ -76,11 +76,11 @@ namespace PmlUnit.Tests
             serviceMock.Setup(manager => manager.GetService(typeof(TestCaseProvider)))
                 .Returns(Mock.Of<TestCaseProvider>());
             serviceMock.Setup(manager => manager.GetService(typeof(TestRunner)))
-                .Returns(new TestRunner(Mock.Of<ObjectProxy>()));
+                .Returns(Mock.Of<TestRunner>());
 
             var addin = new PmlUnitAddin();
             // Act
-            addin.Start(serviceMock.Object, new TestRunner(Mock.Of<ObjectProxy>()));
+            addin.Start(serviceMock.Object, Mock.Of<TestRunner>());
             // Assert
             commandMock.Verify(
                 manager => manager.Commands.Add(It.IsNotNull<ShowTestRunnerCommand>())
