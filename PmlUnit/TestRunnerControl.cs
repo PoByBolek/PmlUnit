@@ -41,9 +41,9 @@ namespace PmlUnit
                 foreach (var test in testCase.Tests)
                 {
                     var item = TestView.Items.Add(test.Name);
-                    var status = new TestStatus(test, item);
-                    item.Tag = status;
-                    item.ImageKey = status.ImageKey;
+                    var entry = new TestListEntry(test, item);
+                    item.Tag = entry;
+                    item.ImageKey = entry.ImageKey;
                     item.SubItems.Add("");
                     item.Group = group;
                 }
@@ -62,70 +62,83 @@ namespace PmlUnit
             base.Dispose(disposing);
         }
 
-        private void OnRunAllLinkClick(object sender, LinkLabelLinkClickedEventArgs e)
+        private void OnRunAllLinkClick(object sender, EventArgs e)
         {
-            Run(status => true);
+            Run(FilterTests(entry => true));
         }
 
-        private void OnRunLinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void OnRunLinkClicked(object sender, EventArgs e)
         {
             RunContextMenu.Show(RunLinkLabel, new Point(0, RunLinkLabel.Height));
         }
 
         private void OnRunFailedTestsMenuItemClick(object sender, EventArgs e)
         {
-            Run(status => status.Failed);
+            Run(FilterTests(entry => entry.Failed));
         }
 
         private void OnRunNotExecutedTestsMenuItemClick(object sender, EventArgs e)
         {
-            Run(status => !status.HasRun);
+            Run(FilterTests(entry => !entry.HasRun));
         }
 
         private void OnRunSucceededTestsMenuItemClick(object sender, EventArgs e)
         {
-            Run(status => status.Succeeded);
+            Run(FilterTests(entry => entry.Succeeded));
         }
 
         private void OnRunSelectedTestsMenuItemClick(object sender, EventArgs e)
         {
-            Run(status => status.Item.Selected);
+            Run(FilterTests(entry => entry.Item.Selected));
         }
 
-        private void Run(Func<TestStatus, bool> predicate)
+        private ICollection<TestListEntry> FilterTests(Func<TestListEntry, bool> predicate)
         {
-            var toRun = new List<TestStatus>();
+            var result = new List<TestListEntry>();
             foreach (ListViewItem item in TestView.Items)
             {
-                var status = item.Tag as TestStatus;
-                if (status != null && predicate(status))
-                    toRun.Add(status);
+                var entry = item.Tag as TestListEntry;
+                if (entry != null && predicate(entry))
+                    result.Add(entry);
             }
+            return result;
+        }
 
+        private void Run(ICollection<TestListEntry> entries)
+        {
             Enabled = false;
+            try
+            {
+                RunInternal(entries);
+            }
+            finally
+            {
+                Enabled = true;
+                ResetTestViewColumnWidths();
+            }
+        }
 
+        private void RunInternal(ICollection<TestListEntry> entries)
+        {
             ExecutionProgressBar.Value = 0;
-            ExecutionProgressBar.Maximum = toRun.Count;
+            ExecutionProgressBar.Maximum = entries.Count;
             ExecutionProgressBar.Color = Color.Green;
 
-            foreach (var status in toRun)
+            foreach (var entry in entries)
             {
-                status.Result = Runner.Run(status.Test);
-                status.Item.ImageKey = status.ImageKey;
-                status.Item.SubItems[1].Text = status.FormatDuration();
+                entry.Result = Runner.Run(entry.Test);
+                entry.Item.ImageKey = entry.ImageKey;
+                entry.Item.SubItems[1].Text = entry.FormatDuration();
 
                 ExecutionProgressBar.Increment(1);
-                if (status.Failed)
+                if (entry.Failed)
                     ExecutionProgressBar.Color = Color.Red;
 
                 Application.DoEvents();
             }
-
-            Enabled = true;
-            ResetTestViewColumnWidths();
         }
 
-        private void OnRefreshLinkClick(object sender, LinkLabelLinkClickedEventArgs e)
+        private void OnRefreshLinkClick(object sender, EventArgs e)
         {
             Runner.RefreshIndex();
             SetTests(Provider.GetTestCases().Select(testCase => Reload(testCase)));
@@ -178,13 +191,13 @@ namespace PmlUnit
             TestResultSplitContainer.Orientation = orientation;
         }
 
-        private class TestStatus
+        private class TestListEntry
         {
             public Test Test { get; }
             public TestResult Result { get; set; }
             public ListViewItem Item { get; }
 
-            public TestStatus(Test test, ListViewItem item)
+            public TestListEntry(Test test, ListViewItem item)
             {
                 if (test == null)
                     throw new ArgumentNullException(nameof(test));
