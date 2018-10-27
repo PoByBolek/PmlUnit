@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -36,7 +37,7 @@ namespace PmlUnit
             TestView.Groups.Clear();
             foreach (var testCase in testCases)
             {
-                var groupName = string.Format("{0} ({1})", testCase.Name, testCase.Tests.Count);
+                var groupName = string.Format(CultureInfo.CurrentCulture, "{0} ({1})", testCase.Name, testCase.Tests.Count);
                 var group = TestView.Groups.Add(testCase.Name, groupName);
                 foreach (var test in testCase.Tests)
                 {
@@ -150,7 +151,7 @@ namespace PmlUnit
             {
                 Runner.Reload(testCase);
             }
-            catch (Exception e)
+            catch (PmlException e)
             {
                 Console.WriteLine("Failed to reload test case {0}", testCase.Name);
                 Console.WriteLine(e);

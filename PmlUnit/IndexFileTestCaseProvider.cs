@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 
@@ -15,6 +16,9 @@ namespace PmlUnit
         {
         }
 
+
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
+            Justification = "The private constructor closes the TextReader returned from CreateIndexFileReader().")]
         public IndexFileTestCaseProvider(string directoryName, TestCaseParser parser)
             : this(directoryName, CreateIndexFileReader(directoryName), parser, closeReader: true)
         {
@@ -68,7 +72,7 @@ namespace PmlUnit
             foreach (string line in reader.ReadAllLines())
             {
                 var trimmed = line.Trim();
-                if (trimmed.StartsWith("/"))
+                if (trimmed.StartsWith("/", StringComparison.Ordinal))
                 {
                     // TODO: what happens when PDMS encounters "/../../" ?
                     directory = Path.Combine(directoryName, trimmed.Substring(1));

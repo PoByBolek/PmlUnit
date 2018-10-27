@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Diagnostics.CodeAnalysis;
 using Aveva.PDMS.PMLNet;
 
 namespace PmlUnit
@@ -11,7 +11,7 @@ namespace PmlUnit
         public PmlObjectProxy(string objectName, params object[] arguments)
         {
             if (string.IsNullOrEmpty(objectName))
-                throw new ArgumentException(nameof(objectName));
+                throw new ArgumentNullException(nameof(objectName));
 
             arguments = arguments ?? new object[0];
             Object = PMLNetAny.createInstance(objectName, arguments, arguments.Length);
@@ -24,10 +24,11 @@ namespace PmlUnit
 
         ~PmlObjectProxy()
         {
-            GC.SuppressFinalize(this);
             Dispose(false);
         }
 
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
+            Justification = "Callers are required to dispose the return value of this method.")]
         public object Invoke(string method, params object[] arguments)
         {
             if (string.IsNullOrEmpty(method))
@@ -49,6 +50,7 @@ namespace PmlUnit
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)

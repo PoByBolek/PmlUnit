@@ -3,6 +3,7 @@ using Aveva.ApplicationFramework;
 
 namespace PmlUnit
 {
+    [CLSCompliant(false)]
     public static class ServiceManagerExtensions
     {
         public static T GetService<T>(this ServiceManager manager)

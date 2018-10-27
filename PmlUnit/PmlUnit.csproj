@@ -20,6 +20,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -60,6 +61,7 @@
     <Compile Include="IndexFileTestCaseProvider.cs" />
     <Compile Include="ObjectProxy.cs" />
     <Compile Include="ParserException.cs" />
+    <Compile Include="PmlException.cs" />
     <Compile Include="PmlObjectProxy.cs" />
     <Compile Include="PmlTestRunner.cs" />
     <Compile Include="PmlUnitAddin.cs" />

@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using Aveva.ApplicationFramework;
 using Aveva.ApplicationFramework.Presentation;
 
@@ -16,6 +18,9 @@ namespace PmlUnit
             get { return "PML Unit"; }
         }
 
+        [CLSCompliant(false)]
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
+            Justification = "Once the addin has successfully, started the TestRunnerControl will dispose the TestRunner.")]
         public void Start(ServiceManager serviceManager)
         {
             var testRunner = new PmlTestRunner();
@@ -30,6 +35,8 @@ namespace PmlUnit
             }
         }
 
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic",
+            Justification = "For consistency with the public Start() method of the IAddin interface, this is also an instance method.")]
         internal void Start(ServiceManager serviceManager, TestRunner testRunner)
         {
             serviceManager.AddService(testRunner);

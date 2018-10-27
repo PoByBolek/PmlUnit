@@ -17,22 +17,18 @@ namespace PmlUnit.Tests
         public void Constructor_QueriesForCorrectServiceTypes()
         {
             // Arrange
-            var windowMock = new Mock<WindowManager>();
-            windowMock.Setup(manager => manager.CreateDockedWindow(
-                It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<Control>(), It.IsAny<DockedPosition>()
-            )).Returns(Mock.Of<DockedWindow>());
-            var serviceMock = new Mock<ServiceManager>();
-            serviceMock.Setup(manager => manager.GetService(typeof(WindowManager)))
-                .Returns(windowMock.Object);
-            serviceMock.Setup(manager => manager.GetService(typeof(TestRunner)))
+            var windowManagerMock = SetupWindowManager();
+            var serviceManagerMock = new Mock<ServiceManager>();
+            serviceManagerMock.Setup(manager => manager.GetService(typeof(WindowManager)))
+                .Returns(windowManagerMock.Object);
+            serviceManagerMock.Setup(manager => manager.GetService(typeof(TestRunner)))
                 .Returns(Mock.Of<TestRunner>());
-            serviceMock.Setup(manager => manager.GetService(typeof(TestCaseProvider)))
+            serviceManagerMock.Setup(manager => manager.GetService(typeof(TestCaseProvider)))
                 .Returns(Mock.Of<TestCaseProvider>());
             // Act
-            new ShowTestRunnerCommand(serviceMock.Object);
+            new ShowTestRunnerCommand(serviceManagerMock.Object);
             // Assert
-            serviceMock.VerifyAll();
+            serviceManagerMock.VerifyAll();
         }
 
         [Test]
@@ -53,19 +49,18 @@ namespace PmlUnit.Tests
         public void Constructor_CreatesRunnerControlWithSpecifiedTestProviderAndRunner()
         {
             // Arrange
-            var windowMock = new Mock<WindowManager>();
-            windowMock.Setup(manager => manager.CreateDockedWindow(
-                It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<Control>(), It.IsAny<DockedPosition>()
-            )).Returns(Mock.Of<DockedWindow>());
+            var windowManagerMock = SetupWindowManager();
             var expectedProvider = Mock.Of<TestCaseProvider>();
             var expectedRunner = Mock.Of<TestRunner>();
             // Act
-            var command = new ShowTestRunnerCommand(windowMock.Object, expectedProvider, expectedRunner);
+            var command = new ShowTestRunnerCommand(
+                windowManagerMock.Object, expectedProvider, expectedRunner
+            );
             // Assert
-            var control = command.GetType().GetField(
-                "RunnerControl", BindingFlags.NonPublic | BindingFlags.Instance
-            ).GetValue(command);
+            var window = command.GetType().GetField(
+                "Window", BindingFlags.NonPublic | BindingFlags.Instance
+            ).GetValue(command) as DockedWindow;
+            var control = window.Control;
             var actualProvider = control.GetType().GetField(
                 "Provider", BindingFlags.NonPublic | BindingFlags.Instance
             ).GetValue(control);
@@ -80,18 +75,13 @@ namespace PmlUnit.Tests
         public void Constructor_CreatesWindowWithRunnerControl()
         {
             // Arrange
-            var windowMock = new Mock<WindowManager>();
-            windowMock.Setup(manager => manager.CreateDockedWindow(
-                It.IsAny<string>(), It.IsAny<string>(),
-                It.IsNotNull<TestRunnerControl>(), It.IsAny<DockedPosition>()
-            )).Returns(Mock.Of<DockedWindow>());
+            var windowManagerMock = SetupWindowManager();
             // Act
             var command = new ShowTestRunnerCommand(
-                windowMock.Object, Mock.Of<TestCaseProvider>(),
-                Mock.Of<TestRunner>()
+                windowManagerMock.Object, Mock.Of<TestCaseProvider>(), Mock.Of<TestRunner>()
             );
             // Assert
-            windowMock.VerifyAll();
+            windowManagerMock.VerifyAll();
         }
 
         [Test]
@@ -99,15 +89,10 @@ namespace PmlUnit.Tests
         {
             // Arrange
             var windowMock = new Mock<DockedWindow>();
-            var managerMock = new Mock<WindowManager>();
-            managerMock.Setup(manager => manager.CreateDockedWindow(
-                It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<Control>(), It.IsAny<DockedPosition>()
-            )).Returns(windowMock.Object);
+            var windowManagerMock = SetupWindowManager(windowMock);
             // Act & Assert
             var command = new ShowTestRunnerCommand(
-                managerMock.Object, Mock.Of<TestCaseProvider>(),
-                Mock.Of<TestRunner>()
+                windowManagerMock.Object, Mock.Of<TestCaseProvider>(), Mock.Of<TestRunner>()
             );
             command.Checked = true;
             command.Execute();
@@ -123,19 +108,13 @@ namespace PmlUnit.Tests
         {
             // Arrange
             var windowMock = new Mock<DockedWindow>();
-            var managerMock = new Mock<WindowManager>();
-            managerMock.Setup(manager => manager.CreateDockedWindow(
-                It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<Control>(), It.IsAny<DockedPosition>()
-            )).Returns(windowMock.Object);
-
+            var windowManagerMock = SetupWindowManager(windowMock);
             var providerMock = new Mock<TestCaseProvider>();
             providerMock.Setup(provider => provider.GetTestCases())
                 .Returns(new List<TestCase>());
             // Act
             var command = new ShowTestRunnerCommand(
-                managerMock.Object, providerMock.Object,
-                Mock.Of<TestRunner>()
+                windowManagerMock.Object, providerMock.Object, Mock.Of<TestRunner>()
             );
             // Assert
             command.Checked = false;
@@ -151,24 +130,36 @@ namespace PmlUnit.Tests
         {
             // Arrange
             var windowMock = new Mock<DockedWindow>();
-            var managerMock = new Mock<WindowManager>();
-            managerMock.Setup(manager => manager.CreateDockedWindow(
-                It.IsAny<string>(), It.IsAny<string>(),
-                It.IsAny<Control>(), It.IsAny<DockedPosition>()
-            )).Returns(windowMock.Object);
-
+            var windowManagerMock = SetupWindowManager(windowMock);
             var providerMock = new Mock<TestCaseProvider>();
             providerMock.Setup(provider => provider.GetTestCases())
                 .Returns(new List<TestCase>());
             // Act
             var command = new ShowTestRunnerCommand(
-                managerMock.Object, providerMock.Object,
-                Mock.Of<TestRunner>()
+                windowManagerMock.Object, providerMock.Object, Mock.Of<TestRunner>()
             );
             // Assert
             providerMock.Verify(provider => provider.GetTestCases(), Times.Never);
             windowMock.Raise(window => window.Shown += null, windowMock.Object, EventArgs.Empty);
             providerMock.Verify(provider => provider.GetTestCases(), Times.Once);
+        }
+
+        private static Mock<WindowManager> SetupWindowManager()
+        {
+            return SetupWindowManager(new Mock<DockedWindow>());
+        }
+
+        private static Mock<WindowManager> SetupWindowManager(Mock<DockedWindow> windowMock)
+        {
+            var result = new Mock<WindowManager>();
+            result.Setup(manager => manager.CreateDockedWindow(
+                It.IsAny<string>(), It.IsAny<string>(),
+                It.IsAny<Control>(), It.IsAny<DockedPosition>()
+            )).Returns((string key, string title, Control control, DockedPosition position) => {
+                windowMock.SetupGet(window => window.Control).Returns(control);
+                return windowMock.Object;
+            });
+            return result;
         }
     }
 }

@@ -46,13 +46,13 @@ namespace PmlUnit
 
         ~PmlTestRunner()
         {
-            GC.SuppressFinalize(this);
             Dispose(false);
         }
 
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -110,7 +110,7 @@ namespace PmlUnit
         private void InvokePmlMethod(string method, params object[] arguments)
         {
             if (RunnerProxy == null)
-                throw new ArgumentNullException(nameof(PmlTestRunner));
+                throw new ObjectDisposedException(nameof(PmlTestRunner));
 
             var result = RunnerProxy.Invoke(method, arguments);
             var exception = UnmarshalException(result);
@@ -118,19 +118,11 @@ namespace PmlUnit
                 throw exception;
         }
 
-        private static Exception UnmarshalException(object result)
+        private static PmlException UnmarshalException(object result)
         {
             var stackTrace = result as Hashtable;
             if (stackTrace != null && stackTrace.Count > 0)
-            {
-                var message = new StringBuilder();
-                foreach (var key in stackTrace.Keys.OfType<double>().OrderBy(x => x))
-                {
-                    message.Append(stackTrace[key]);
-                    message.Append('\n');
-                }
-                return new Exception(message.ToString());
-            }
+                return new PmlException(stackTrace);
 
             var disposable = result as IDisposable;
             if (disposable != null)

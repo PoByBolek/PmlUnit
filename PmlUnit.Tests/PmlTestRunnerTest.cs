@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 using Moq;
 using NUnit.Framework;
 
@@ -29,6 +30,8 @@ namespace PmlUnit.Tests
         }
 
         [Test]
+        [SuppressMessage("Microsoft.Usage", "CA2202:Do not dispose objects multiple times",
+            Justification = "Tests that the TestRunner does not dispose its proxy multiple times.")]
         public void Dispose_ShouldOnlyDisposeTheProxyOnce()
         {
             var proxy = new Mock<ObjectProxy>();
@@ -156,7 +159,7 @@ namespace PmlUnit.Tests
             var result = runner.Run(new TestCaseBuilder("Test").AddTest("test").Build().Tests[0]);
             Assert.That(!result.Success);
             Assert.That(result.Error, Is.Not.Null);
-            Assert.That(result.Error.Message, Is.EqualTo("This is an error message...\n... which spans two lines\n"));
+            Assert.That(result.Error.Message, Is.EqualTo("This is an error message...\r\n... which spans two lines\r\n"));
         }
 
         [Test]

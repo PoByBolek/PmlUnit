@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
+using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -13,6 +15,10 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+
+[assembly: CLSCompliant(true)]
+[assembly: NeutralResourcesLanguage("en")]
+
 [assembly: InternalsVisibleTo("PmlUnit.Tests")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 

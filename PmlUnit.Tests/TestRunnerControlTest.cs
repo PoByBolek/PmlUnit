@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
@@ -10,6 +11,7 @@ namespace PmlUnit.Tests
 {
     [TestFixture]
     [TestOf(typeof(PmlTestRunner))]
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class TestRunnerControlTest
     {
         private List<TestCase> TestCases;
@@ -33,6 +35,12 @@ namespace PmlUnit.Tests
 
             RunnerControl = new TestRunnerControl(ProviderMock.Object, RunnerMock.Object);
             TestList = FindControl<ListView>("TestView");
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            RunnerControl.Dispose();
         }
 
         [Test]

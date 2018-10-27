@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using Aveva.ApplicationFramework;
 using Aveva.ApplicationFramework.Presentation;
 
@@ -7,7 +8,6 @@ namespace PmlUnit
     class ShowTestRunnerCommand : Command
     {
         private readonly DockedWindow Window;
-        private readonly TestRunnerControl RunnerControl;
 
         public ShowTestRunnerCommand(ServiceManager serviceManager)
             : this(
@@ -18,6 +18,8 @@ namespace PmlUnit
         {
         }
 
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
+            Justification = "The DockedWindow should dispose the Control when PDMS exits.")]
         public ShowTestRunnerCommand(WindowManager windowManager, TestCaseProvider testCaseProvider, TestRunner testRunner)
         {
             if (windowManager == null)
@@ -30,12 +32,12 @@ namespace PmlUnit
             ExecuteOnCheckedChange = false;
             Key = "PmlUnit.ShowTestRunnerCommand";
 
-            RunnerControl = new TestRunnerControl(testCaseProvider, testRunner);
+            var runnerControl = new TestRunnerControl(testCaseProvider, testRunner);
             try
             {
 
                 Window = windowManager.CreateDockedWindow(
-                    "PmlUnit.TestRunner", "PML Unit", RunnerControl, DockedPosition.Right
+                    "PmlUnit.TestRunner", "PML Unit", runnerControl, DockedPosition.Right
                 );
                 Window.SaveLayout = true;
                 Window.Shown += OnWindowShown;
@@ -45,7 +47,7 @@ namespace PmlUnit
             }
             catch
             {
-                RunnerControl.Dispose();
+                runnerControl.Dispose();
                 throw;
             }
         }
@@ -53,7 +55,9 @@ namespace PmlUnit
         private void OnWindowShown(object sender, EventArgs e)
         {
             Checked = true;
-            RunnerControl.LoadTests();
+            var runnerControl = Window.Control as TestRunnerControl;
+            if (runnerControl != null)
+                runnerControl.LoadTests();
         }
 
         private void OnWindowClosed(object sender, EventArgs e)
