@@ -42,14 +42,20 @@ namespace PmlUnit
                 Window.SaveLayout = true;
                 Window.Shown += OnWindowShown;
                 Window.Closed += OnWindowClosed;
-
-                Checked = Window.Visible;
             }
             catch
             {
                 runnerControl.Dispose();
                 throw;
             }
+        }
+
+        public void InitializeCheckedState()
+        {
+            // Checked is a virtual property of the Command base class. So we
+            // shouldn't call this in the constructor. That's why this method
+            // exists.
+            Checked = Window.Visible;
         }
 
         private void OnWindowShown(object sender, EventArgs e)

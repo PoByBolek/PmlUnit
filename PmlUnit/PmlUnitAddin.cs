@@ -46,7 +46,11 @@ namespace PmlUnit
 
             var commandManager = serviceManager.GetService<CommandManager>();
             if (commandManager != null)
-                commandManager.Commands.Add(new ShowTestRunnerCommand(serviceManager));
+            {
+                var command = new ShowTestRunnerCommand(serviceManager);
+                command.InitializeCheckedState();
+                commandManager.Commands.Add(command);
+            }
 
             var commandBarManager = serviceManager.GetService<CommandBarManager>();
             if (commandBarManager != null)
