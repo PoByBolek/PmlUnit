@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Linq;
-using System.Text;
 
 namespace PmlUnit
 {
@@ -73,11 +71,16 @@ namespace PmlUnit
 
         public void Reload(TestCase testCase)
         {
+            if (testCase == null)
+                throw new ArgumentNullException(nameof(testCase));
+
             InvokePmlMethod("reload", testCase.Name);
         }
 
         public void Run(TestCase testCase)
         {
+            if (testCase == null)
+                throw new ArgumentNullException(nameof(testCase));
             if (RunnerProxy == null)
                 throw new ObjectDisposedException(nameof(PmlTestRunner));
 
@@ -87,6 +90,8 @@ namespace PmlUnit
 
         public TestResult Run(Test test)
         {
+            if (test == null)
+                throw new ArgumentNullException(nameof(test));
             if (RunnerProxy == null)
                 throw new ObjectDisposedException(nameof(PmlTestRunner));
 
@@ -100,7 +105,7 @@ namespace PmlUnit
                 var elapsed = Clock.CurrentInstant - start;
                 return new TestResult(elapsed, UnmarshalException(result));
             }
-            catch (Exception error)
+            catch (PmlException error)
             {
                 var elapsed = Clock.CurrentInstant - start;
                 return new TestResult(elapsed, error);

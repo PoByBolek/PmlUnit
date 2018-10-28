@@ -117,7 +117,7 @@ namespace PmlUnit.Tests
         {
             int seconds = 0;
             var proxy = new Mock<ObjectProxy>();
-            proxy.Setup(mock => mock.Invoke(It.IsAny<string>(), It.IsAny<object[]>())).Throws<Exception>();
+            proxy.Setup(mock => mock.Invoke(It.IsAny<string>(), It.IsAny<object[]>())).Throws<PmlException>();
             var clock = new Mock<Clock>();
             clock.SetupGet(mock => mock.CurrentInstant)
                 .Returns(() => Instant.FromSeconds(seconds))
@@ -138,7 +138,7 @@ namespace PmlUnit.Tests
         [Test]
         public void Run_ShouldReturnFailedResultWhenTestFails()
         {
-            var error = new Exception();
+            var error = new PmlException();
             var proxy = new Mock<ObjectProxy>();
             proxy.Setup(mock => mock.Invoke(It.IsAny<string>(), It.IsAny<object[]>())).Throws(error);
             var runner = new PmlTestRunner(proxy.Object);
