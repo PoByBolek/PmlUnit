@@ -20,7 +20,7 @@ namespace PmlUnit
 
         [CLSCompliant(false)]
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
-            Justification = "Once the addin has successfully, started the TestRunnerControl will dispose the TestRunner.")]
+            Justification = "Once the addin has successfully started, the TestRunnerControl will dispose the TestRunner.")]
         public void Start(ServiceManager serviceManager)
         {
             var testRunner = new PmlTestRunner();

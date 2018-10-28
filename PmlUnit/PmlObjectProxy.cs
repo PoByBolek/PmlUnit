@@ -1,6 +1,11 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
+
+#if E3D_21
+using Aveva.Core.PMLNet;
+#else
 using Aveva.PDMS.PMLNet;
+#endif
 
 namespace PmlUnit
 {
