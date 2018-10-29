@@ -205,8 +205,9 @@ namespace PmlUnit
             this.Controls.Add(this.TestResultSplitContainer);
             this.Controls.Add(runAllLinkLabel);
             this.Controls.Add(refreshLinkLabel);
+            this.MinimumSize = new System.Drawing.Size(150, 50);
             this.Name = "TestRunnerControl";
-            this.Size = new System.Drawing.Size(399, 286);
+            this.Size = new System.Drawing.Size(400, 300);
             this.TestResultSplitContainer.Panel1.ResumeLayout(false);
             this.TestResultSplitContainer.Panel2.ResumeLayout(false);
             this.TestResultSplitContainer.ResumeLayout(false);
