@@ -104,7 +104,7 @@ namespace PmlUnit.Tests
         }
 
         [Test]
-        public void Checked_ChangesWhenWindowIsShownOrHidden()
+        public void Checked_ChangesWhenWindowIsHidden()
         {
             // Arrange
             var windowMock = new Mock<DockedWindow>();
@@ -116,12 +116,9 @@ namespace PmlUnit.Tests
             var command = new ShowTestRunnerCommand(
                 windowManagerMock.Object, providerMock.Object, Mock.Of<TestRunner>()
             );
-            // Assert
-            command.Checked = false;
-            windowMock.Raise(window => window.Shown += null, windowMock.Object, EventArgs.Empty);
-            Assert.IsTrue(command.Checked);
-
+            command.Checked = true;
             windowMock.Raise(window => window.Closed += null, windowMock.Object, EventArgs.Empty);
+            // Assert
             Assert.IsFalse(command.Checked);
         }
 

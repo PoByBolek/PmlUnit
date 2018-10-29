@@ -29,7 +29,6 @@ namespace PmlUnit
             if (testRunner == null)
                 throw new ArgumentNullException(nameof(testRunner));
 
-            ExecuteOnCheckedChange = false;
             Key = "PmlUnit.ShowTestRunnerCommand";
 
             var runnerControl = new TestRunnerControl(testCaseProvider, testRunner);
@@ -42,6 +41,8 @@ namespace PmlUnit
                 Window.SaveLayout = true;
                 Window.Shown += OnWindowShown;
                 Window.Closed += OnWindowClosed;
+
+                windowManager.WindowLayoutLoaded += OnWindowLayoutLoaded;
             }
             catch
             {
@@ -50,17 +51,13 @@ namespace PmlUnit
             }
         }
 
-        public void InitializeCheckedState()
+        private void OnWindowLayoutLoaded(object sender, EventArgs e)
         {
-            // Checked is a virtual property of the Command base class. So we
-            // shouldn't call this in the constructor. That's why this method
-            // exists.
             Checked = Window.Visible;
         }
 
         private void OnWindowShown(object sender, EventArgs e)
         {
-            Checked = true;
             var runnerControl = Window.Control as TestRunnerControl;
             if (runnerControl != null)
                 runnerControl.LoadTests();
