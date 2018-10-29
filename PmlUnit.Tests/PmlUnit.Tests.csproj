@@ -103,6 +103,7 @@
   <ItemGroup>
     <Compile Include="EnvironmentVariableTestCaseProviderTest.cs" />
     <Compile Include="IndexFileTestCaseProviderTest.cs" />
+    <Compile Include="InstantTest.cs" />
     <Compile Include="PmlTestRunnerTest.cs" />
     <Compile Include="PmlUnitAddinTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
