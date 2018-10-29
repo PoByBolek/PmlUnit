@@ -19,6 +19,7 @@ namespace PmlUnit.Tests
         private Mock<TestRunner> RunnerMock;
         private TestRunnerControl RunnerControl;
         private ListView TestList;
+        private Label ResultLabel;
 
         [SetUp]
         public void Setup()
@@ -35,6 +36,7 @@ namespace PmlUnit.Tests
 
             RunnerControl = new TestRunnerControl(ProviderMock.Object, RunnerMock.Object);
             TestList = FindControl<ListView>("TestView");
+            ResultLabel = FindControl<Label>("TestResultLabel");
         }
 
         [TearDown]
@@ -150,6 +152,21 @@ namespace PmlUnit.Tests
             var expected = new HashSet<int> { 0, 1, 2, 3, 4 };
             expected.ExceptWith(selected);
             AssertTestsHaveRun(expected);
+        }
+
+        [Test]
+        public void SelectedIndexChange_DisplaysTestFailureInDetailsPanel()
+        {
+            // Arrange
+            RunnerMock.Reset();
+            RunnerMock.Setup(runner => runner.Run(It.IsAny<Test>()))
+                .Returns(new TestResult(TimeSpan.FromSeconds(1), new PmlException("An error occurred")));
+            RunnerControl.LoadTests();
+            // Act
+            RunEventHandler("OnRunAllLinkClick");
+            TestList.Items[0].Selected = true;
+            // Assert
+            Assert.AreEqual("An error occurred", ResultLabel.Text);
         }
 
         private void RunEventHandler(string handler)

@@ -164,8 +164,8 @@ namespace PmlUnit
         {
             foreach (ListViewItem item in TestView.SelectedItems)
             {
-                var result = item.SubItems[0].Tag as TestResult;
-                TestResultLabel.Text = result?.Error?.Message ?? "";
+                var entry = item.Tag as TestListEntry;
+                TestResultLabel.Text = entry?.Result?.Error?.Message ?? "";
             }
         }
 
