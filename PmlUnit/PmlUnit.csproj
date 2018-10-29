@@ -123,9 +123,13 @@
     <EmbeddedResource Include="TestRunnerControl.resx">
       <DependentUpon>TestRunnerControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="PmlUnitAddin.uic">
+    <EmbeddedResource Include="PmlUnitAddin.e3d.uic">
       <DependentUpon>PmlUnitAddin.cs</DependentUpon>
-      <LogicalName>PmlUnit.PmlUnitAddin.uic</LogicalName>
+      <LogicalName>PmlUnit.PmlUnitAddin.e3d.uic</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PmlUnitAddin.pdms.uic">
+      <DependentUpon>PmlUnitAddin.cs</DependentUpon>
+      <LogicalName>PmlUnit.PmlUnitAddin.pdms.uic</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

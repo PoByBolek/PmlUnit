@@ -67,7 +67,11 @@ namespace PmlUnit
         {
             var assembly = typeof(PmlUnitAddin).Assembly;
             // Visual Studio (or MSBuild?) seems to give the resource different names from time to time...
-            var resourceNames = new string[] { "PmlUnit.PmlUnitAddin.uic", "PmlUnit.PmlUnitAddin" };
+#if PDMS_120 || PDMS_121
+            var resourceNames = new string[] { "PmlUnit.PmlUnitAddin.pdms.uic", "PmlUnit.PmlUnitAddin.pdms" };
+#else
+            var resourceNames = new string[] { "PmlUnit.PmlUnitAddin.e3d.uic", "PmlUnit.PmlUnitAddin.e3d" };
+#endif
 
             foreach (var resource in resourceNames)
             {

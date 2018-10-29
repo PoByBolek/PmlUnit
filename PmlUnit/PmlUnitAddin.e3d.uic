@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<UserInterfaceCustomization xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="www.aveva.com">
+  <Version>1.0</Version>
+  <Tools>
+    <StateButtonTool Name="PmlUnit.ShowTestRunnerButton">
+      <Command>
+        <Type>Instance</Type>
+        <Key>PmlUnit.ShowTestRunnerCommand</Key>
+        <Arguments />
+      </Command>
+      <Image>iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAADdgAAA3YBfdWCzAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAUXSURBVFiF7ZdrbBRVFMd/587uskUEQUFFTdGCIAiiQkhIwKiRR0wKdLsRTDAEEAy2tCv4aAt0F+jgI5GyFYlRv/ggyrbLQ1FMMJAYNBqsYtgqJvpFlOADMGIouzv3+KHb8rBsCyV+8nyZ3Ll3zv93zrn3zIzQA2tKRYsFeVNg9qxRtR9eig/TEwBHRQEU1Uv1Id1duC21eoJF1wOjgQPWamXp6Oj+SxW+KIAth9be4Mt6KaDfWbePOdY3csbomqM9AehWCfyeV5wT3+44wb4gu4ABnvEe7Il4twHOmIjfOdXtsl02AGN0O3ACtLg1LX+CTgP+cKyz8z8BmDEi+ougU4F9wEngEzEytaf1/9+gi2NYurRmBugWIACcFuzMRPzZXe3z4YqqYlVJtM9jmdX4kntRHdGXl06saq7bAb0UMx7oALCYuwUN5IYqxirAnGXRazLp9AKQosaGukWhiqpHsYwxsCnRsK7lbI28mzCxYd2OxrgbBNbkBVWtbYy7BbnsSCaTPoTROxCdVFpRtVlUXEFOq8iXJRXPjO82wMXazMroVYCiHFLkAxUeEjV7VWW++GQ9YDQrP4bLqwa2P5O3BGdCJECe140a4w9HIgXqpb8PlVe3Ihw3Vj9KNKz7Dfim3Uvp0upXHR8tqjIwVL5iSlPD2t1dAoQXPd1PlXltHHLwXGVN5a7zofdPotqMyOqs8bcAlFZUbUZlCvCtWGdJIr6mPFxZ9bZV7hJjK4HdXZbABp0YcK0I+xLxum1nzzXF3QTKZ8BgtVqswjjBFm2rj57weZnnUSlRYYsqhdZ4W3OJOCUQRTkKXeyBUGTlKIElgJe13uPwr0KodSgDPJQpBnldkTtz6BMF3m/a4C5BxBUoKqmsvs5aHQyyvzHuLugSwHheA+AHXt7a8NyBztYk691mhNcAv6IRVA8BqJhmhamlFTVrQCPA4TFXBY4acX4AxpYurX43L0CovGaOwr2I/po1gVX5QMUEqhH+UvBbkUHhSHSATfuXg3yKahXgWZVwW8qyhSLUoQQvCBBeEu0joi8ATJjsHzR3oZQDbG2JrU6mYtp0MLYSIJmKxpKpmM5ZaMpQagCMsAqb2Ru8AtsYr5v6+4BAsCnujkw21H1+8Fh6I2JeVdV6FX0FLnAM1ZdZCdzQuw9HioY713fng+/2AYGNB4+nH0EZh+iV2UymJFRW0yx/pO8vrag+ku6V3Uor861hSPC0bd286dnjnWYgtHTFMBFdhsDY8f73Sm6vFWPwJ1MxtZZMyahaEVFfMhVTMF7JqFoB64wJizfxPn8zYFW1UCEkRt9S4RYUN3DaWQukjWVku3inACJ2gyrO0BEOhcPM4W4E32FDhjo/q/AGiAgUIuxtiruLRXgKFZ813NMYdz8++5lzAEIVNSGU6cbh7x9asoPOj7x9rCrZ9sjPz0Robq95jo9WRYerlZ0AiQ3u5sa4+3iy3m0+H7oDIByJFBi0HqDoVrMn10Yv2oIFcPNQZw+AiNbPmxcN5lvfAaC2d7UqN4J8NW6S7+vOIu9uJsZPdvb3v9oA3HKyb/rJLgFmP1FzE6rLaet0ZcbIJf/ptEWO3j3RIeevanbZU4PzAmQzhIBg/4Hmu4cXB/Z1FXm+09A+fuyBmAA7gAJPnBl5AdSoAKinfi/bo+A7LByJFAC9u1on0FaCbFZbgD6XRf1chT+tcFuy3j3S2bQBeOfFup9EZDrCfiB7maQzwBfWyrQLiQP8A/qVVm8T1ZAdAAAAAElFTkSuQmCC</Image>
+      <ShortCut>CtrlT</ShortCut>
+      <Caption>Test Runner</Caption>
+      <DisplayStyle>Default</DisplayStyle>
+    </StateButtonTool>
+  </Tools>
+  <InstanceTools />
+  <MenuBar />
+  <CommandBars />
+  <TaskPanes />
+  <ContextMenus />
+  <AreaLeftTools />
+  <AreaRightTools />
+  <FooterTools />
+  <NavigationMenuTools />
+  <QATTools />
+  <ContextualTabGroups />
+  <TabToolbarTools />
+  <Tabs>
+    <Tab Name="PmlUnit.MainTab">
+      <Caption>PML UNIT</Caption>
+      <ContextualTabGroup>
+        <Item>None</Item>
+      </ContextualTabGroup>
+      <Groups>
+        <Group Name="PmlUnit.MainGroup">
+          <Tools>
+            <Tool Name="PmlUnit.ShowTestRunnerButton" LargeImage="True" ImageOnly="False" />
+          </Tools>
+          <Caption>Run</Caption>
+        </Group>
+      </Groups>
+      <KeyTip>U</KeyTip>
+    </Tab>
+  </Tabs>
+  <MiniToolbarTools />
+  <Namespace>PmlUnit</Namespace>
+</UserInterfaceCustomization>
