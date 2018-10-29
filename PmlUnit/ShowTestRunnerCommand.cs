@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using Aveva.ApplicationFramework;
 using Aveva.ApplicationFramework.Presentation;
 
 namespace PmlUnit
@@ -9,46 +7,23 @@ namespace PmlUnit
     {
         private readonly DockedWindow Window;
 
-        public ShowTestRunnerCommand(ServiceManager serviceManager)
-            : this(
-                  serviceManager.GetService<WindowManager>(),
-                  serviceManager.GetService<TestCaseProvider>(),
-                  serviceManager.GetService<TestRunner>()
-            )
-        {
-        }
-
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
-            Justification = "The DockedWindow should dispose the Control when PDMS exits.")]
-        public ShowTestRunnerCommand(WindowManager windowManager, TestCaseProvider testCaseProvider, TestRunner testRunner)
+        public ShowTestRunnerCommand(WindowManager windowManager, TestRunnerControl control)
         {
             if (windowManager == null)
                 throw new ArgumentNullException(nameof(windowManager));
-            if (testCaseProvider == null)
-                throw new ArgumentNullException(nameof(testCaseProvider));
-            if (testRunner == null)
-                throw new ArgumentNullException(nameof(testRunner));
+            if (control == null)
+                throw new ArgumentNullException(nameof(control));
 
             Key = "PmlUnit.ShowTestRunnerCommand";
 
-            var runnerControl = new TestRunnerControl(testCaseProvider, testRunner);
-            try
-            {
+            Window = windowManager.CreateDockedWindow(
+                "PmlUnit.TestRunner", "PML Unit", control, DockedPosition.Right
+            );
+            Window.SaveLayout = true;
+            Window.Shown += OnWindowShown;
+            Window.Closed += OnWindowClosed;
 
-                Window = windowManager.CreateDockedWindow(
-                    "PmlUnit.TestRunner", "PML Unit", runnerControl, DockedPosition.Right
-                );
-                Window.SaveLayout = true;
-                Window.Shown += OnWindowShown;
-                Window.Closed += OnWindowClosed;
-
-                windowManager.WindowLayoutLoaded += OnWindowLayoutLoaded;
-            }
-            catch
-            {
-                runnerControl.Dispose();
-                throw;
-            }
+            windowManager.WindowLayoutLoaded += OnWindowLayoutLoaded;
         }
 
         private void OnWindowLayoutLoaded(object sender, EventArgs e)

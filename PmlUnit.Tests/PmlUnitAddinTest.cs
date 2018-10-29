@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Reflection;
 using System.Windows.Forms;
 using Aveva.ApplicationFramework;
 using Aveva.ApplicationFramework.Presentation;
@@ -10,48 +12,75 @@ namespace PmlUnit.Tests
 {
     [TestFixture]
     [TestOf(typeof(PmlUnitAddin))]
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     class PmlUnitAddinTest
     {
+        private Mock<CommandBarManager> CommandBarManagerMock;
+        private Mock<CommandManager> CommandManagerMock;
+        private Mock<ServiceManager> ServiceManagerMock;
+        private Mock<TestRunner> TestRunnerMock;
+        private PmlUnitAddin Addin;
+
+        [SetUp]
+        public void Setup()
+        {
+            CommandBarManagerMock = new Mock<CommandBarManager>();
+
+            CommandManagerMock = new Mock<CommandManager>();
+            CommandManagerMock.Setup(manager => manager.Commands.Add(It.IsAny<Command>()));
+
+            var windowManagerMock = new Mock<WindowManager>();
+            windowManagerMock.Setup(manager => manager.CreateDockedWindow(
+                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Control>(), It.IsAny<DockedPosition>()
+            )).Returns(Mock.Of<DockedWindow>());
+
+            ServiceManagerMock = new Mock<ServiceManager>();
+            ServiceManagerMock.Setup(manager => manager.GetService(typeof(CommandBarManager)))
+                .Returns(CommandBarManagerMock.Object);
+            ServiceManagerMock.Setup(manager => manager.GetService(typeof(CommandManager)))
+                .Returns(CommandManagerMock.Object);
+            ServiceManagerMock.Setup(manager => manager.GetService(typeof(WindowManager)))
+                .Returns(windowManagerMock.Object);
+
+            TestRunnerMock = new Mock<TestRunner>();
+            Addin = new PmlUnitAddin(TestRunnerMock.Object);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            Addin.Dispose();
+        }
+
         [Test]
         public void Start_RegistersTestCaseProvider()
         {
-            // Arrange
-            var mock = new Mock<ServiceManager>();
-            var addin = new PmlUnitAddin();
             // Act
-            addin.Start(mock.Object, Mock.Of<TestRunner>());
+            Addin.Start(ServiceManagerMock.Object);
             // Assert
-            mock.Verify(manager => manager.AddService(
-                typeof(TestCaseProvider), It.IsNotNull<TestCaseProvider>()
-            ));
+            ServiceManagerMock.Verify(
+                manager => manager.AddService(typeof(TestCaseProvider), It.IsNotNull<TestCaseProvider>())
+            );
         }
 
         [Test]
         public void Start_RegistersTestRunner()
         {
-            // Arrange
-            var mock = new Mock<ServiceManager>();
-            var runner = Mock.Of<TestRunner>();
-            var addin = new PmlUnitAddin();
             // Act
-            addin.Start(mock.Object, runner);
+            Addin.Start(ServiceManagerMock.Object);
             // Assert
-            mock.Verify(manager => manager.AddService(typeof(TestRunner), runner));
+            ServiceManagerMock.Verify(
+                manager => manager.AddService(typeof(TestRunner), TestRunnerMock.Object)
+            );
         }
 
         [Test]
         public void Start_AddsUiCustomizationFile()
         {
-            // Arrange
-            var commandBarMock = new Mock<CommandBarManager>();
-            var serviceMock = new Mock<ServiceManager>();
-            serviceMock.Setup(manager => manager.GetService(typeof(CommandBarManager)))
-                .Returns(commandBarMock.Object);
-            var addin = new PmlUnitAddin();
             // Act
-            addin.Start(serviceMock.Object, Mock.Of<TestRunner>());
+            Addin.Start(ServiceManagerMock.Object);
             // Assert
-            commandBarMock.Verify(
+            CommandBarManagerMock.Verify(
                 manager => manager.AddUICustomizationFromStream(It.IsNotNull<Stream>(), "PmlUnit")
             );
         }
@@ -59,32 +88,33 @@ namespace PmlUnit.Tests
         [Test]
         public void Start_AddsTestRunnerCommand()
         {
-            // Arrange
-            var commandMock = new Mock<CommandManager>();
-            commandMock.Setup(manager => manager.Commands.Add(It.IsAny<Command>()));
-            var serviceMock = new Mock<ServiceManager>();
-            serviceMock.Setup(manager => manager.GetService(typeof(CommandManager)))
-                .Returns(commandMock.Object);
-
-            var windowMock = new Mock<WindowManager>();
-            windowMock.Setup(manager => manager.CreateDockedWindow(
-                It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Control>(), It.IsAny<DockedPosition>()
-            )).Returns(Mock.Of<DockedWindow>());
-            serviceMock.Setup(manager => manager.GetService(typeof(WindowManager)))
-                .Returns(windowMock.Object);
-
-            serviceMock.Setup(manager => manager.GetService(typeof(TestCaseProvider)))
-                .Returns(Mock.Of<TestCaseProvider>());
-            serviceMock.Setup(manager => manager.GetService(typeof(TestRunner)))
-                .Returns(Mock.Of<TestRunner>());
-
-            var addin = new PmlUnitAddin();
             // Act
-            addin.Start(serviceMock.Object, Mock.Of<TestRunner>());
+            Addin.Start(ServiceManagerMock.Object);
             // Assert
-            commandMock.Verify(
+            CommandManagerMock.Verify(
                 manager => manager.Commands.Add(It.IsNotNull<ShowTestRunnerCommand>())
             );
+        }
+
+        [Test]
+        public void Stop_DisposesTestRunner()
+        {
+            // Act
+            Addin.Stop();
+            // Assert
+            TestRunnerMock.Verify(runner => runner.Dispose());
+        }
+
+        [Test]
+        public void Stop_DoesNotDisposesTestRunnerControl()
+        {
+            // Act
+            Addin.Stop();
+            // Assert
+            var control = Addin.GetType()
+                .GetField("RunnerControl", BindingFlags.Instance | BindingFlags.NonPublic)
+                .GetValue(Addin) as Control;
+            Assert.IsFalse(control.IsDisposed);
         }
     }
 }

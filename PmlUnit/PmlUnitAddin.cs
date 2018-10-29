@@ -1,13 +1,64 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using Aveva.ApplicationFramework;
 using Aveva.ApplicationFramework.Presentation;
 
 namespace PmlUnit
 {
-    public class PmlUnitAddin : IAddin
+    public class PmlUnitAddin : IAddin, IDisposable
     {
+        private readonly TestRunner TestRunner;
+        private readonly TestCaseProvider TestCaseProvider;
+        private readonly TestRunnerControl RunnerControl;
+
+        public PmlUnitAddin()
+        {
+            try
+            {
+                TestRunner = new PmlTestRunner();
+                TestCaseProvider = new EnvironmentVariableTestCaseProvider();
+                RunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner);
+            }
+            catch
+            {
+                if (TestRunner != null)
+                    TestRunner.Dispose();
+                if (RunnerControl != null)
+                    RunnerControl.Dispose();
+                throw;
+            }
+        }
+
+        internal PmlUnitAddin(TestRunner testRunner)
+        {
+            if (testRunner == null)
+                throw new ArgumentNullException(nameof(testRunner));
+
+            TestRunner = testRunner;
+            TestCaseProvider = new EnvironmentVariableTestCaseProvider();
+            RunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner);
+        }
+
+        ~PmlUnitAddin()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                TestRunner.Dispose();
+                RunnerControl.Dispose();
+            }
+        }
+
         public string Description
         {
             get { return "PML Unit Test Runner Addin"; }
@@ -19,34 +70,28 @@ namespace PmlUnit
         }
 
         [CLSCompliant(false)]
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
-            Justification = "Once the addin has successfully started, the TestRunnerControl will dispose the TestRunner.")]
         public void Start(ServiceManager serviceManager)
         {
-            var testRunner = new PmlTestRunner();
             try
             {
-                Start(serviceManager, testRunner);
+                StartInternal(serviceManager);
             }
             catch
             {
-                testRunner.Dispose();
+                Dispose();
                 throw;
             }
         }
 
-        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic",
-            Justification = "For consistency with the public Start() method of the IAddin interface, this is also an instance method.")]
-        internal void Start(ServiceManager serviceManager, TestRunner testRunner)
+        private void StartInternal(ServiceManager serviceManager)
         {
-            serviceManager.AddService(testRunner);
-            serviceManager.AddService<TestCaseProvider>(
-                new EnvironmentVariableTestCaseProvider()
-            );
+            serviceManager.AddService(TestRunner);
+            serviceManager.AddService(TestCaseProvider);
 
+            var windowManager = serviceManager.GetService<WindowManager>();
             var commandManager = serviceManager.GetService<CommandManager>();
-            if (commandManager != null)
-                commandManager.Commands.Add(new ShowTestRunnerCommand(serviceManager));
+            if (windowManager != null && commandManager != null)
+                commandManager.Commands.Add(new ShowTestRunnerCommand(windowManager, RunnerControl));
 
             var commandBarManager = serviceManager.GetService<CommandBarManager>();
             if (commandBarManager != null)
@@ -81,6 +126,8 @@ namespace PmlUnit
 
         public void Stop()
         {
+            // PDMS crashes if we also dispose the TestRunnerControl here
+            TestRunner.Dispose();
         }
     }
 }
