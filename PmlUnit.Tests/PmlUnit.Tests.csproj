@@ -2,7 +2,7 @@
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">PDMS 12.1</Platform>
     <PlatformTarget>x86</PlatformTarget>
     <ProjectGuid>{8586BD13-436D-4092-9472-DD637A41B23F}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -32,9 +32,6 @@
     <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Platform)' == 'PDMS 12.0' ">
-    <DefineConstants>$(DefineConstants);PDMS_120</DefineConstants>
-  </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'PDMS 12.1' ">
     <DefineConstants>$(DefineConstants);PDMS_121</DefineConstants>
   </PropertyGroup>
@@ -44,15 +41,11 @@
   <PropertyGroup Condition=" '$(Platform)' == 'E3D 2.1' ">
     <DefineConstants>$(DefineConstants);E3D_21</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|PDMS 12.0' ">
-  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|PDMS 12.1' ">
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|E3D 1.1' ">
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|E3D 2.1' ">
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|PDMS 12.0' ">
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|PDMS 12.1' ">
   </PropertyGroup>

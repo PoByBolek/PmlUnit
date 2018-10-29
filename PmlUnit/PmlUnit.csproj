@@ -3,7 +3,7 @@
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">PDMS 12.0</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">PDMS 12.1</Platform>
     <PlatformTarget>x86</PlatformTarget>
     <ProjectGuid>{03530452-7C4A-4943-AA30-7EFEADADE1F2}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -27,11 +27,6 @@
     <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Platform)' == 'PDMS 12.0' ">
-    <DefineConstants>$(DefineConstants);PDMS_120</DefineConstants>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
-    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
-  </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'PDMS 12.1' ">
     <DefineConstants>$(DefineConstants);PDMS_121</DefineConstants>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
@@ -47,15 +42,11 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|PDMS 12.0' ">
-  </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|PDMS 12.1' ">
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|E3D 1.1' ">
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|E3D 2.1' ">
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|PDMS 12.0' ">
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|PDMS 12.1' ">
   </PropertyGroup>
