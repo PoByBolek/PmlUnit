@@ -28,17 +28,17 @@
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'PDMS 12.1' ">
-    <DefineConstants>$(DefineConstants);PDMS_121</DefineConstants>
+    <DefineConstants>$(DefineConstants);PDMS;PDMS_121</DefineConstants>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'E3D 1.1' ">
-    <DefineConstants>$(DefineConstants);E3D_11</DefineConstants>
+    <DefineConstants>$(DefineConstants);E3D;E3D_11</DefineConstants>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'E3D 2.1' ">
-    <DefineConstants>$(DefineConstants);E3D_21</DefineConstants>
+    <DefineConstants>$(DefineConstants);E3D;E3D_21</DefineConstants>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
   </PropertyGroup>

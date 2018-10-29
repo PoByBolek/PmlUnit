@@ -33,13 +33,13 @@
     <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'PDMS 12.1' ">
-    <DefineConstants>$(DefineConstants);PDMS_121</DefineConstants>
+    <DefineConstants>$(DefineConstants);PDMS;PDMS_121</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'E3D 1.1' ">
-    <DefineConstants>$(DefineConstants);E3D_11</DefineConstants>
+    <DefineConstants>$(DefineConstants);E3D;E3D_11</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'E3D 2.1' ">
-    <DefineConstants>$(DefineConstants);E3D_21</DefineConstants>
+    <DefineConstants>$(DefineConstants);E3D;E3D_21</DefineConstants>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|PDMS 12.1' ">
   </PropertyGroup>
