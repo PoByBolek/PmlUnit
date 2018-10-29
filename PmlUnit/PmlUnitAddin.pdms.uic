@@ -2,7 +2,7 @@
 <UserInterfaceCustomization xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="www.aveva.com">
   <Version>1.0</Version>
   <Tools>
-    <StateButtonTool Name="PmlUnit.ShowTestRunnerMenuButton">
+    <StateButtonTool Name="PmlUnit.ShowTestRunnerButton">
       <Command>
         <Type>Instance</Type>
         <Key>PmlUnit.ShowTestRunnerCommand</Key>
@@ -18,7 +18,7 @@
       <Caption>PML Unit</Caption>
       <DisplayStyle>Default</DisplayStyle>
       <Tools>
-        <Tool Name="PmlUnit.ShowTestRunnerMenuButton" />
+        <Tool Name="PmlUnit.ShowTestRunnerButton" />
       </Tools>
       <IsContextMenu>false</IsContextMenu>
     </MenuTool>
