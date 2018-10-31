@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -22,7 +21,6 @@ namespace PmlUnit
             Provider = provider;
             Runner = runner;
             InitializeComponent();
-            ResetTestViewColumnWidths();
             ResetSplitContainerOrientation();
         }
 
@@ -33,24 +31,7 @@ namespace PmlUnit
 
         private void SetTests(IEnumerable<TestCase> testCases)
         {
-            TestView.Items.Clear();
-            TestView.Groups.Clear();
-            foreach (var testCase in testCases)
-            {
-                var groupName = string.Format(CultureInfo.CurrentCulture, "{0} ({1})", testCase.Name, testCase.Tests.Count);
-                var group = TestView.Groups.Add(testCase.Name, groupName);
-                foreach (var test in testCase.Tests)
-                {
-                    var item = TestView.Items.Add(test.Name);
-                    var entry = new TestListEntry(test, item);
-                    item.Tag = entry;
-                    item.ImageKey = entry.ImageKey;
-                    item.SubItems.Add("");
-                    item.Group = group;
-                }
-            }
-
-            ResetTestViewColumnWidths();
+            TestList.SetTests(testCases.SelectMany(testCase => testCase.Tests));
         }
 
         protected override void Dispose(bool disposing)
@@ -65,7 +46,7 @@ namespace PmlUnit
 
         private void OnRunAllLinkClick(object sender, EventArgs e)
         {
-            Run(FilterTests(entry => true));
+            Run(TestList.AllTests);
         }
 
         private void OnRunLinkClicked(object sender, EventArgs e)
@@ -75,34 +56,22 @@ namespace PmlUnit
 
         private void OnRunFailedTestsMenuItemClick(object sender, EventArgs e)
         {
-            Run(FilterTests(entry => entry.Failed));
+            Run(TestList.FailedTests);
         }
 
         private void OnRunNotExecutedTestsMenuItemClick(object sender, EventArgs e)
         {
-            Run(FilterTests(entry => !entry.HasRun));
+            Run(TestList.NotExecutedTests);
         }
 
         private void OnRunSucceededTestsMenuItemClick(object sender, EventArgs e)
         {
-            Run(FilterTests(entry => entry.Succeeded));
+            Run(TestList.SucceededTests);
         }
 
         private void OnRunSelectedTestsMenuItemClick(object sender, EventArgs e)
         {
-            Run(FilterTests(entry => entry.Item.Selected));
-        }
-
-        private ICollection<TestListEntry> FilterTests(Func<TestListEntry, bool> predicate)
-        {
-            var result = new List<TestListEntry>();
-            foreach (ListViewItem item in TestView.Items)
-            {
-                var entry = item.Tag as TestListEntry;
-                if (entry != null && predicate(entry))
-                    result.Add(entry);
-            }
-            return result;
+            Run(TestList.SelectedTests);
         }
 
         private void Run(ICollection<TestListEntry> entries)
@@ -115,7 +84,7 @@ namespace PmlUnit
             finally
             {
                 Enabled = true;
-                ResetTestViewColumnWidths();
+                TestList.ResetColumnWidths();
             }
         }
 
@@ -128,11 +97,8 @@ namespace PmlUnit
             foreach (var entry in entries)
             {
                 entry.Result = Runner.Run(entry.Test);
-                entry.Item.ImageKey = entry.ImageKey;
-                entry.Item.SubItems[1].Text = entry.FormatDuration();
-
                 ExecutionProgressBar.Increment(1);
-                if (entry.Failed)
+                if (entry.Result != null && !entry.Result.Success)
                     ExecutionProgressBar.Color = Color.Red;
 
                 Application.DoEvents();
@@ -160,24 +126,12 @@ namespace PmlUnit
             return testCase;
         }
 
-        private void OnSelectedIndexChanged(object sender, EventArgs e)
+        private void OnTestListSelectionChanged(object sender, EventArgs e)
         {
-            foreach (ListViewItem item in TestView.SelectedItems)
+            foreach (var entry in TestList.SelectedTests)
             {
-                var entry = item.Tag as TestListEntry;
-                TestResultLabel.Text = entry?.Result?.Error?.Message ?? "";
+                TestResultLabel.Text = entry.Result?.Error?.Message ?? "";
             }
-        }
-
-        private void OnTestViewSizeChanged(object sender, EventArgs e)
-        {
-            ResetTestViewColumnWidths();
-        }
-
-        private void ResetTestViewColumnWidths()
-        {
-            ExecutionTimeColumn.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
-            TestNameColumn.Width = Math.Max(0, TestView.ClientSize.Width - ExecutionTimeColumn.Width);
         }
 
         private void OnSplitContainerSizeChanged(object sender, EventArgs e)
@@ -190,64 +144,6 @@ namespace PmlUnit
             var size = TestResultSplitContainer.Size;
             var orientation = size.Width > size.Height ? Orientation.Vertical : Orientation.Horizontal;
             TestResultSplitContainer.Orientation = orientation;
-        }
-
-        private class TestListEntry
-        {
-            public Test Test { get; }
-            public TestResult Result { get; set; }
-            public ListViewItem Item { get; }
-
-            public TestListEntry(Test test, ListViewItem item)
-            {
-                if (test == null)
-                    throw new ArgumentNullException(nameof(test));
-                if (item == null)
-                    throw new ArgumentNullException(nameof(item));
-
-                Test = test;
-                Item = item;
-            }
-
-            public bool Succeeded
-            {
-                get { return Result != null && Result.Success; }
-            }
-
-            public bool Failed
-            {
-                get { return Result != null && !Result.Success; }
-            }
-
-            public bool HasRun
-            {
-                get { return Result != null; }
-            }
-
-            public string ImageKey
-            {
-                get
-                {
-                    if (Result == null)
-                        return "Unknown";
-                    else if (Result.Success)
-                        return "Success";
-                    else
-                        return "Failure";
-                }
-            }
-
-            public string FormatDuration()
-            {
-                if (Result == null)
-                    return "";
-
-                var millis = Result.Duration.TotalMilliseconds;
-                if (millis < 1)
-                    return "< 1 ms";
-                else
-                    return Convert.ToInt64(millis) + " ms";
-            }
         }
     }
 }

@@ -18,7 +18,7 @@ namespace PmlUnit.Tests
         private Mock<TestCaseProvider> ProviderMock;
         private Mock<TestRunner> RunnerMock;
         private TestRunnerControl RunnerControl;
-        private ListView TestList;
+        private TestListView TestList;
         private Label ResultLabel;
 
         [SetUp]
@@ -35,7 +35,7 @@ namespace PmlUnit.Tests
             RunnerMock.Setup(runner => runner.Run(It.IsAny<Test>())).Returns(new TestResult(TimeSpan.FromSeconds(1)));
 
             RunnerControl = new TestRunnerControl(ProviderMock.Object, RunnerMock.Object);
-            TestList = FindControl<ListView>("TestView");
+            TestList = FindControl<TestListView>("TestList");
             ResultLabel = FindControl<Label>("TestResultLabel");
         }
 
@@ -77,12 +77,13 @@ namespace PmlUnit.Tests
             // Act
             RunnerControl.LoadTests();
             // Assert
-            Assert.AreEqual(5, TestList.Items.Count);
-            Assert.AreEqual("testOne", TestList.Items[0].Text);
-            Assert.AreEqual("testTwo", TestList.Items[1].Text);
-            Assert.AreEqual("testThree", TestList.Items[2].Text);
-            Assert.AreEqual("testFour", TestList.Items[3].Text);
-            Assert.AreEqual("testFive", TestList.Items[4].Text);
+            var allTests = TestList.AllTests;
+            Assert.AreEqual(5, allTests.Count);
+            Assert.AreEqual("testOne", allTests[0].Test.Name);
+            Assert.AreEqual("testTwo", allTests[1].Test.Name);
+            Assert.AreEqual("testThree", allTests[2].Test.Name);
+            Assert.AreEqual("testFour", allTests[3].Test.Name);
+            Assert.AreEqual("testFive", allTests[4].Test.Name);
         }
 
         [Test]
@@ -164,7 +165,7 @@ namespace PmlUnit.Tests
             RunnerControl.LoadTests();
             // Act
             RunEventHandler("OnRunAllLinkClick");
-            TestList.Items[0].Selected = true;
+            //TestList.Items[0].Selected = true;
             // Assert
             Assert.AreEqual("An error occurred", ResultLabel.Text);
         }
@@ -219,7 +220,7 @@ namespace PmlUnit.Tests
         {
             foreach (int index in indices)
             {
-                TestList.Items[index].Selected = true;
+                //TestList.Items[index].Selected = true;
             }
         }
 

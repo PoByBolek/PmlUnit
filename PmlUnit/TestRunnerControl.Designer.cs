@@ -21,15 +21,11 @@ namespace PmlUnit
             this.components = new System.ComponentModel.Container();
             System.Windows.Forms.LinkLabel runAllLinkLabel;
             System.Windows.Forms.LinkLabel refreshLinkLabel;
-            System.Windows.Forms.ImageList imageList1;
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TestRunnerControl));
             System.Windows.Forms.ToolStripMenuItem failedTestsToolStripMenuItem;
             System.Windows.Forms.ToolStripMenuItem notExecutedTestsToolStripMenuItem;
             System.Windows.Forms.ToolStripMenuItem succeededTestsToolStripMenuItem;
             System.Windows.Forms.ToolStripMenuItem selectedTestsToolStripMenuItem;
-            this.TestView = new System.Windows.Forms.ListView();
-            this.TestNameColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.ExecutionTimeColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.TestList = new PmlUnit.TestListView();
             this.TestResultSplitContainer = new System.Windows.Forms.SplitContainer();
             this.TestResultLabel = new System.Windows.Forms.Label();
             this.ExecutionProgressBar = new PmlUnit.ColorizedProgressBar();
@@ -37,7 +33,6 @@ namespace PmlUnit
             this.RunContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             runAllLinkLabel = new System.Windows.Forms.LinkLabel();
             refreshLinkLabel = new System.Windows.Forms.LinkLabel();
-            imageList1 = new System.Windows.Forms.ImageList(this.components);
             failedTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             notExecutedTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             succeededTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -92,14 +87,6 @@ namespace PmlUnit
             refreshLinkLabel.Text = "Refresh";
             refreshLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnRefreshLinkClick);
             // 
-            // imageList1
-            // 
-            imageList1.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageList1.ImageStream")));
-            imageList1.TransparentColor = System.Drawing.Color.Transparent;
-            imageList1.Images.SetKeyName(0, "Unknown");
-            imageList1.Images.SetKeyName(1, "Failure");
-            imageList1.Images.SetKeyName(2, "Success");
-            // 
             // RunContextMenu
             // 
             this.RunContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -138,33 +125,14 @@ namespace PmlUnit
             selectedTestsToolStripMenuItem.Text = "Selected Tests";
             selectedTestsToolStripMenuItem.Click += new System.EventHandler(this.OnRunSelectedTestsMenuItemClick);
             // 
-            // TestView
+            // TestList
             // 
-            this.TestView.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.TestView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.TestNameColumn,
-            this.ExecutionTimeColumn});
-            this.TestView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TestView.FullRowSelect = true;
-            this.TestView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
-            this.TestView.HideSelection = false;
-            this.TestView.Location = new System.Drawing.Point(0, 0);
-            this.TestView.Name = "TestView";
-            this.TestView.Size = new System.Drawing.Size(167, 254);
-            this.TestView.SmallImageList = imageList1;
-            this.TestView.TabIndex = 0;
-            this.TestView.UseCompatibleStateImageBehavior = false;
-            this.TestView.View = System.Windows.Forms.View.Details;
-            this.TestView.SelectedIndexChanged += new System.EventHandler(this.OnSelectedIndexChanged);
-            this.TestView.SizeChanged += new System.EventHandler(this.OnTestViewSizeChanged);
-            // 
-            // TestNameColumn
-            // 
-            this.TestNameColumn.Text = "Name";
-            // 
-            // ExecutionTimeColumn
-            // 
-            this.ExecutionTimeColumn.Text = "Time";
+            this.TestList.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TestList.Location = new System.Drawing.Point(0, 0);
+            this.TestList.Name = "TestList";
+            this.TestList.Size = new System.Drawing.Size(167, 254);
+            this.TestList.TabIndex = 0;
+            this.TestList.SelectionChanged += new System.EventHandler(this.OnTestListSelectionChanged);
             // 
             // TestResultSplitContainer
             // 
@@ -176,7 +144,7 @@ namespace PmlUnit
             // 
             // TestResultSplitContainer.Panel1
             // 
-            this.TestResultSplitContainer.Panel1.Controls.Add(this.TestView);
+            this.TestResultSplitContainer.Panel1.Controls.Add(this.TestList);
             // 
             // TestResultSplitContainer.Panel2
             // 
@@ -219,9 +187,7 @@ namespace PmlUnit
 
         #endregion
 
-        private System.Windows.Forms.ListView TestView;
-        private System.Windows.Forms.ColumnHeader TestNameColumn;
-        private System.Windows.Forms.ColumnHeader ExecutionTimeColumn;
+        private TestListView TestList;
         private System.Windows.Forms.SplitContainer TestResultSplitContainer;
         private System.Windows.Forms.Label TestResultLabel;
         private ColorizedProgressBar ExecutionProgressBar;

@@ -97,6 +97,12 @@
     <Compile Include="TestCaseBuilder.cs" />
     <Compile Include="TestCaseParser.cs" />
     <Compile Include="TestCaseProvider.cs" />
+    <Compile Include="TestListView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TestListView.Designer.cs">
+      <DependentUpon>TestListView.cs</DependentUpon>
+    </Compile>
     <Compile Include="TestResult.cs" />
     <Compile Include="TestRunner.cs" />
     <Compile Include="TestRunnerControl.cs">
@@ -110,6 +116,9 @@
   <ItemGroup>
     <EmbeddedResource Include="ColorizedProgressBar.resx">
       <DependentUpon>ColorizedProgressBar.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestListView.resx">
+      <DependentUpon>TestListView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TestRunnerControl.resx">
       <DependentUpon>TestRunnerControl.cs</DependentUpon>
