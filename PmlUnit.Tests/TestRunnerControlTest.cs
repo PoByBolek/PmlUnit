@@ -35,8 +35,8 @@ namespace PmlUnit.Tests
             RunnerMock.Setup(runner => runner.Run(It.IsAny<Test>())).Returns(new TestResult(TimeSpan.FromSeconds(1)));
 
             RunnerControl = new TestRunnerControl(ProviderMock.Object, RunnerMock.Object);
-            TestList = FindControl<TestListView>("TestList");
-            ResultLabel = FindControl<Label>("TestResultLabel");
+            TestList = RunnerControl.FindControl<TestListView>("TestList");
+            ResultLabel = RunnerControl.FindControl<Label>("TestResultLabel");
         }
 
         [TearDown]
@@ -165,7 +165,7 @@ namespace PmlUnit.Tests
             RunnerControl.LoadTests();
             // Act
             RunEventHandler("OnRunAllLinkClick");
-            //TestList.Items[0].Selected = true;
+            TestList.AllTests[0].Selected = true;
             // Assert
             Assert.AreEqual("An error occurred", ResultLabel.Text);
         }
@@ -194,33 +194,11 @@ namespace PmlUnit.Tests
             }
         }
 
-        private T FindControl<T>(string name) where T : Control
-        {
-            var controls = new Stack<Control>(RunnerControl.Controls.OfType<Control>());
-            while (controls.Count > 0)
-            {
-                var control = controls.Pop();
-                var casted = control as T;
-                if (casted != null && casted.Name == name)
-                {
-                    return casted;
-                }
-
-                foreach (Control child in control.Controls)
-                {
-                    controls.Push(child);
-                }
-            }
-
-            Assert.Fail("Unable to find a {0} named \"{1}\".", typeof(T), name);
-            return null;
-        }
-
         private void SelectTests(IEnumerable<int> indices)
         {
             foreach (int index in indices)
             {
-                //TestList.Items[index].Selected = true;
+                TestList.AllTests[index].Selected = true;
             }
         }
 

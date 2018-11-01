@@ -101,6 +101,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="ControlExtensions.cs" />
     <Compile Include="EnvironmentVariableTestCaseProviderTest.cs" />
     <Compile Include="IndexFileTestCaseProviderTest.cs" />
     <Compile Include="InstantTest.cs" />
@@ -110,6 +111,7 @@
     <Compile Include="ShowTestRunnerCommandTest.cs" />
     <Compile Include="SimpleTestCaseParserTest.cs" />
     <Compile Include="TestCaseBuilderTest.cs" />
+    <Compile Include="TestListViewTest.cs" />
     <Compile Include="TestRunnerControlTest.cs" />
   </ItemGroup>
   <ItemGroup>

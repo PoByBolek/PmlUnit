@@ -33,7 +33,6 @@ namespace PmlUnit
                     item.Group = group;
                     item.SubItems.Add("");
                     item.Tag = new Entry(test, item);
-                    var entry = new Entry(test, item);
                 }
             }
 
@@ -64,7 +63,7 @@ namespace PmlUnit
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> SelectedTests => FilterTests(entry => entry.Item.Selected);
+        public List<TestListEntry> SelectedTests => FilterTests(entry => entry.Selected);
 
         private List<TestListEntry> FilterTests(Func<Entry, bool> predicate)
         {
@@ -91,8 +90,8 @@ namespace PmlUnit
         private class Entry : TestListEntry
         {
             public Test Test { get; }
-            public ListViewItem Item { get; }
 
+            private readonly ListViewItem Item;
             private TestResult ResultField;
 
             public Entry(Test test, ListViewItem item)
@@ -104,7 +103,7 @@ namespace PmlUnit
 
                 Test = test;
                 Item = item;
-                Item.ImageKey = ImageKey;
+                Item.ImageKey = GetImageKey();
             }
 
             public TestResult Result
@@ -113,40 +112,34 @@ namespace PmlUnit
                 set
                 {
                     ResultField = value;
-                    Item.ImageKey = ImageKey;
+                    Item.ImageKey = GetImageKey();
                     Item.SubItems[1].Text = FormatDuration();
                 }
             }
 
-            public bool Succeeded
+            public bool Succeeded => Result != null && Result.Success;
+
+            public bool Failed => Result != null && !Result.Success;
+
+            public bool HasRun => Result != null;
+
+            public bool Selected
             {
-                get { return Result != null && Result.Success; }
+                get { return Item.Selected; }
+                set { Item.Selected = value; }
             }
 
-            public bool Failed
+            private string GetImageKey()
             {
-                get { return Result != null && !Result.Success; }
+                if (Result == null)
+                    return "Unknown";
+                else if (Result.Success)
+                    return "Success";
+                else
+                    return "Failure";
             }
 
-            public bool HasRun
-            {
-                get { return Result != null; }
-            }
-
-            public string ImageKey
-            {
-                get
-                {
-                    if (Result == null)
-                        return "Unknown";
-                    else if (Result.Success)
-                        return "Success";
-                    else
-                        return "Failure";
-                }
-            }
-
-            public string FormatDuration()
+            private string FormatDuration()
             {
                 if (Result == null)
                     return "";
@@ -154,8 +147,12 @@ namespace PmlUnit
                 var millis = Result.Duration.TotalMilliseconds;
                 if (millis < 1)
                     return "< 1 ms";
+                else if (millis < 1000)
+                    return string.Format(CultureInfo.CurrentCulture, "{0} ms", (int)millis);
+                else if (millis < 10000)
+                    return string.Format(CultureInfo.CurrentCulture, "{0:N1} s", ((int)millis / 100) / 10.0);
                 else
-                    return Convert.ToInt64(millis) + " ms";
+                    return string.Format(CultureInfo.CurrentCulture, "{0:N0} s", millis / 1000);
             }
         }
     }
@@ -164,5 +161,6 @@ namespace PmlUnit
     {
         Test Test { get; }
         TestResult Result { get; set; }
+        bool Selected { get; set; }
     }
 }
