@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 using Moq;
@@ -11,15 +10,37 @@ namespace PmlUnit.Tests
 {
     [TestFixture]
     [TestOf(typeof(PmlTestRunner))]
-    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class TestRunnerControlTest
+    {
+        [Test]
+        public void Constructor_ShouldCheckForNullArguments()
+        {
+            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, null));
+            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(Mock.Of<TestCaseProvider>(), null));
+            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, Mock.Of<TestRunner>()));
+        }
+
+        [Test]
+        public void Dispose_DisposesTestRunner()
+        {
+            var runnerMock = new Mock<TestRunner>();
+            var control = new TestRunnerControl(Mock.Of<TestCaseProvider>(), runnerMock.Object);
+            // Act
+            control.Dispose();
+            // Assert
+            runnerMock.Verify(runner => runner.Dispose());
+        }
+    }
+
+    [TestFixture]
+    [TestOf(typeof(PmlTestRunner))]
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
+    public class TestRunnerControlProviderTest
     {
         private List<TestCase> TestCases;
         private Mock<TestCaseProvider> ProviderMock;
-        private Mock<TestRunner> RunnerMock;
         private TestRunnerControl RunnerControl;
         private TestListView TestList;
-        private Label ResultLabel;
 
         [SetUp]
         public void Setup()
@@ -31,35 +52,14 @@ namespace PmlUnit.Tests
             ProviderMock = new Mock<TestCaseProvider>();
             ProviderMock.Setup(provider => provider.GetTestCases()).Returns(TestCases);
 
-            RunnerMock = new Mock<TestRunner>();
-            RunnerMock.Setup(runner => runner.Run(It.IsAny<Test>())).Returns(new TestResult(TimeSpan.FromSeconds(1)));
-
-            RunnerControl = new TestRunnerControl(ProviderMock.Object, RunnerMock.Object);
+            RunnerControl = new TestRunnerControl(ProviderMock.Object, Mock.Of<TestRunner>());
             TestList = RunnerControl.FindControl<TestListView>("TestList");
-            ResultLabel = RunnerControl.FindControl<Label>("TestResultLabel");
         }
 
         [TearDown]
         public void TearDown()
         {
             RunnerControl.Dispose();
-        }
-
-        [Test]
-        public void Constructor_ShouldCheckForNullArguments()
-        {
-            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, null));
-            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(ProviderMock.Object, null));
-            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, RunnerMock.Object));
-        }
-
-        [Test]
-        public void Dispose_DisposesTestRunner()
-        {
-            // Act
-            RunnerControl.Dispose();
-            // Assert
-            RunnerMock.Verify(runner => runner.Dispose());
         }
 
         [Test]
@@ -85,89 +85,129 @@ namespace PmlUnit.Tests
             Assert.AreEqual("testFour", allTests[3].Test.Name);
             Assert.AreEqual("testFive", allTests[4].Test.Name);
         }
+    }
+
+    [TestFixture]
+    [TestOf(typeof(PmlTestRunner))]
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
+    public class TestRunnerControlRunTest
+    {
+        private TestCase TestCase;
+        private Mock<TestRunner> RunnerMock;
+        private TestRunnerControl RunnerControl;
+        private TestListView TestList;
+        private Label ResultLabel;
+
+        [SetUp]
+        public void Setup()
+        {
+            TestCase = new TestCaseBuilder("TestCase").AddTest("one").AddTest("two").AddTest("three").AddTest("four").Build();
+
+            RunnerMock = new Mock<TestRunner>();
+            RunnerMock.Setup(runner => runner.Run(It.IsAny<Test>())).Returns(new TestResult(TimeSpan.FromSeconds(1)));
+
+            RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), RunnerMock.Object);
+            ResultLabel = RunnerControl.FindControl<Label>("TestResultLabel");
+            TestList = RunnerControl.FindControl<TestListView>("TestList");
+            TestList.SetTests(TestCase.Tests);
+
+            var tests = TestList.AllTests;
+            tests[0].Result = new TestResult(TimeSpan.FromSeconds(1));
+            tests[1].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("error"));
+            tests[2].Result = new TestResult(TimeSpan.FromSeconds(1));
+
+            tests[1].Selected = true;
+            tests[3].Selected = true;
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            RunnerControl.Dispose();
+        }
 
         [Test]
         public void RunAllLinkClick_RunsAllTests()
         {
-            // Arrange
-            RunnerControl.LoadTests();
             // Act
             RunEventHandler("OnRunAllLinkClick");
             // Assert
-            AssertTestsHaveRun(new HashSet<int> { 0, 1, 2, 3, 4 });
-        }
-
-        [TestCase("")]
-        [TestCase("0")]
-        [TestCase("1")]
-        [TestCase("2")]
-        [TestCase("3")]
-        [TestCase("4")]
-        [TestCase("0,1")]
-        [TestCase("1,2")]
-        [TestCase("2,3")]
-        [TestCase("3,4")]
-        [TestCase("1,3")]
-        [TestCase("0,4")]
-        [TestCase("0,2,4")]
-        [TestCase("0,1,2,3,4")]
-        public void RunSelectedLinkClick_RunsSelectedTests(string selectedIndices)
-        {
-            // these are strings so that the Visual Studio Test Runner can display them
-            var selected = SplitInts(selectedIndices);
-
-            // Arrange
-            RunnerControl.LoadTests();
-            SelectTests(selected);
-            // Act
-            RunEventHandler("OnRunSelectedTestsMenuItemClick");
-            // Assert
-            AssertTestsHaveRun(selected);
-        }
-
-        [TestCase("")]
-        [TestCase("0")]
-        [TestCase("1")]
-        [TestCase("2")]
-        [TestCase("3")]
-        [TestCase("4")]
-        [TestCase("0,1")]
-        [TestCase("1,2")]
-        [TestCase("2,3")]
-        [TestCase("3,4")]
-        [TestCase("1,3")]
-        [TestCase("0,4")]
-        [TestCase("0,2,4")]
-        [TestCase("0,1,2,3,4")]
-        public void RunNotExecutedLinkClick_RunsNotExecutedTests(string selectedIndices)
-        {
-            var selected = SplitInts(selectedIndices);
-            // Arrange
-            RunnerControl.LoadTests();
-            SelectTests(selected);
-            // Act
-            RunEventHandler("OnRunSelectedTestsMenuItemClick");
-            RunnerMock.ResetCalls();
-            RunEventHandler("OnRunNotExecutedTestsMenuItemClick");
-            // Assert
-            var expected = new HashSet<int> { 0, 1, 2, 3, 4 };
-            expected.ExceptWith(selected);
-            AssertTestsHaveRun(expected);
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[0]), Times.Once());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[1]), Times.Once());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[2]), Times.Once());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[3]), Times.Once());
         }
 
         [Test]
-        public void SelectedIndexChange_DisplaysTestFailureInDetailsPanel()
+        public void RunSucceededLinkClick_RunsSucceededTests()
+        {
+            // Act
+            RunEventHandler("OnRunSucceededTestsMenuItemClick");
+            // Assert
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[0]), Times.Once());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[1]), Times.Never());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[2]), Times.Once());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[3]), Times.Never());
+        }
+
+        [Test]
+        public void RunFailedLinkClick_RunsFailedTests()
+        {
+            // Act
+            RunEventHandler("OnRunFailedTestsMenuItemClick");
+            // Assert
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[0]), Times.Never());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[1]), Times.Once());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[2]), Times.Never());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[3]), Times.Never());
+        }
+
+        [Test]
+        public void RunNotExecutedLinkClick_RunsNotExecutedTests()
+        {
+            // Act
+            RunEventHandler("OnRunNotExecutedTestsMenuItemClick");
+            // Assert
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[0]), Times.Never());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[1]), Times.Never());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[2]), Times.Never());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[3]), Times.Once());
+        }
+
+        [Test]
+        public void RunSelectedLinkClick_RunsSelectedTests()
+        {
+            // Act
+            RunEventHandler("OnRunSelectedTestsMenuItemClick");
+            // Assert
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[0]), Times.Never());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[1]), Times.Once());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[2]), Times.Never());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[3]), Times.Once());
+        }
+
+        [Test]
+        public void Run_AssignsTestResultsToListEntries()
         {
             // Arrange
+            var results = new List<TestResult> {
+                new TestResult(TimeSpan.FromSeconds(1), new PmlException("error")), null,
+                new TestResult(TimeSpan.FromSeconds(3)), new TestResult(TimeSpan.FromSeconds(4))
+            };
             RunnerMock.Reset();
-            RunnerMock.Setup(runner => runner.Run(It.IsAny<Test>()))
-                .Returns(new TestResult(TimeSpan.FromSeconds(1), new PmlException("An error occurred")));
-            RunnerControl.LoadTests();
+            for (int i = 0; i < results.Count; i++)
+                SetupTestResult(TestCase.Tests[i], results[i]);
             // Act
             RunEventHandler("OnRunAllLinkClick");
-            TestList.AllTests[0].Selected = true;
             // Assert
-            Assert.AreEqual("An error occurred", ResultLabel.Text);
+            var tests = TestList.AllTests;
+            for (int i = 0; i < results.Count; i++)
+                Assert.AreSame(results[i], tests[i].Result);
+        }
+
+        private void SetupTestResult(Test test, TestResult result)
+        {
+            RunnerMock.Setup(runner => runner.Run(test)).Returns(result);
         }
 
         private void RunEventHandler(string handler)
@@ -184,35 +224,17 @@ namespace PmlUnit.Tests
             method.Invoke(RunnerControl, new object[] { null, EventArgs.Empty });
         }
 
-        private void AssertTestsHaveRun(ICollection<int> indicesThatShouldHaveRun)
+        [Test]
+        public void SelectedIndexChange_DisplaysTestFailureInDetailsPanel()
         {
-            var tests = TestCases.SelectMany(testCase => testCase.Tests).ToList();
-            for (int i = 0; i < tests.Count; i++)
-            {
-                var times = indicesThatShouldHaveRun.Contains(i) ? Times.Once() : Times.Never();
-                RunnerMock.Verify(runner => runner.Run(tests[i]), times);
-            }
-        }
-
-        private void SelectTests(IEnumerable<int> indices)
-        {
-            foreach (int index in indices)
-            {
-                TestList.AllTests[index].Selected = true;
-            }
-        }
-
-        private static HashSet<int> SplitInts(string values)
-        {
-            var result = new HashSet<int>();
-            foreach (string part in values.Split(','))
-            {
-                if (!string.IsNullOrEmpty(part))
-                {
-                    result.Add(int.Parse(part));
-                }
-            }
-            return result;
+            // Arrange
+            TestList.SetTests(TestCase.Tests);
+            var tests = TestList.AllTests;
+            tests[0].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("An error occurred"));
+            // Act
+            TestList.AllTests[0].Selected = true;
+            // Assert
+            Assert.AreEqual("An error occurred", ResultLabel.Text);
         }
     }
 }
