@@ -53,6 +53,12 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|E3D 2.1' ">
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\PmlUnit.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Aveva.ApplicationFramework, Version=1.1.20.0, Culture=neutral, PublicKeyToken=17c64733a9775004, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -121,6 +127,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\PmlUnit.snk">
+      <Link>PmlUnit.snk</Link>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>

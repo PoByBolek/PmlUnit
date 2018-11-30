@@ -54,6 +54,12 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|E3D 2.1' ">
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\PmlUnit.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Aveva.ApplicationFramework">
       <HintPath>..\lib\$(Platform)\Aveva.ApplicationFramework.dll</HintPath>
@@ -131,6 +137,11 @@
       <DependentUpon>PmlUnitAddin.cs</DependentUpon>
       <LogicalName>PmlUnit.PmlUnitAddin.pdms.uic</LogicalName>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\PmlUnit.snk">
+      <Link>PmlUnit.snk</Link>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
