@@ -88,6 +88,12 @@
       <DependentUpon>ColorizedProgressBar.cs</DependentUpon>
     </Compile>
     <Compile Include="EnvironmentVariableTestCaseProvider.cs" />
+    <Compile Include="IconLabel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="IconLabel.Designer.cs">
+      <DependentUpon>IconLabel.cs</DependentUpon>
+    </Compile>
     <Compile Include="IndexFileTestCaseProvider.cs" />
     <Compile Include="ObjectProxy.cs" />
     <Compile Include="ParserException.cs" />
@@ -96,6 +102,11 @@
     <Compile Include="PmlTestRunner.cs" />
     <Compile Include="PmlUnitAddin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="ServiceManagerExtensions.cs" />
     <Compile Include="ShowTestRunnerCommand.cs" />
     <Compile Include="Test.cs" />
@@ -110,6 +121,12 @@
       <DependentUpon>TestListView.cs</DependentUpon>
     </Compile>
     <Compile Include="TestResult.cs" />
+    <Compile Include="TestResultView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TestResultView.Designer.cs">
+      <DependentUpon>TestResultView.cs</DependentUpon>
+    </Compile>
     <Compile Include="TestRunner.cs" />
     <Compile Include="TestRunnerControl.cs">
       <SubType>UserControl</SubType>
@@ -123,8 +140,15 @@
     <EmbeddedResource Include="ColorizedProgressBar.resx">
       <DependentUpon>ColorizedProgressBar.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="TestListView.resx">
-      <DependentUpon>TestListView.cs</DependentUpon>
+    <EmbeddedResource Include="IconLabel.resx">
+      <DependentUpon>IconLabel.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestResultView.resx">
+      <DependentUpon>TestResultView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TestRunnerControl.resx">
       <DependentUpon>TestRunnerControl.cs</DependentUpon>
@@ -142,6 +166,15 @@
     <None Include="..\PmlUnit.snk">
       <Link>PmlUnit.snk</Link>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Failure.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Success.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\Unknown.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

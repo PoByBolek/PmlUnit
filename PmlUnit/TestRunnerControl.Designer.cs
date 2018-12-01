@@ -27,7 +27,7 @@ namespace PmlUnit
             System.Windows.Forms.ToolStripMenuItem selectedTestsToolStripMenuItem;
             this.TestList = new PmlUnit.TestListView();
             this.TestResultSplitContainer = new System.Windows.Forms.SplitContainer();
-            this.TestResultLabel = new System.Windows.Forms.Label();
+            this.TestResults = new PmlUnit.TestResultView();
             this.ExecutionProgressBar = new PmlUnit.ColorizedProgressBar();
             this.RunLinkLabel = new System.Windows.Forms.LinkLabel();
             this.RunContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -148,20 +148,20 @@ namespace PmlUnit
             // 
             // TestResultSplitContainer.Panel2
             // 
-            this.TestResultSplitContainer.Panel2.Controls.Add(this.TestResultLabel);
+            this.TestResultSplitContainer.Panel2.Controls.Add(this.TestResults);
             this.TestResultSplitContainer.Size = new System.Drawing.Size(399, 254);
             this.TestResultSplitContainer.SplitterDistance = 167;
             this.TestResultSplitContainer.TabIndex = 4;
             this.TestResultSplitContainer.SizeChanged += new System.EventHandler(this.OnSplitContainerSizeChanged);
             // 
-            // TestResultLabel
+            // TestResults
             // 
-            this.TestResultLabel.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.TestResultLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TestResultLabel.Location = new System.Drawing.Point(0, 0);
-            this.TestResultLabel.Name = "TestResultLabel";
-            this.TestResultLabel.Size = new System.Drawing.Size(228, 254);
-            this.TestResultLabel.TabIndex = 0;
+            this.TestResults.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.TestResults.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TestResults.Location = new System.Drawing.Point(0, 0);
+            this.TestResults.Name = "TestResults";
+            this.TestResults.Size = new System.Drawing.Size(228, 254);
+            this.TestResults.TabIndex = 0;
             // 
             // TestRunnerControl
             // 
@@ -189,7 +189,7 @@ namespace PmlUnit
 
         private TestListView TestList;
         private System.Windows.Forms.SplitContainer TestResultSplitContainer;
-        private System.Windows.Forms.Label TestResultLabel;
+        private TestResultView TestResults;
         private ColorizedProgressBar ExecutionProgressBar;
         private System.Windows.Forms.LinkLabel RunLinkLabel;
         private System.Windows.Forms.ContextMenuStrip RunContextMenu;

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
+using PmlUnit.Properties;
 
 namespace PmlUnit
 {
@@ -16,6 +17,10 @@ namespace PmlUnit
         {
             InitializeComponent();
             ResetColumnWidths();
+
+            TestStatusImageList.Images.Add("Unknown", Resources.Unknown);
+            TestStatusImageList.Images.Add("Failure", Resources.Failure);
+            TestStatusImageList.Images.Add("Success", Resources.Success);
         }
 
         public void SetTests(IEnumerable<Test> tests)

@@ -32,7 +32,6 @@ namespace PmlUnit
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(TestListView));
             this.TestList = new System.Windows.Forms.ListView();
             this.TestNameColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ExecutionTimeColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
@@ -68,11 +67,7 @@ namespace PmlUnit
             // 
             // TestStatusImageList
             // 
-            this.TestStatusImageList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("TestStatusImageList.ImageStream")));
             this.TestStatusImageList.TransparentColor = System.Drawing.Color.Transparent;
-            this.TestStatusImageList.Images.SetKeyName(0, "Unknown");
-            this.TestStatusImageList.Images.SetKeyName(1, "Failure");
-            this.TestStatusImageList.Images.SetKeyName(2, "Success");
             // 
             // TestListView
             // 

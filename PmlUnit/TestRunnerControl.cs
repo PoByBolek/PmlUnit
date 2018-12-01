@@ -32,6 +32,7 @@ namespace PmlUnit
         private void SetTests(IEnumerable<TestCase> testCases)
         {
             TestList.SetTests(testCases.SelectMany(testCase => testCase.Tests));
+            ResetTestSummary(TestList.AllTests);
         }
 
         protected override void Dispose(bool disposing)
@@ -85,6 +86,7 @@ namespace PmlUnit
             {
                 Enabled = true;
                 TestList.ResetColumnWidths();
+                ResetTestSummary(entries);
             }
         }
 
@@ -128,10 +130,16 @@ namespace PmlUnit
 
         private void OnTestListSelectionChanged(object sender, EventArgs e)
         {
-            foreach (var entry in TestList.SelectedTests)
-            {
-                TestResultLabel.Text = entry.Result?.Error?.Message ?? "";
-            }
+        }
+
+        private void ResetTestSummary(ICollection<TestListEntry> selected)
+        {
+            TestResults.TestEntries.Clear();
+
+            if (selected.Count > 0)
+                TestResults.TestEntries.AddRange(selected);
+            else
+                TestResults.TestEntries.AddRange(TestList.AllTests);
         }
 
         private void OnSplitContainerSizeChanged(object sender, EventArgs e)

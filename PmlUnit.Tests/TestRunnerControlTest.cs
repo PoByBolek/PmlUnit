@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Windows.Forms;
 using Moq;
 using NUnit.Framework;
 
@@ -96,7 +95,7 @@ namespace PmlUnit.Tests
         private Mock<TestRunner> RunnerMock;
         private TestRunnerControl RunnerControl;
         private TestListView TestList;
-        private Label ResultLabel;
+        private TestResultView TestResults;
 
         [SetUp]
         public void Setup()
@@ -107,7 +106,7 @@ namespace PmlUnit.Tests
             RunnerMock.Setup(runner => runner.Run(It.IsAny<Test>())).Returns(new TestResult(TimeSpan.FromSeconds(1)));
 
             RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), RunnerMock.Object);
-            ResultLabel = RunnerControl.FindControl<Label>("TestResultLabel");
+            TestResults = RunnerControl.FindControl<TestResultView>("TestResults");
             TestList = RunnerControl.FindControl<TestListView>("TestList");
             TestList.SetTests(TestCase.Tests);
 
@@ -234,7 +233,7 @@ namespace PmlUnit.Tests
             // Act
             TestList.AllTests[0].Selected = true;
             // Assert
-            Assert.AreEqual("An error occurred", ResultLabel.Text);
+            Assert.AreEqual("An error occurred", TestResults.Text);
         }
     }
 }
