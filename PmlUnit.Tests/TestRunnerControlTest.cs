@@ -95,7 +95,7 @@ namespace PmlUnit.Tests
         private Mock<TestRunner> RunnerMock;
         private TestRunnerControl RunnerControl;
         private TestListView TestList;
-        private TestResultView TestResults;
+        private TestSummaryView TestSummary;
 
         [SetUp]
         public void Setup()
@@ -106,7 +106,7 @@ namespace PmlUnit.Tests
             RunnerMock.Setup(runner => runner.Run(It.IsAny<Test>())).Returns(new TestResult(TimeSpan.FromSeconds(1)));
 
             RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), RunnerMock.Object);
-            TestResults = RunnerControl.FindControl<TestResultView>("TestResults");
+            TestSummary = RunnerControl.FindControl<TestSummaryView>("TestSummary");
             TestList = RunnerControl.FindControl<TestListView>("TestList");
             TestList.SetTests(TestCase.Tests);
 
@@ -233,7 +233,7 @@ namespace PmlUnit.Tests
             // Act
             TestList.AllTests[0].Selected = true;
             // Assert
-            Assert.AreEqual("An error occurred", TestResults.Text);
+            Assert.AreEqual("An error occurred", TestSummary.Text);
         }
     }
 }

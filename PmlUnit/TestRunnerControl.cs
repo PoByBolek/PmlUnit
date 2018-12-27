@@ -134,12 +134,12 @@ namespace PmlUnit
 
         private void ResetTestSummary(ICollection<TestListEntry> selected)
         {
-            TestResults.TestEntries.Clear();
+            TestSummary.TestEntries.Clear();
 
             if (selected.Count > 0)
-                TestResults.TestEntries.AddRange(selected);
+                TestSummary.TestEntries.AddRange(selected);
             else
-                TestResults.TestEntries.AddRange(TestList.AllTests);
+                TestSummary.TestEntries.AddRange(TestList.AllTests);
         }
 
         private void OnSplitContainerSizeChanged(object sender, EventArgs e)

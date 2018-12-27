@@ -9,13 +9,13 @@ using System.Windows.Forms;
 
 namespace PmlUnit
 {
-    partial class TestResultView : UserControl
+    partial class TestSummaryView : UserControl
     {
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public TestListEntryCollection TestEntries { get; }
 
-        public TestResultView()
+        public TestSummaryView()
         {
             InitializeComponent();
 

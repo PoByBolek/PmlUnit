@@ -121,18 +121,18 @@
       <DependentUpon>TestListView.cs</DependentUpon>
     </Compile>
     <Compile Include="TestResult.cs" />
-    <Compile Include="TestResultView.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TestResultView.Designer.cs">
-      <DependentUpon>TestResultView.cs</DependentUpon>
-    </Compile>
     <Compile Include="TestRunner.cs" />
     <Compile Include="TestRunnerControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="TestRunnerControl.Designer.cs">
       <DependentUpon>TestRunnerControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="TestSummaryView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TestSummaryView.Designer.cs">
+      <DependentUpon>TestSummaryView.cs</DependentUpon>
     </Compile>
     <Compile Include="TextReaderExtensions.cs" />
   </ItemGroup>
@@ -147,8 +147,8 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="TestResultView.resx">
-      <DependentUpon>TestResultView.cs</DependentUpon>
+    <EmbeddedResource Include="TestSummaryView.resx">
+      <DependentUpon>TestSummaryView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TestRunnerControl.resx">
       <DependentUpon>TestRunnerControl.cs</DependentUpon>

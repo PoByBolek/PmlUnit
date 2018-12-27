@@ -1,6 +1,6 @@
 ﻿namespace PmlUnit
 {
-    partial class TestResultView
+    partial class TestSummaryView
     {
         /// <summary> 
         /// Erforderliche Designervariable.
@@ -129,7 +129,7 @@
             this.NotExecutedTestCountLabel.Text = "0 not executed tests";
             this.NotExecutedTestCountLabel.Visible = false;
             // 
-            // TestResultView
+            // TestSummaryView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -137,7 +137,7 @@
             this.Controls.Add(this.RuntimeLabel);
             this.Controls.Add(this.ResultLabel);
             this.Controls.Add(summaryLabel);
-            this.Name = "TestResultView";
+            this.Name = "TestSummaryView";
             this.Size = new System.Drawing.Size(301, 150);
             testCountPanel.ResumeLayout(false);
             testCountPanel.PerformLayout();
