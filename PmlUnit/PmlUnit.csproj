@@ -114,6 +114,12 @@
     <Compile Include="TestCaseBuilder.cs" />
     <Compile Include="TestCaseParser.cs" />
     <Compile Include="TestCaseProvider.cs" />
+    <Compile Include="TestDetailsView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="TestDetailsView.Designer.cs">
+      <DependentUpon>TestDetailsView.cs</DependentUpon>
+    </Compile>
     <Compile Include="TestListView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -146,6 +152,9 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TestDetailsView.resx">
+      <DependentUpon>TestDetailsView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="TestSummaryView.resx">
       <DependentUpon>TestSummaryView.cs</DependentUpon>

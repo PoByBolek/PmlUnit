@@ -25,12 +25,13 @@ namespace PmlUnit
             System.Windows.Forms.ToolStripMenuItem notExecutedTestsToolStripMenuItem;
             System.Windows.Forms.ToolStripMenuItem succeededTestsToolStripMenuItem;
             System.Windows.Forms.ToolStripMenuItem selectedTestsToolStripMenuItem;
-            this.TestList = new PmlUnit.TestListView();
             this.TestResultSplitContainer = new System.Windows.Forms.SplitContainer();
+            this.TestList = new PmlUnit.TestListView();
+            this.TestDetails = new PmlUnit.TestDetailsView();
             this.TestSummary = new PmlUnit.TestSummaryView();
-            this.ExecutionProgressBar = new PmlUnit.ColorizedProgressBar();
             this.RunLinkLabel = new System.Windows.Forms.LinkLabel();
             this.RunContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.ExecutionProgressBar = new PmlUnit.ColorizedProgressBar();
             runAllLinkLabel = new System.Windows.Forms.LinkLabel();
             refreshLinkLabel = new System.Windows.Forms.LinkLabel();
             failedTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -42,16 +43,6 @@ namespace PmlUnit
             this.TestResultSplitContainer.SuspendLayout();
             this.RunContextMenu.SuspendLayout();
             this.SuspendLayout();
-            // 
-            // ExecutionProgressBar
-            // 
-            this.ExecutionProgressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ExecutionProgressBar.BackColor = System.Drawing.Color.Transparent;
-            this.ExecutionProgressBar.Location = new System.Drawing.Point(0, 0);
-            this.ExecutionProgressBar.Name = "ExecutionProgressBar";
-            this.ExecutionProgressBar.Size = new System.Drawing.Size(399, 10);
-            this.ExecutionProgressBar.TabIndex = 0;
             // 
             // runAllLinkLabel
             // 
@@ -65,17 +56,6 @@ namespace PmlUnit
             runAllLinkLabel.Text = "Run all";
             runAllLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnRunAllLinkClick);
             // 
-            // RunLinkLabel
-            // 
-            this.RunLinkLabel.AutoSize = true;
-            this.RunLinkLabel.Location = new System.Drawing.Point(47, 13);
-            this.RunLinkLabel.Name = "RunLinkLabel";
-            this.RunLinkLabel.Size = new System.Drawing.Size(36, 13);
-            this.RunLinkLabel.TabIndex = 2;
-            this.RunLinkLabel.TabStop = true;
-            this.RunLinkLabel.Text = "Run...";
-            this.RunLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnRunLinkClicked);
-            // 
             // refreshLinkLabel
             // 
             refreshLinkLabel.AutoSize = true;
@@ -86,16 +66,6 @@ namespace PmlUnit
             refreshLinkLabel.TabStop = true;
             refreshLinkLabel.Text = "Refresh";
             refreshLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnRefreshLinkClick);
-            // 
-            // RunContextMenu
-            // 
-            this.RunContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            failedTestsToolStripMenuItem,
-            notExecutedTestsToolStripMenuItem,
-            succeededTestsToolStripMenuItem,
-            selectedTestsToolStripMenuItem});
-            this.RunContextMenu.Name = "RunContextMenu";
-            this.RunContextMenu.Size = new System.Drawing.Size(174, 92);
             // 
             // failedTestsToolStripMenuItem
             // 
@@ -125,15 +95,6 @@ namespace PmlUnit
             selectedTestsToolStripMenuItem.Text = "Selected Tests";
             selectedTestsToolStripMenuItem.Click += new System.EventHandler(this.OnRunSelectedTestsMenuItemClick);
             // 
-            // TestList
-            // 
-            this.TestList.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TestList.Location = new System.Drawing.Point(0, 0);
-            this.TestList.Name = "TestList";
-            this.TestList.Size = new System.Drawing.Size(167, 254);
-            this.TestList.TabIndex = 0;
-            this.TestList.SelectionChanged += new System.EventHandler(this.OnTestListSelectionChanged);
-            // 
             // TestResultSplitContainer
             // 
             this.TestResultSplitContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -155,6 +116,25 @@ namespace PmlUnit
             this.TestResultSplitContainer.TabIndex = 4;
             this.TestResultSplitContainer.SizeChanged += new System.EventHandler(this.OnSplitContainerSizeChanged);
             // 
+            // TestList
+            // 
+            this.TestList.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TestList.Location = new System.Drawing.Point(0, 0);
+            this.TestList.Name = "TestList";
+            this.TestList.Size = new System.Drawing.Size(167, 254);
+            this.TestList.TabIndex = 0;
+            this.TestList.SelectionChanged += new System.EventHandler(this.OnTestListSelectionChanged);
+            // 
+            // TestDetails
+            // 
+            this.TestDetails.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.TestDetails.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TestDetails.Location = new System.Drawing.Point(0, 0);
+            this.TestDetails.Name = "TestDetails";
+            this.TestDetails.Size = new System.Drawing.Size(228, 254);
+            this.TestDetails.TabIndex = 1;
+            this.TestDetails.Visible = false;
+            // 
             // TestSummary
             // 
             this.TestSummary.BackColor = System.Drawing.SystemColors.ControlLightLight;
@@ -163,6 +143,38 @@ namespace PmlUnit
             this.TestSummary.Name = "TestSummary";
             this.TestSummary.Size = new System.Drawing.Size(228, 254);
             this.TestSummary.TabIndex = 0;
+            // 
+            // RunLinkLabel
+            // 
+            this.RunLinkLabel.AutoSize = true;
+            this.RunLinkLabel.Location = new System.Drawing.Point(47, 13);
+            this.RunLinkLabel.Name = "RunLinkLabel";
+            this.RunLinkLabel.Size = new System.Drawing.Size(36, 13);
+            this.RunLinkLabel.TabIndex = 2;
+            this.RunLinkLabel.TabStop = true;
+            this.RunLinkLabel.Text = "Run...";
+            this.RunLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnRunLinkClicked);
+            // 
+            // RunContextMenu
+            // 
+            this.RunContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            failedTestsToolStripMenuItem,
+            notExecutedTestsToolStripMenuItem,
+            succeededTestsToolStripMenuItem,
+            selectedTestsToolStripMenuItem});
+            this.RunContextMenu.Name = "RunContextMenu";
+            this.RunContextMenu.Size = new System.Drawing.Size(174, 92);
+            // 
+            // ExecutionProgressBar
+            // 
+            this.ExecutionProgressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ExecutionProgressBar.BackColor = System.Drawing.Color.Transparent;
+            this.ExecutionProgressBar.Color = System.Drawing.Color.Transparent;
+            this.ExecutionProgressBar.Location = new System.Drawing.Point(0, 0);
+            this.ExecutionProgressBar.Name = "ExecutionProgressBar";
+            this.ExecutionProgressBar.Size = new System.Drawing.Size(399, 10);
+            this.ExecutionProgressBar.TabIndex = 0;
             // 
             // TestRunnerControl
             // 
@@ -194,5 +206,6 @@ namespace PmlUnit
         private ColorizedProgressBar ExecutionProgressBar;
         private System.Windows.Forms.LinkLabel RunLinkLabel;
         private System.Windows.Forms.ContextMenuStrip RunContextMenu;
+        private TestDetailsView TestDetails;
     }
 }

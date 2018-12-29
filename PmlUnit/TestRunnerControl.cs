@@ -33,6 +33,7 @@ namespace PmlUnit
         {
             TestList.SetTests(testCases.SelectMany(testCase => testCase.Tests));
             ResetTestSummary(TestList.AllTests);
+            ResetTestDetails(TestList.SelectedTests.FirstOrDefault());
         }
 
         protected override void Dispose(bool disposing)
@@ -87,6 +88,7 @@ namespace PmlUnit
                 Enabled = true;
                 TestList.ResetColumnWidths();
                 ResetTestSummary(entries);
+                ResetTestDetails(entries.FirstOrDefault());
             }
         }
 
@@ -130,6 +132,10 @@ namespace PmlUnit
 
         private void OnTestListSelectionChanged(object sender, EventArgs e)
         {
+            var selected = TestList.SelectedTests;
+            ResetTestDetails(selected.FirstOrDefault());
+            TestSummary.Visible = selected.Count != 1;
+            TestDetails.Visible = selected.Count == 1;
         }
 
         private void ResetTestSummary(ICollection<TestListEntry> selected)
@@ -140,6 +146,15 @@ namespace PmlUnit
                 TestSummary.TestEntries.AddRange(selected);
             else
                 TestSummary.TestEntries.AddRange(TestList.AllTests);
+        }
+
+        private void ResetTestDetails(TestListEntry selected)
+        {
+            if (selected == null)
+                return;
+
+            TestDetails.Test = selected.Test;
+            TestDetails.Result = selected.Result;
         }
 
         private void OnSplitContainerSizeChanged(object sender, EventArgs e)
