@@ -204,6 +204,34 @@ namespace PmlUnit.Tests
                 Assert.AreSame(results[i], tests[i].Result);
         }
 
+        [Test]
+        public void RunSelected_AssignsExecutedEntriesToSummary()
+        {
+            // Arrange
+            var entries = TestList.AllTests;
+            // Act
+            RunEventHandler("OnRunSelectedTestsMenuItemClick");
+            // Assert
+            Assert.AreEqual(2, TestSummary.TestEntries.Count);
+            Assert.AreSame(entries[1], TestSummary.TestEntries[0]);
+            Assert.AreSame(entries[3], TestSummary.TestEntries[1]);
+        }
+
+        [Test]
+        public void RunAll_AssignsExecutedEntriesToSummary()
+        {
+            // Arrange
+            var entries = TestList.AllTests;
+            // Act
+            RunEventHandler("OnRunAllLinkClick");
+            // Assert
+            Assert.AreEqual(4, TestSummary.TestEntries.Count);
+            Assert.AreSame(entries[0], TestSummary.TestEntries[0]);
+            Assert.AreSame(entries[1], TestSummary.TestEntries[1]);
+            Assert.AreSame(entries[2], TestSummary.TestEntries[2]);
+            Assert.AreSame(entries[3], TestSummary.TestEntries[3]);
+        }
+
         private void SetupTestResult(Test test, TestResult result)
         {
             RunnerMock.Setup(runner => runner.Run(test)).Returns(result);
@@ -222,18 +250,105 @@ namespace PmlUnit.Tests
 
             method.Invoke(RunnerControl, new object[] { null, EventArgs.Empty });
         }
+    }
+
+
+    [TestFixture]
+    [TestOf(typeof(PmlTestRunner))]
+    [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
+    public class TestRunnerControlSelectionTest
+    {
+        private TestCase TestCase;
+        private TestRunnerControl RunnerControl;
+        private TestListView TestList;
+        private TestSummaryView TestSummary;
+        private TestDetailsView TestDetails;
+
+        [SetUp]
+        public void Setup()
+        {
+            TestCase = new TestCaseBuilder("Test").AddTest("one").AddTest("two").AddTest("three").Build();
+            RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), Mock.Of<TestRunner>());
+            TestSummary = RunnerControl.FindControl<TestSummaryView>("TestSummary");
+            TestDetails = RunnerControl.FindControl<TestDetailsView>("TestDetails");
+            TestList = RunnerControl.FindControl<TestListView>("TestList");
+            TestList.SetTests(TestCase.Tests);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            RunnerControl.Dispose();
+        }
 
         [Test]
-        public void SelectedIndexChange_DisplaysTestFailureInDetailsPanel()
+        public void SelectedIndexChange_AssignsTestOfSingleSelectedEntryToTestDetails()
         {
             // Arrange
-            TestList.SetTests(TestCase.Tests);
-            var tests = TestList.AllTests;
-            tests[0].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("An error occurred"));
-            // Act
-            TestList.AllTests[0].Selected = true;
-            // Assert
-            Assert.AreEqual("An error occurred", TestSummary.Text);
+            var entries = TestList.AllTests;
+            // Act & Assert
+            for (int i = 0; i < entries.Count; i++)
+            {
+                entries[i].Selected = true;
+                Assert.AreSame(TestDetails.Test, entries[i].Test, "Should assign test {0}.", i);
+                entries[i].Selected = false;
+            }
+        }
+
+        [Test]
+        public void SelectedIndexChange_AssignsResultOfSingleSelectedEntryToTestDetails()
+        {
+            // Arrange
+            var entries = TestList.AllTests;
+            entries[0].Result = new TestResult(TimeSpan.FromTicks(0));
+            entries[1].Result = new TestResult(TimeSpan.FromTicks(0), new Exception());
+            entries[2].Result = null;
+            // Act & Assert
+            for (int i = 0; i < entries.Count; i++)
+            {
+                entries[i].Selected = true;
+                Assert.AreSame(TestDetails.Result, entries[i].Result, "Should assign test result {0}.", i);
+                entries[i].Selected = false;
+            }
+        }
+
+        [Test]
+        public void SelectedIndexChange_ShowsTestDetailsIfExactlyOneEntryIsSelected()
+        {
+            // Arrange
+            var entries = TestList.AllTests;
+            // Act & Assert
+            for (int i = 0; i < entries.Count; i++)
+            {
+                entries[i].Selected = true;
+                Assert.IsTrue(TestDetails.Visible, "Should show test details for test {0}", i);
+                Assert.IsFalse(TestSummary.Visible, "Should not show test summary for test {0}", i);
+                entries[i].Selected = false;
+            }
+        }
+
+        [Test]
+        public void SelectedIndexChange_ShowsTestSummaryUnlessExactlyOneEntryIsSelected()
+        {
+            // Arrange
+            var entries = TestList.AllTests;
+            // Act & Assert
+            Assert.IsFalse(TestDetails.Visible);
+            Assert.IsTrue(TestSummary.Visible);
+
+            entries[0].Selected = true;
+            entries[1].Selected = true;
+            entries[2].Selected = true;
+            Assert.IsFalse(TestDetails.Visible);
+            Assert.IsTrue(TestSummary.Visible);
+
+            for (int i = 0; i < entries.Count; i++)
+            {
+                entries[i].Selected = false;
+                Assert.IsFalse(TestDetails.Visible, "Should not show test details for test {0}", i);
+                Assert.True(TestSummary.Visible, "Should show test summary for test {0}", i);
+                entries[i].Selected = true;
+            }
         }
     }
 }

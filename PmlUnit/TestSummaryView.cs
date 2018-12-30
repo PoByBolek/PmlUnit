@@ -77,6 +77,18 @@ namespace PmlUnit
 
         public bool IsReadOnly => false;
 
+        public TestListEntry this[int index]
+        {
+            get { return Entries[index]; }
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException(nameof(value));
+                Entries[index] = value;
+                RaiseChanged();
+            }
+        }
+
         public void Add(TestListEntry item)
         {
             if (item == null)
