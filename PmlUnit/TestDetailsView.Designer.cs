@@ -1,4 +1,6 @@
-﻿namespace PmlUnit
+﻿using System.CodeDom.Compiler;
+
+namespace PmlUnit
 {
     partial class TestDetailsView
     {
@@ -26,6 +28,7 @@
         /// Erforderliche Methode für die Designerunterstützung. 
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
         /// </summary>
+        [GeneratedCode("Windows Form Designer generated code", "1.0")]
         private void InitializeComponent()
         {
             this.ElapsedTimeLabel = new System.Windows.Forms.Label();
