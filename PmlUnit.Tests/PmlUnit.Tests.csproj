@@ -117,6 +117,7 @@
     <Compile Include="ShowTestRunnerCommandTest.cs" />
     <Compile Include="SimpleTestCaseParserTest.cs" />
     <Compile Include="TestCaseBuilderTest.cs" />
+    <Compile Include="TestDetailsViewTest.cs" />
     <Compile Include="TestListViewTest.cs" />
     <Compile Include="TestRunnerControlTest.cs" />
   </ItemGroup>

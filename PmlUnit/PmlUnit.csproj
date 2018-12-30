@@ -141,6 +141,7 @@
       <DependentUpon>TestSummaryView.cs</DependentUpon>
     </Compile>
     <Compile Include="TextReaderExtensions.cs" />
+    <Compile Include="TimeSpanExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ColorizedProgressBar.resx">

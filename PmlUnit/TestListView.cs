@@ -27,7 +27,7 @@ namespace PmlUnit
         {
             TestList.Items.Clear();
             TestList.Groups.Clear();
-            
+
             foreach (var testGroup in tests.GroupBy(test => test.TestCase))
             {
                 var groupName = string.Format(CultureInfo.CurrentCulture, "{0} ({1})", testGroup.Key.Name, testGroup.Count());
@@ -148,16 +148,8 @@ namespace PmlUnit
             {
                 if (Result == null)
                     return "";
-
-                var millis = Result.Duration.TotalMilliseconds;
-                if (millis < 1)
-                    return "< 1 ms";
-                else if (millis < 1000)
-                    return string.Format(CultureInfo.CurrentCulture, "{0} ms", (int)millis);
-                else if (millis < 10000)
-                    return string.Format(CultureInfo.CurrentCulture, "{0:N1} s", ((int)millis / 100) / 10.0);
                 else
-                    return string.Format(CultureInfo.CurrentCulture, "{0:N0} s", millis / 1000);
+                    return Result.Duration.Format();
             }
         }
     }
