@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -48,7 +49,7 @@ namespace PmlUnit
                 TestEntries.Where(entry => entry.Result != null)
                 .Sum(entry => entry.Result.Duration.TotalSeconds)
             ));
-            RuntimeLabel.Text = string.Format("(Total runtime: {0:c})", totalRuntime);
+            RuntimeLabel.Text = string.Format(CultureInfo.CurrentCulture, "(Total runtime: {0:c})", totalRuntime);
             RuntimeLabel.Left = ResultLabel.Right;
         }
 
