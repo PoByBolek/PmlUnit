@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) 2019 Florian Zimmermann.
+// Licensed under the MIT License: https://opensource.org/licenses/MIT
+using System;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.CompilerServices;
@@ -8,12 +10,11 @@ using System.Runtime.InteropServices;
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die einer Assembly zugeordnet sind.
 [assembly: AssemblyTitle("PmlUnit")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Test framework and test runner for PML code in AVEVA PDMS, Everything3D, and other products.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("PmlUnit")]
-[assembly: AssemblyCopyright("Copyright ©  2017")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCopyright("Copyright © 2019 Florian Zimmermann")]
 [assembly: AssemblyCulture("")]
 
 [assembly: CLSCompliant(true)]

@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) 2019 Florian Zimmermann.
+// Licensed under the MIT License: https://opensource.org/licenses/MIT
+using System;
 using Aveva.ApplicationFramework.Presentation;
 
 namespace PmlUnit
