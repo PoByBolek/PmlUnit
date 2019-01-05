@@ -9,11 +9,38 @@ using System.Runtime.InteropServices;
 // Allgemeine Informationen über eine Assembly werden über die folgenden 
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die einer Assembly zugeordnet sind.
-[assembly: AssemblyTitle("PmlUnit")]
 [assembly: AssemblyDescription("Test framework and test runner for PML code in AVEVA PDMS, Everything3D, and other products.")]
-[assembly: AssemblyConfiguration("")]
+
+#if PDMS_121
+
+[assembly: AssemblyTitle("PML Unit for PDMS 12.1")]
+#if DEBUG
+[assembly: AssemblyConfiguration("PDMS 12.1 Debug")]
+#else
+[assembly: AssemblyConfiguration("PDMS 12.1 Release")]
+#endif
+
+#elif E3D_11
+
+[assembly: AssemblyTitle("PML Unit for E3D 1.1")]
+#if DEBUG
+[assembly: AssemblyConfiguration("E3D 1.1 Debug")]
+#else
+[assembly: AssemblyConfiguration("E3D 1.1 Release")]
+#endif
+
+#elif E3D_21
+[assembly: AssemblyTitle("PML Unit for E3D 2.1")]
+#if DEBUG
+[assembly: AssemblyConfiguration("E3D 2.1 Debug")]
+#else
+[assembly: AssemblyConfiguration("E3D 2.1 Release")]
+#endif
+
+#endif
+
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("PmlUnit")]
+[assembly: AssemblyProduct("PML Unit")]
 [assembly: AssemblyCopyright("Copyright © 2019 Florian Zimmermann")]
 [assembly: AssemblyCulture("")]
 
@@ -43,3 +70,4 @@ using System.Runtime.InteropServices;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyInformationalVersion("1.0.0")]
