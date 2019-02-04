@@ -34,12 +34,21 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'PDMS 12.1' ">
     <DefineConstants>$(DefineConstants);PDMS;PDMS_121</DefineConstants>
+    <ApplicationFrameworkVersion>1.1.20.0</ApplicationFrameworkVersion>
+    <ApplicationFrameworkPresentationVersion>108.8100.20.0</ApplicationFrameworkPresentationVersion>
+    <PmlNetVersion>12.1.0.0</PmlNetVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'E3D 1.1' ">
     <DefineConstants>$(DefineConstants);E3D;E3D_11</DefineConstants>
+    <ApplicationFrameworkVersion>1.1.20.0</ApplicationFrameworkVersion>
+    <ApplicationFrameworkPresentationVersion>108.8100.20.0</ApplicationFrameworkPresentationVersion>
+    <PmlNetVersion>1.1.0.0</PmlNetVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'E3D 2.1' ">
     <DefineConstants>$(DefineConstants);E3D;E3D_21</DefineConstants>
+    <ApplicationFrameworkVersion>1.2.2.0</ApplicationFrameworkVersion>
+    <ApplicationFrameworkPresentationVersion>1.2.2.0</ApplicationFrameworkPresentationVersion>
+    <PmlNetVersion>1.2.0.0</PmlNetVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|PDMS 12.1' ">
   </PropertyGroup>
@@ -60,13 +69,11 @@
     <AssemblyOriginatorKeyFile>..\PmlUnit.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Aveva.ApplicationFramework, Version=1.1.20.0, Culture=neutral, PublicKeyToken=17c64733a9775004, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Aveva.ApplicationFramework, Version=$(ApplicationFrameworkVersion), Culture=neutral, PublicKeyToken=17c64733a9775004">
       <HintPath>..\lib\$(Platform)\Aveva.ApplicationFramework.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Aveva.ApplicationFramework.Presentation, Version=108.8100.20.0, Culture=neutral, PublicKeyToken=17c64733a9775004, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Aveva.ApplicationFramework.Presentation, Version=$(ApplicationFrameworkPresentationVersion), Culture=neutral, PublicKeyToken=17c64733a9775004">
       <HintPath>..\lib\$(Platform)\Aveva.ApplicationFramework.Presentation.dll</HintPath>
       <Private>True</Private>
     </Reference>
@@ -80,6 +87,10 @@
     </Reference>
     <Reference Include="nunit.framework, Version=3.9.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
       <HintPath>..\packages\NUnit.3.9.0\lib\net45\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PMLNet, Version=$(PmlNetVersion), Culture=neutral, PublicKeyToken=17c64733a9775004">
+      <HintPath>..\lib\$(Platform)\PMLNet.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

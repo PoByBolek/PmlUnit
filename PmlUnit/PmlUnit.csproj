@@ -31,16 +31,25 @@
     <DefineConstants>$(DefineConstants);PDMS;PDMS_121</DefineConstants>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <ApplicationFrameworkVersion>1.1.20.0</ApplicationFrameworkVersion>
+    <ApplicationFrameworkPresentationVersion>108.8100.20.0</ApplicationFrameworkPresentationVersion>
+    <PmlNetVersion>12.1.0.0</PmlNetVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'E3D 1.1' ">
     <DefineConstants>$(DefineConstants);E3D;E3D_11</DefineConstants>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <ApplicationFrameworkVersion>1.1.20.0</ApplicationFrameworkVersion>
+    <ApplicationFrameworkPresentationVersion>108.8100.20.0</ApplicationFrameworkPresentationVersion>
+    <PmlNetVersion>1.1.0.0</PmlNetVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Platform)' == 'E3D 2.1' ">
     <DefineConstants>$(DefineConstants);E3D;E3D_21</DefineConstants>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <ApplicationFrameworkVersion>1.2.2.0</ApplicationFrameworkVersion>
+    <ApplicationFrameworkPresentationVersion>1.2.2.0</ApplicationFrameworkPresentationVersion>
+    <PmlNetVersion>1.2.0.0</PmlNetVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|PDMS 12.1' ">
   </PropertyGroup>
@@ -61,15 +70,15 @@
     <AssemblyOriginatorKeyFile>..\PmlUnit.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Aveva.ApplicationFramework">
+    <Reference Include="Aveva.ApplicationFramework, Version=$(ApplicationFrameworkVersion), Culture=neutral, PublicKeyToken=17c64733a9775004">
       <HintPath>..\lib\$(Platform)\Aveva.ApplicationFramework.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Aveva.ApplicationFramework.Presentation">
+    <Reference Include="Aveva.ApplicationFramework.Presentation, Version=$(ApplicationFrameworkPresentationVersion), Culture=neutral, PublicKeyToken=17c64733a9775004">
       <HintPath>..\lib\$(Platform)\Aveva.ApplicationFramework.Presentation.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="PMLNet">
+    <Reference Include="PMLNet, Version=$(PmlNetVersion), Culture=neutral, PublicKeyToken=17c64733a9775004">
       <HintPath>..\lib\$(Platform)\PMLNet.dll</HintPath>
       <Private>False</Private>
     </Reference>
