@@ -63,12 +63,15 @@
   <ItemGroup>
     <Reference Include="Aveva.ApplicationFramework">
       <HintPath>..\lib\$(Platform)\Aveva.ApplicationFramework.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Aveva.ApplicationFramework.Presentation">
       <HintPath>..\lib\$(Platform)\Aveva.ApplicationFramework.Presentation.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="PMLNet">
       <HintPath>..\lib\$(Platform)\PMLNet.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
