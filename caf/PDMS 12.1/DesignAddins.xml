@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfString xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <string>ExplorerAddin</string>
+  <string>DrawListAddin</string>
+  <string>MyDataAddin</string>
+  <string>HistoryAddin</string>
+  <string>ReferenceListAddin</string>
+  <string>PipeCheckAddin</string>
+  <string>OutputAddin</string>
+  <string>FindAddin</string>
+  <string>LinksAddin</string>
+  <string>AttributesUtility</string>
+  <string>StatusControllerAddin</string>
+  <string>ModelChangesAddin</string>
+  <string>SVGCompare</string>
+  <string>InstrumentationImportAddin</string>
+  <string>AvevaNetExportConfigAddin</string>
+  <string>ReportingAddin</string>
+  <!--
+    You need to change this to an absolute path to the PmlUnit DLL in the
+    pdms-12.1 bin directory.
+  -->
+  <string>..\bin\PmlUnit</string>
+</ArrayOfString>

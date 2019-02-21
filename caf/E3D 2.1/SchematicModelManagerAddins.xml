@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfString xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <string>ExplorerAddin</string>
+  <string>MyDataAddin</string>
+  <string>FindAddin</string>
+  <string>AttributesUtility</string>
+  <string>CatalogSearchAddin</string>
+  <string>LinksAddin</string>
+  <string>HistoryAddin</string>
+  <string>ReferenceListAddin</string>
+  <string>EditElements</string>
+  <string>StatusControllerAddin</string>
+  <string>ConnMapAddin</string>
+  <string>InstrumentationImportAddin</string>
+  <string>Aveva.Core.ExcelInterface</string>
+  <string>SVGCompare</string>
+  <string>AvevaNetExportConfigAddin</string>
+  <string>ReportingAddin</string>
+  <string>..\bin\PmlUnit</string>
+</ArrayOfString>

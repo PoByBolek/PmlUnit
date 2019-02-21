@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfString xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <string>ExplorerAddin</string>
+  <string>DrawListAddin</string>
+  <string>MyDataAddin</string>
+  <string>HistoryAddin</string>
+  <string>ReferenceListAddin</string>
+  <string>OutputAddin</string>
+  <string>FindAddin</string>
+  <string>AttributesUtility</string>
+  <string>StatusControllerAddin</string>
+  <string>AvevaNetExportConfigAddin</string>
+  <string>ReportingAddin</string>
+  <string>PipeFabricationAddin</string>
+  <string>MessageAddin</string>
+  <string>..\bin\PmlUnit</string>
+</ArrayOfString>

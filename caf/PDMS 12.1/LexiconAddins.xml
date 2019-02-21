@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfString xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <string>ExplorerAddin</string>
+  <string>OutputAddin</string>
+  <string>FindAddin</string>
+  <string>EditElements</string>
+  <string>LexiconGUIAddin</string>
+  <string>Aveva.Pdms.SchematicModelManager.Addin</string>
+  <string>GraphicalViewer</string>
+  <string>AVEVA.Datasheets.Addin</string>
+  <!--
+    You need to change this to an absolute path to the PmlUnit DLL in the
+    pdms-12.1 bin directory.
+  -->
+  <string>..\bin\PmlUnit</string>
+</ArrayOfString>
