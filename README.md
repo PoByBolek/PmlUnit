@@ -260,9 +260,10 @@ PML Unit is licensed under the MIT license.
 The test status icons are taken from [Font-Awesome-SVG-PNG][fa-svg], which is
 licensed under the MIT license.
 
-The basis for test runner icon was created by [Recep Kütük][iconfinder] and is
-free for personal and commercial use.
+The [test runner icon][iconfinder] was created by [Recep Kütük][recep-kutuk] and
+is free for personal and commercial use.
 
 
   [fa-svg]: https://github.com/encharm/Font-Awesome-SVG-PNG
   [iconfinder]: https://www.iconfinder.com/icons/728987/chemistry_experiment_lab_laboratory_research_science_test_icon
+  [recep-kutuk]: http://www.recepkutuk.com/bitsies/
