@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
-using System.IO;
 using Aveva.ApplicationFramework;
 using Aveva.ApplicationFramework.Presentation;
 
@@ -94,36 +93,6 @@ namespace PmlUnit
             var commandManager = serviceManager.GetService<CommandManager>();
             if (windowManager != null && commandManager != null)
                 commandManager.Commands.Add(new ShowTestRunnerCommand(windowManager, RunnerControl));
-
-            var commandBarManager = serviceManager.GetService<CommandBarManager>();
-            if (commandBarManager != null)
-            {
-                using (var stream = GetCustomizationFileStream())
-                {
-                    if (stream != null)
-                        commandBarManager.AddUICustomizationFromStream(stream, "PmlUnit");
-                }
-            }
-        }
-
-        private static Stream GetCustomizationFileStream()
-        {
-            var assembly = typeof(PmlUnitAddin).Assembly;
-            // Visual Studio (or MSBuild?) seems to give the resource different names from time to time...
-#if PDMS
-            var resourceNames = new string[] { "PmlUnit.PmlUnitAddin.pdms.uic", "PmlUnit.PmlUnitAddin.pdms" };
-#else
-            var resourceNames = new string[] { "PmlUnit.PmlUnitAddin.e3d.uic", "PmlUnit.PmlUnitAddin.e3d" };
-#endif
-
-            foreach (var resource in resourceNames)
-            {
-                var result = assembly.GetManifestResourceStream(resource);
-                if (result != null)
-                    return result;
-            }
-
-            return null;
         }
 
         public void Stop()

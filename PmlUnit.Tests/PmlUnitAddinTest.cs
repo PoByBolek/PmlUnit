@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
 using Aveva.ApplicationFramework;
@@ -17,7 +16,6 @@ namespace PmlUnit.Tests
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     class PmlUnitAddinTest
     {
-        private Mock<CommandBarManager> CommandBarManagerMock;
         private Mock<CommandManager> CommandManagerMock;
         private Mock<ServiceManager> ServiceManagerMock;
         private Mock<TestRunner> TestRunnerMock;
@@ -26,8 +24,6 @@ namespace PmlUnit.Tests
         [SetUp]
         public void Setup()
         {
-            CommandBarManagerMock = new Mock<CommandBarManager>();
-
             CommandManagerMock = new Mock<CommandManager>();
             CommandManagerMock.Setup(manager => manager.Commands.Add(It.IsAny<Command>()));
 
@@ -37,8 +33,6 @@ namespace PmlUnit.Tests
             )).Returns(Mock.Of<DockedWindow>());
 
             ServiceManagerMock = new Mock<ServiceManager>();
-            ServiceManagerMock.Setup(manager => manager.GetService(typeof(CommandBarManager)))
-                .Returns(CommandBarManagerMock.Object);
             ServiceManagerMock.Setup(manager => manager.GetService(typeof(CommandManager)))
                 .Returns(CommandManagerMock.Object);
             ServiceManagerMock.Setup(manager => manager.GetService(typeof(WindowManager)))
@@ -73,17 +67,6 @@ namespace PmlUnit.Tests
             // Assert
             ServiceManagerMock.Verify(
                 manager => manager.AddService(typeof(TestRunner), TestRunnerMock.Object)
-            );
-        }
-
-        [Test]
-        public void Start_AddsUiCustomizationFile()
-        {
-            // Act
-            Addin.Start(ServiceManagerMock.Object);
-            // Assert
-            CommandBarManagerMock.Verify(
-                manager => manager.AddUICustomizationFromStream(It.IsNotNull<Stream>(), "PmlUnit")
             );
         }
 

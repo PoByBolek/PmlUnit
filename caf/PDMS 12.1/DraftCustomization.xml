@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<UICustomizationSet xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <UICustomizationFiles>
+    <CustomizationFile Name="Module" Path="draft.uic" />
+    <CustomizationFile Name="StatusControllerAddin" Path="StatusController.uic" />
+    <CustomizationFile Name="Project" Path="$1.uic" />
+    <!--
+        You need to change the Path attribute to an absolute path the PmlUnit.uic
+        in the pdms-12.1\caf directory.
+    -->
+    <CustomizationFile Name="PmlUnit" Path="PmlUnit.uic" />
+  </UICustomizationFiles>
+</UICustomizationSet>

@@ -14,7 +14,7 @@
   <string>ReportingAddin</string>
   <!--
     You need to change this to an absolute path to the PmlUnit DLL in the
-    pdms-12.1 bin directory.
+    pdms-12.1\bin directory.
   -->
   <string>..\bin\PmlUnit</string>
 </ArrayOfString>

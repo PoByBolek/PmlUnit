@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UICustomizationSet xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <UICustomizationFiles>
+    <CustomizationFile Name="Module" Path="paragon.uic" />
+    <CustomizationFile Name="Project" Path="$1.uic" Optional="true"/>
+    <CustomizationFile Name="Catalogue" Path="AVEVA.catalogue.applications.uic" />
+    <CustomizationFile Name="MessageAddin" Path="MessageAddinMenu.uic" />
+    <CustomizationFile Name ="InstrumentationImportAddin" Path="InstrumentationImportAddin.uic"/>
+    <CustomizationFile Name="PmlUnit" Path="PmlUnit.Ribbon.uic" />
+  </UICustomizationFiles>
+</UICustomizationSet>

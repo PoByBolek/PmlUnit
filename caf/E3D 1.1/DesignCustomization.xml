@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UICustomizationSet xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <DefaultIcon>AvevaSharedIcons:ID_WARNING</DefaultIcon>
+  <UICustomizationFiles>
+    <CustomizationFile Name="Module" Path="design.uic" />
+    <CustomizationFile Name="SchematicExplorerAddin" Path="CoreSchematicMenu.uic" />
+    <CustomizationFile Name="Project" Path="$1.uic" Optional="true"/>
+    <CustomizationFile Name="SVGCompare" Path="SVGCompare.uic" />
+    <CustomizationFile Name="Cabling" Path="AVEVA.design.cabling.uic" />
+    <CustomizationFile Name="Hvac" Path="AVEVA.design.hvac.uic" />
+    <CustomizationFile Name="Supports" Path="AVEVA.design.MDS.uic" />
+    <CustomizationFile Name="Piping" Path="AVEVA.design.piping.uic" />
+    <CustomizationFile Name="Steelwork" Path="AVEVA.design.steelwork.uic" />
+    <CustomizationFile Name="MessageAddin" Path="MessageWindowCoreMenus.uic" />
+    <CustomizationFile Name="Laser" Path="AVEVA.design.laser.uic" />
+    <CustomizationFile Name="Integrator" Path="Integrator.uic" />
+    <CustomizationFile Name="DiagramViewer" Path="DiagramViewer.uic" />
+    <CustomizationFile Name="InstrumentationImportAddin" Path="InstrumentationImportAddin.uic" />
+    <CustomizationFile Name="PmlUnit" Path="PmlUnit.Ribbon.uic" />
+  </UICustomizationFiles>
+</UICustomizationSet>

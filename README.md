@@ -15,21 +15,27 @@ tree:
     |   |   `-- PmlUnit.dll
     |   `-- caf
     |       |-- AdminAddins.xml
+    |       |-- AdminCustomization.xml
     |       |-- DesignAddins.xml
+    |       |-- DesignCustomization.xml
     |       `-- ...
     |-- e3d-2.1
     |   |-- bin
     |   |   `-- PmlUnit.dll
     |   `-- caf
+    |       |-- AdminAddins.xml
+    |       |-- AdminCustomization.xml
     |       |-- DesignAddins.xml
-    |       |-- DrawAddins.xml
+    |       |-- DesignCustomization.xml
     |       `-- ...
     |-- pdms-12.1
     |   |-- bin
     |   |   `-- PmlUnit.dll
     |   `-- caf
     |       |-- AdminAddins.xml
+    |       |-- AdminCustomization.xml
     |       |-- DesignAddins.xml
+    |       |-- DesignCustomization.xml
     |       `-- ...
     |-- pmllib
     |   |-- pml-unit
@@ -41,28 +47,29 @@ tree:
         |   `-- ...
         `-- pml.index
 
-Then you need to set the `CAF_ADDINS_PATH` and `PMLLIB` environment variables
-in your start scripts as follows:
+Then you need to set the `CAF_ADDINS_PATH`, `CAF_UIC_PATH`, and `PMLLIB`
+environment variables in your start scripts as follows:
 
-| Platform  | `CAF_ADDINS_PATH`           | `PMLLIB`             |
-| --------- | --------------------------- | -------------------- |
-| PDMS 12.1 | `D:\pml-unit\pdms-12.1\caf` | `D:\pml-unit\pmllib` |
-| E3D 1.1   | `D:\pml-unit\e3d-1.1\caf`   | `D:\pml-unit\pmllib` |
-| E3D 2.1   | `D:\pml-unit\e3d-2.1\caf`   | `D:\pml-unit\pmllib` |
+| Platform  | `CAF_ADDINS_PATH`           | `CAF_UIC_PATH`              | `PMLLIB`             |
+| --------- | --------------------------- | --------------------------- | -------------------- |
+| PDMS 12.1 | `D:\pml-unit\pdms-12.1\caf` | `D:\pml-unit\pdms-12.1\caf` | `D:\pml-unit\pmllib` |
+| E3D 1.1   | `D:\pml-unit\e3d-1.1\caf`   | `D:\pml-unit\e3d-1.1\caf`   | `D:\pml-unit\pmllib` |
+| E3D 2.1   | `D:\pml-unit\e3d-2.1\caf`   | `D:\pml-unit\e3d-2.1\caf`   | `D:\pml-unit\pmllib` |
 
 For example, for Everything3D 2.1 you could set the environment variables in
 your `custom_evars.bat` in your projects directory:
 
     set CAF_ADDINS_PATH=D:\pml-unit\e3d-2.1\caf
+    set CAF_UIC_PATH=D:\pml-unit\e3d-2.1\caf
     set PMLLIB=%PMLLIB%;D:\pml-unit\pmllib
 
 ### Note for PDMS 12.1
 
-Note that for PDMS 12.1 you will have to edit the `*Addins.xml` files in
-`D:\pml-unit\pdms-12.1\caf` so that they contain an absolute path to the
-`PmlUnit.dll`, i.e. `D:\pml-unit\pdms-12.1\bin\PmlUnit.dll`. Unfortunately,
-PDMS does not load addins with paths names relative to the `CAF_ADDINS_PATH`
-environment variable.
+Note that for PDMS 12.1 you will have to edit the `*Addins.xml` and
+`*Customization.xml` files in `D:\pml-unit\pdms-12.1\caf` so that they contain
+absolute paths to the `PmlUnit.dll` and `PmlUnit.uic`, respectively.
+Unfortunately, PDMS does not load addins and UIC files with paths names relative
+to the `CAF_ADDINS_PATH` and `CAF_UIC_PATH` environment variables.
 
 For example, if you want PML Unit to show up in the PDMS Design module, you
 should edit the `D:\pml-unit\pdms-12.1\caf\DesignAddins.xml` file like this:
@@ -87,6 +94,21 @@ should edit the `D:\pml-unit\pdms-12.1\caf\DesignAddins.xml` file like this:
         <string>ReportingAddin</string>
         <string>D:\pml-unit\pdms-12.1\bin\PmlUnit</string>
     </ArrayOfString>
+
+Also, you should also edit the `D:\pml-unit\pdms-12.1\caf\DesignCustomization.xml`
+file like this:
+
+    <?xml version="1.0" encoding="utf-8"?>
+    <UICustomizationSet xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <UICustomizationFiles>
+            <CustomizationFile Name="Module" Path="design.uic" />
+            <CustomizationFile Name="StatusControllerAddin" Path="StatusController.uic" />
+            <CustomizationFile Name="SchematicExplorerAddin" Path="CoreSchematicMenu.uic" />
+            <CustomizationFile Name="Project" Path="$1.uic" />
+            <CustomizationFile Name="SVGCompare" Path="SVGCompare.uic" />
+            <CustomizationFile Name="PmlUnit" Path="D:\pml-unit\pdms-12.1\caf\PmlUnit.uic" />
+        </UICustomizationFiles>
+    </UICustomizationSet>
 
 ----------------
 

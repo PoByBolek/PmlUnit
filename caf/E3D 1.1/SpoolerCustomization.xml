@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<UICustomizationSet xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <UICustomizationFiles>
+    <CustomizationFile Name="Module" Path="spooler.uic" />
+    <CustomizationFile Name="Project" Path="$1.uic" />
+    <CustomizationFile Name="MessageAddin" Path="MessageWindowCoreMenus.uic" />
+    <CustomizationFile Name="PmlUnit" Path="PmlUnit.Menu.uic" />
+  </UICustomizationFiles>
+</UICustomizationSet>

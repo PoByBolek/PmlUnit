@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<UserInterfaceCustomization xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="www.aveva.com">
+  <Version>1.0</Version>
+  <Tools>
+    <StateButtonTool Name="PmlUnit.ShowTestRunnerButton">
+      <Command>
+        <Type>Instance</Type>
+        <Key>PmlUnit.ShowTestRunnerCommand</Key>
+        <Arguments />
+      </Command>
+      <Image>iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAz1JREFUWIXtlk9onGUQxn8zu9sINWqqNdUeemjx0ijFSLUW6VERL1mzElOsIhiDTbapUu3mkOWzdBtCITSJemx78SCbBDwURMFTsZWIlDagHgTRaxIVten22xkPm4ZtdjfZb7N4cm7zzr9n5h2e94UmSf5Gdm76evZK1DhtFgBxQlSLkeOiBlz66VzLcmFpzESOYKiKXwjxE690BIWouQDiUQOWC0tjiKQVVuYn6bgDcKwRAJGvwESOAOD2tIsduOvsvwBwR1xRLW5+hyInUPcLAOL6jateXklyvlEAkXcgxD+IO5j466CicD50O9kogP+lbh5Ipk9eVXR/SbMr+YnRA3fbh+cUOktmruancs/Uk7fuJVSwMq0i+WpxALW6GbHuJbzTcXd62Nf3y0Vi16a9BY1KJAB9fX2JZvg0DGBxy0NDABg3qph/AFho2RbpTagbQM/RE4+a2giAiacrPUpn4jrSNTT8SNMBhLH4WUXvBT6bmTzz9Vp7fuLMl24+i9KqRc42FUD3YOYQyKtm/F308L1afm563IybIvS+PJB5rikADmWzcVymAFQ4PTs59lst35mPT/+i4qMAgkylUqnYpgFsX7w9gNLRer/Q09eSWy02H/jMfOBr9a1/bhnD+BnlCd+x551NAehJZ9pNLAB46mAcrePCLl4MlonZcQATOdXVn314Pf91mbDgPqai9+3cpRx9IRAodQqQ3JtdV//0k1uXVHnRErdHgTdr1ajZU3Igc1BFX9M4dD4b+dsACTsG3FLhja7B4ZoPU1XeTqVSsWL77jlV3efw4fRELltv5+X6tW9D5r8vYvDd422J/UEQ2NpaVSdgO/b0q+q+ra2CxG6ORuq8TPY+GcfdflXonF8ovFXNp2IC3YOZ7Sbyo0IbkOx9u2Vmo07X08c/H/HLX4UAC8QSj+XHg8XyehUTMJFTCm24fZGfyM022Pyq7Nodo32nADzoYSFYa6+yXXYYlJd67nm+tz/wRjsv17vSmY4Yct1FDgODGwAoSaHgmEuJCQFboZxG9PhS+IBT/R9TsQPJwcxHKrIhgzUi7pybnswNlZ9V7MA//PWuw6TBH02rbPY7zrhuS7y/1vQv5+5W7x5H9mgAAAAASUVORK5CYII=</Image>
+      <ShortCut>CtrlT</ShortCut>
+      <Caption>Test Runner</Caption>
+      <DisplayStyle>Default</DisplayStyle>
+    </StateButtonTool>
+  </Tools>
+  <InstanceTools />
+  <MenuBar />
+  <CommandBars />
+  <TaskPanes />
+  <ContextMenus />
+  <AreaLeftTools />
+  <AreaRightTools />
+  <FooterTools />
+  <NavigationMenuTools />
+  <QATTools />
+  <ContextualTabGroups />
+  <TabToolbarTools />
+  <Tabs>
+    <Tab Name="PmlUnit.MainTab">
+      <Caption>PML UNIT</Caption>
+      <ContextualTabGroup>
+        <Item>None</Item>
+      </ContextualTabGroup>
+      <Groups>
+        <Group Name="PmlUnit.MainGroup">
+          <Tools>
+            <Tool Name="PmlUnit.ShowTestRunnerButton" LargeImage="True" ImageOnly="False" />
+          </Tools>
+          <Caption>Run</Caption>
+        </Group>
+      </Groups>
+      <KeyTip>U</KeyTip>
+    </Tab>
+  </Tabs>
+  <MiniToolbarTools />
+  <Namespace>PmlUnit</Namespace>
+</UserInterfaceCustomization>

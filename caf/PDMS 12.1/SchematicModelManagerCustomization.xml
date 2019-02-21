@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<UICustomizationSet xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <UICustomizationFiles>
+    <CustomizationFile Name="Project" Path="$1.uic" />
+    <CustomizationFile Name="CoreMenu" Path="CoreSchematicMenu.uic" />
+    <CustomizationFile Name="SmmFileMenu" Path="Schematic Model Manager/Resources/SmmFileMenu.uic" />
+    <CustomizationFile Name="SmmEditMenu" Path="Schematic Model Manager/Resources/SmmEditMenu.uic" />
+    <CustomizationFile Name="SmmViewMenu" Path="Schematic Model Manager/Resources/SmmViewMenu.uic" />
+    <CustomizationFile Name="SmmToolsMenu" Path="Schematic Model Manager/Resources/SmmToolsMenu.uic" />
+    <CustomizationFile Name="SmmWindowMenu" Path="Schematic Model Manager/Resources/SmmWindowMenu.uic" />
+    <CustomizationFile Name="SmmHelpMenu" Path="Schematic Model Manager/Resources/SmmHelpMenu.uic" />
+    <CustomizationFile Name="StatusControllerAddin" Path="StatusController.uic" />
+    <CustomizationFile Name="AIAddin" Path="SchematicAIIntegrationAddin.uic" />
+    <CustomizationFile Name="ConnectionMap" Path="ConnMap.uic" />
+    <CustomizationFile Name="SCMVModuleGeneral" Path="SchematicCMVModule.uic" />
+    <CustomizationFile Name="SCMVModuleSMM" Path="SchematicCMVModuleSMM.uic" />
+    <CustomizationFile Name="SVGCompare" Path="SVGCompare.uic" />
+    <!--
+        You need to change the Path attribute to an absolute path the PmlUnit.uic
+        in the pdms-12.1\caf directory.
+    -->
+    <CustomizationFile Name="PmlUnit" Path="PmlUnit.uic" />
+  </UICustomizationFiles>
+</UICustomizationSet>
