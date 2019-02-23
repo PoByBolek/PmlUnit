@@ -1,5 +1,5 @@
 @echo off
-setlocal
+setlocal EnableExtensions
 
 for %%X in (msbuild.exe) do (
     set "msbuild.exe=%%~$PATH:X"
@@ -42,24 +42,17 @@ goto :eof
 
 :build
 set "platform=%~1"
-set "build_dir=%~2"
+set "bin_dir=build\%~2\bin\"
+set "caf_dir=build\%~2\caf\"
+
 "%msbuild.exe%" /p:Configuration=Release "/p:Platform=%platform%" PmlUnit.sln
 
-if not exist build (
-    mkdir build
+if not exist %bin_dir% (
+    mkdir %bin_dir%
 )
-if not exist build\%build_dir% (
-    mkdir build\%build_dir%
-)
-if not exist build\%build_dir% (
-    mkdir build\%build_dir%
-)
-if not exist build\%build_dir%\bin (
-    mkdir build\%build_dir%\bin
-)
-if not exist build\%build_dir%\caf (
-    mkdir build\%build_dir%\caf
+if not exist %caf_dir% (
+    mkdir %caf_dir%
 )
 
-copy "PmlUnit\bin\Release\%platform%\*" build\%build_dir%\bin\
-copy "caf\%platform%\*" build\%build_dir%\caf\
+copy "PmlUnit\bin\Release\%platform%\*" "%bin_dir%"
+copy "caf\%platform%\*" %caf_dir%
