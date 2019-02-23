@@ -72,7 +72,8 @@ popd
 rmdir /S /Q build
 
 call :write_success "PmlUnit.zip created sucessfully"
-goto :eof
+goto end
+
 
 :build
 set "platform=%~1"
@@ -132,3 +133,12 @@ goto :eof
 echo.
 echo [92m[SUCCESS] %~1[0m
 goto :eof
+
+
+:end
+(((echo.%cmdcmdline%) | find /I "%~0") > nul)
+if %errorlevel% equ 0 (
+    rem We were called from Windows Explorer. Pause so that people can actually
+    rem look at the command output
+    pause
+)
