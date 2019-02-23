@@ -1,6 +1,26 @@
 @echo off
 setlocal
 
+for %%X in (msbuild.exe) do (
+    set "msbuild.exe=%%~$PATH:X"
+)
+if defined msbuild.exe (
+    if exist "%msbuild.exe" (
+        goto msbuild_found
+    )
+)
+for /f "delims=" %%i in ('powershell.exe -ExecutionPolicy bypass "& '%~dp0\find-msbuild.ps1'"') do (
+    set "msbuild.exe=%%i"
+)
+if not defined msbuild.exe (
+    goto end
+)
+if not exist "%msbuild.exe%" (
+    goto end
+)
+
+:msbuild_found
+
 nuget restore
 
 call :build "PDMS 12.1" "pdms-12.1"
@@ -23,8 +43,7 @@ goto :eof
 :build
 set "platform=%~1"
 set "build_dir=%~2"
-echo MSBuild /p:Configuration=Release "/p:Platform=%platform%" PmlUnit.sln
-MSBuild /p:Configuration=Release "/p:Platform=%platform%" PmlUnit.sln
+"%msbuild.exe%" /p:Configuration=Release "/p:Platform=%platform%" PmlUnit.sln
 
 if not exist build (
     mkdir build
