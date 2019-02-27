@@ -1,7 +1,13 @@
 @echo off
 setlocal EnableExtensions
 
-set "nunit.exe=%~dp0\packages\NUnit.ConsoleRunner.3.9.0\tools\nunit3-console.exe"
+set "BASE_DIR=%~dp0"
+
+set "PmlUnit.sln=%BASE_DIR%\PmlUnit.sln"
+set "PmlUnit=%BASE_DIR%\PmlUnit"
+set "PmlUnit.Tests=%BASE_DIR%\PmlUnit.Tests"
+
+set "nunit.exe=%BASE_DIR%\packages\NUnit.ConsoleRunner.3.9.0\tools\nunit3-console.exe"
 
 for %%X in (msbuild.exe) do (
     set "msbuild.exe=%%~$PATH:X"
@@ -26,8 +32,11 @@ if not exist "%msbuild.exe%" (
 :msbuild_found
 call :write_info "Using msbuild from '%msbuild.exe%'"
 
+pushd %~dp0
 nuget restore
-if %errorlevel% neq 0 (
+set _restore_error_level=%errorlevel%
+popd
+if %_restore_error_level% neq 0 (
     call :write_error "Failed to restore dependencies"
     goto end
 )
@@ -47,12 +56,12 @@ if %errorlevel% neq 0 (
 
 call :write_info "Copying PMLLIB files to output directory"
 
-xcopy /S /E /F /I pmllib build\pmllib
+xcopy /S /E /F /I "%BASE_DIR%\pmllib" build\pmllib
 if %errorlevel% neq 0 (
     call :write_error "Failed to copy PMLLIB to output directory"
     goto end
 )
-xcopy /S /E /F /I pmllib-tests build\pmllib-tests
+xcopy /S /E /F /I "%BASE_DIR%\pmllib-tests" build\pmllib-tests
 if %errorlevel% neq 0 (
     call :write_error "Failed to copy PMLLIB tests to output directory"
     goto end
@@ -83,13 +92,13 @@ set "bin_dir=build\%~2\bin\"
 set "caf_dir=build\%~2\caf\"
 
 call :write_info "Building solution for %platform%"
-"%msbuild.exe%" /p:Configuration=Release "/p:Platform=%platform%" PmlUnit.sln
+"%msbuild.exe%" /p:Configuration=Release "/p:Platform=%platform%" "%PmlUnit.sln%"
 if %errorlevel% neq 0 (
     call :write_error "Failed to build solution for %platform%"
     exit /B 1
 )
 call :write_info "Running tests for %platform%"
-"%nunit.exe%" --noresult "PmlUnit.Tests\bin\Release\%platform%\PmlUnit.Tests.dll"
+"%nunit.exe%" --noresult "%PmlUnit.Tests%\bin\Release\%platform%\PmlUnit.Tests.dll"
 if %errorlevel% neq 0 (
     call :write_error "Tests for %platform% failed"
     exit /B 2
@@ -110,12 +119,12 @@ if not exist %caf_dir% (
     )
 )
 
-copy "PmlUnit\bin\Release\%platform%\*" "%bin_dir%"
+copy "%PmlUnit%\bin\Release\%platform%\*" "%bin_dir%"
 if %errorlevel% neq 0 (
     call :write_error "Failed to copy PmlUnit.dll to output directory %bin_dir%"
     exit /B 13
 )
-copy "caf\%platform%\*" %caf_dir%
+copy "%BASE_DIR%\caf\%platform%\*" %caf_dir%
 if %errorlevel% neq 0 (
     call :write_error "Failed to copy CAF XML files to output directory %caf_dir%"
     exit /B 14
