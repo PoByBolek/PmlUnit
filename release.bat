@@ -7,6 +7,17 @@ set "PmlUnit.sln=%BASE_DIR%\PmlUnit.sln"
 set "PmlUnit=%BASE_DIR%\PmlUnit"
 set "PmlUnit.Tests=%BASE_DIR%\PmlUnit.Tests"
 
+for /f "delims=" %%i in ('powershell.exe -ExecutionPolicy bypass "& '%BASE_DIR%\get-version.ps1' '%PmlUnit%'"') do (
+    set "VERSION=%%i"
+)
+if not defined VERSION (
+    call :write_error "Unable to determine PmlUnit version"
+    goto end
+)
+call :write_info "Building PmlUnit %VERSION%"
+set "BUILD_DIR=PmlUnit-%VERSION%"
+set "RELEASE_FILE=PmlUnit-%VERSION%.zip"
+
 set "nunit.exe=%BASE_DIR%\packages\NUnit.ConsoleRunner.3.9.0\tools\nunit3-console.exe"
 
 for %%X in (msbuild.exe) do (
@@ -17,7 +28,7 @@ if defined msbuild.exe (
         goto msbuild_found
     )
 )
-for /f "delims=" %%i in ('powershell.exe -ExecutionPolicy bypass "& '%~dp0\find-msbuild.ps1'"') do (
+for /f "delims=" %%i in ('powershell.exe -ExecutionPolicy bypass "& '%BASE_DIR%\find-msbuild.ps1'"') do (
     set "msbuild.exe=%%i"
 )
 if not defined msbuild.exe (
@@ -56,52 +67,45 @@ if %errorlevel% neq 0 (
 
 call :write_info "Copying PMLLIB files to output directory"
 
-xcopy /S /E /F /I "%BASE_DIR%\pmllib" build\pmllib
+xcopy /S /E /F /I "%BASE_DIR%\pmllib" "%BUILD_DIR%\pmllib"
 if %errorlevel% neq 0 (
     call :write_error "Failed to copy PMLLIB to output directory"
     goto end
 )
-xcopy /S /E /F /I "%BASE_DIR%\pmllib-tests" build\pmllib-tests
+xcopy /S /E /F /I "%BASE_DIR%\pmllib-tests" "%BUILD_DIR%\pmllib-tests"
 if %errorlevel% neq 0 (
     call :write_error "Failed to copy PMLLIB tests to output directory"
     goto end
 )
 
 call :write_info "Copying README and LICENSE to output directory"
-copy "%BASE_DIR%\README.md" build\README.txt
+copy "%BASE_DIR%\README.md" "%BUILD_DIR%\README.txt"
 if %errorlevel% neq 0 (
     call :write_error "Failed to copy README to output directory"
     goto end
 )
-copy "%BASE_DIR%\LICENSE" build\LICENSE.txt
+copy "%BASE_DIR%\LICENSE" "%BUILD_DIR%\LICENSE.txt"
 if %errorlevel% neq 0 (
     call :write_error "Failed to copy LICENSE to output directory"
     goto end
 )
 
-pushd build
 call :write_info "Creating zip file"
-"C:\Program Files\7-Zip\7z.exe" a PmlUnit.zip *
+"C:\Program Files\7-Zip\7z.exe" a "%RELEASE_FILE%" "%BUILD_DIR%"
 if %errorlevel% neq 0 (
     call :write_error "Failed to zip build directory"
     goto end
 )
-move PmlUnit.zip ..
-if %errorlevel% neq 0 (
-    call :write_error "Failed to move zip file to parent directory"
-    goto end
-)
-popd
-rmdir /S /Q build
+rmdir /S /Q "%BUILD_DIR%"
 
-call :write_success "PmlUnit.zip created sucessfully"
+call :write_success "%RELEASE_FILE% created sucessfully"
 goto end
 
 
 :build
 set "platform=%~1"
-set "bin_dir=build\%~2\bin\"
-set "caf_dir=build\%~2\caf\"
+set "bin_dir=%BUILD_DIR%\%~2\bin\"
+set "caf_dir=%BUILD_DIR%\%~2\caf\"
 
 call :write_info "Building solution for %platform%"
 "%msbuild.exe%" /p:Configuration=Release "/p:Platform=%platform%" "%PmlUnit.sln%"
