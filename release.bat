@@ -1,6 +1,8 @@
 @echo off
 setlocal EnableExtensions
 
+set "nunit.exe=%~dp0\packages\NUnit.ConsoleRunner.3.9.0\tools\nunit3-console.exe"
+
 for %%X in (msbuild.exe) do (
     set "msbuild.exe=%%~$PATH:X"
 )
@@ -86,31 +88,37 @@ if %errorlevel% neq 0 (
     call :write_error "Failed to build solution for %platform%"
     exit /B 1
 )
+call :write_info "Running tests for %platform%"
+"%nunit.exe%" --noresult "PmlUnit.Tests\bin\Release\%platform%\PmlUnit.Tests.dll"
+if %errorlevel% neq 0 (
+    call :write_error "Tests for %platform% failed"
+    exit /B 2
+)
 
 if not exist %bin_dir% (
     mkdir %bin_dir%
     if %errorlevel% neq 0 (
         call :write_error "Unable to create output directory %bin_dir%"
-        exit /B 2
+        exit /B 11
     )
 )
 if not exist %caf_dir% (
     mkdir %caf_dir%
     if %errorlevel% neq 0 (
         call :write_error "Unable to create output directory %caf_dir%"
-        exit /B 3
+        exit /B 12
     )
 )
 
 copy "PmlUnit\bin\Release\%platform%\*" "%bin_dir%"
 if %errorlevel% neq 0 (
     call :write_error "Failed to copy PmlUnit.dll to output directory %bin_dir%"
-    exit /B 4
+    exit /B 13
 )
 copy "caf\%platform%\*" %caf_dir%
 if %errorlevel% neq 0 (
     call :write_error "Failed to copy CAF XML files to output directory %caf_dir%"
-    exit /B 5
+    exit /B 14
 )
 
 goto :eof
