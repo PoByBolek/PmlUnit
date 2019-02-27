@@ -3,6 +3,8 @@
 PML Unit is a test framework for the PML programming language and a test runner
 for PML code in AVEVA Everything3D, PDMS, and other products.
 
+![Demo](screenshots/demo.gif)
+
 ## Installation
 
 Download and unpack PML Unit to a directory of your choice. For example, if you
