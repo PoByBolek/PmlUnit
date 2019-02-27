@@ -67,6 +67,18 @@ if %errorlevel% neq 0 (
     goto end
 )
 
+call :write_info "Copying README and LICENSE to output directory"
+copy "%BASE_DIR%\README.md" build\README.txt
+if %errorlevel% neq 0 (
+    call :write_error "Failed to copy README to output directory"
+    goto end
+)
+copy "%BASE_DIR%\LICENSE" build\LICENSE.txt
+if %errorlevel% neq 0 (
+    call :write_error "Failed to copy LICENSE to output directory"
+    goto end
+)
+
 pushd build
 call :write_info "Creating zip file"
 "C:\Program Files\7-Zip\7z.exe" a PmlUnit.zip *
