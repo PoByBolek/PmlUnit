@@ -26,7 +26,9 @@ namespace PmlUnit
             Window = windowManager.CreateDockedWindow(
                 "PmlUnit.TestRunner", "PML Unit", control, DockedPosition.Right
             );
+#if E3D_21
             Window.Image = Resources.TestRunner;
+#endif
             Window.SaveLayout = true;
             Window.Shown += OnWindowShown;
             Window.Closed += OnWindowClosed;
