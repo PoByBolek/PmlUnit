@@ -3,11 +3,14 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Windows.Forms;
-using Aveva.ApplicationFramework;
 using Aveva.ApplicationFramework.Presentation;
 using Moq;
-
 using NUnit.Framework;
+
+#if PDMS || E3D_11
+using ICommandManager = Aveva.ApplicationFramework.Presentation.CommandManager;
+using IWindowManager = Aveva.ApplicationFramework.Presentation.WindowManager;
+#endif
 
 namespace PmlUnit.Tests
 {
@@ -16,26 +19,26 @@ namespace PmlUnit.Tests
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     class PmlUnitAddinTest
     {
-        private Mock<CommandManager> CommandManagerMock;
-        private Mock<ServiceManager> ServiceManagerMock;
+        private Mock<ICommandManager> CommandManagerMock;
+        private Mock<ServiceProvider> ServiceProviderMock;
         private Mock<TestRunner> TestRunnerMock;
         private PmlUnitAddin Addin;
 
         [SetUp]
         public void Setup()
         {
-            CommandManagerMock = new Mock<CommandManager>();
+            CommandManagerMock = new Mock<ICommandManager>();
             CommandManagerMock.Setup(manager => manager.Commands.Add(It.IsAny<Command>()));
 
-            var windowManagerMock = new Mock<WindowManager>();
+            var windowManagerMock = new Mock<IWindowManager>();
             windowManagerMock.Setup(manager => manager.CreateDockedWindow(
                 It.IsAny<string>(), It.IsAny<string>(), It.IsAny<Control>(), It.IsAny<DockedPosition>()
             )).Returns(Mock.Of<DockedWindow>());
 
-            ServiceManagerMock = new Mock<ServiceManager>();
-            ServiceManagerMock.Setup(manager => manager.GetService(typeof(CommandManager)))
+            ServiceProviderMock = new Mock<ServiceProvider>();
+            ServiceProviderMock.Setup(provider => provider.GetService<ICommandManager>())
                 .Returns(CommandManagerMock.Object);
-            ServiceManagerMock.Setup(manager => manager.GetService(typeof(WindowManager)))
+            ServiceProviderMock.Setup(provider => provider.GetService<IWindowManager>())
                 .Returns(windowManagerMock.Object);
 
             TestRunnerMock = new Mock<TestRunner>();
@@ -49,32 +52,10 @@ namespace PmlUnit.Tests
         }
 
         [Test]
-        public void Start_RegistersTestCaseProvider()
-        {
-            // Act
-            Addin.Start(ServiceManagerMock.Object);
-            // Assert
-            ServiceManagerMock.Verify(
-                manager => manager.AddService(typeof(TestCaseProvider), It.IsNotNull<TestCaseProvider>())
-            );
-        }
-
-        [Test]
-        public void Start_RegistersTestRunner()
-        {
-            // Act
-            Addin.Start(ServiceManagerMock.Object);
-            // Assert
-            ServiceManagerMock.Verify(
-                manager => manager.AddService(typeof(TestRunner), TestRunnerMock.Object)
-            );
-        }
-
-        [Test]
         public void Start_AddsTestRunnerCommand()
         {
             // Act
-            Addin.Start(ServiceManagerMock.Object);
+            Addin.Start(ServiceProviderMock.Object);
             // Assert
             CommandManagerMock.Verify(
                 manager => manager.Commands.Add(It.IsNotNull<ShowTestRunnerCommand>())

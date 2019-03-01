@@ -2,7 +2,16 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using Aveva.ApplicationFramework;
-using Aveva.ApplicationFramework.Presentation;
+
+#if PDMS || E3D_11
+using IAddin = Aveva.ApplicationFramework.IAddin;
+using ICommandManager = Aveva.ApplicationFramework.Presentation.CommandManager;
+using IWindowManager = Aveva.ApplicationFramework.Presentation.WindowManager;
+#else
+using IAddin = Aveva.ApplicationFramework.IAddinInjected;
+using ICommandManager = Aveva.ApplicationFramework.Presentation.ICommandManager;
+using IWindowManager = Aveva.ApplicationFramework.Presentation.IWindowManager;
+#endif
 
 namespace PmlUnit
 {
@@ -73,26 +82,32 @@ namespace PmlUnit
         [CLSCompliant(false)]
         public void Start(ServiceManager serviceManager)
         {
+            Start(new ProxyServiceProvider(serviceManager));
+        }
+
+#if E3D_21
+        [CLSCompliant(false)]
+        public void Start(IDependencyResolver resolver)
+        {
+            Start(new DependencyResolverServiceProvider(resolver));
+        }
+#endif
+
+        internal void Start(ServiceProvider provider)
+        {
             try
             {
-                StartInternal(serviceManager);
+                RunnerControl.LoadTests();
+                var windowManager = provider.GetService<IWindowManager>();
+                var commandManager = provider.GetService<ICommandManager>();
+                if (windowManager != null && commandManager != null)
+                    commandManager.Commands.Add(new ShowTestRunnerCommand(windowManager, RunnerControl));
             }
             catch
             {
                 Dispose();
                 throw;
             }
-        }
-
-        private void StartInternal(ServiceManager serviceManager)
-        {
-            serviceManager.AddService(TestRunner);
-            serviceManager.AddService(TestCaseProvider);
-
-            var windowManager = serviceManager.GetService<WindowManager>();
-            var commandManager = serviceManager.GetService<CommandManager>();
-            if (windowManager != null && commandManager != null)
-                commandManager.Commands.Add(new ShowTestRunnerCommand(windowManager, RunnerControl));
         }
 
         public void Stop()

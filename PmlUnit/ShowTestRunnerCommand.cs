@@ -4,13 +4,17 @@ using System;
 using Aveva.ApplicationFramework.Presentation;
 using PmlUnit.Properties;
 
+#if PDMS || E3D_11
+using IWindowManager = Aveva.ApplicationFramework.Presentation.WindowManager;
+#endif
+
 namespace PmlUnit
 {
     class ShowTestRunnerCommand : Command
     {
         private readonly DockedWindow Window;
 
-        public ShowTestRunnerCommand(WindowManager windowManager, TestRunnerControl control)
+        public ShowTestRunnerCommand(IWindowManager windowManager, TestRunnerControl control)
         {
             if (windowManager == null)
                 throw new ArgumentNullException(nameof(windowManager));

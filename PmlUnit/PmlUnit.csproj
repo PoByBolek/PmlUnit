@@ -119,7 +119,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ServiceManagerExtensions.cs" />
+    <Compile Include="ServiceProvider.cs" />
     <Compile Include="ShowTestRunnerCommand.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="TestCase.cs" />
