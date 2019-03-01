@@ -30,7 +30,6 @@ namespace PmlUnit
             Window.Image = Resources.TestRunner;
 #endif
             Window.SaveLayout = true;
-            Window.Shown += OnWindowShown;
             Window.Closed += OnWindowClosed;
 
             windowManager.WindowLayoutLoaded += OnWindowLayoutLoaded;
@@ -39,13 +38,6 @@ namespace PmlUnit
         private void OnWindowLayoutLoaded(object sender, EventArgs e)
         {
             Checked = Window.Visible;
-        }
-
-        private void OnWindowShown(object sender, EventArgs e)
-        {
-            var runnerControl = Window.Control as TestRunnerControl;
-            if (runnerControl != null)
-                runnerControl.LoadTests();
         }
 
         private void OnWindowClosed(object sender, EventArgs e)

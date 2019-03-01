@@ -17,7 +17,6 @@ namespace PmlUnit.Tests
     {
         private Mock<WindowManager> WindowManagerMock;
         private Mock<DockedWindow> WindowMock;
-        private Mock<TestCaseProvider> ProviderMock;
         private TestRunnerControl Control;
         private ShowTestRunnerCommand Command;
 
@@ -34,10 +33,7 @@ namespace PmlUnit.Tests
                 return WindowMock.Object;
             });
 
-            ProviderMock = new Mock<TestCaseProvider>();
-            ProviderMock.Setup(provider => provider.GetTestCases()).Returns(new List<TestCase>());
-
-            Control = new TestRunnerControl(ProviderMock.Object, Mock.Of<TestRunner>());
+            Control = new TestRunnerControl(Mock.Of<TestCaseProvider>(), Mock.Of<TestRunner>());
             Command = new ShowTestRunnerCommand(WindowManagerMock.Object, Control);
         }
 
@@ -90,17 +86,6 @@ namespace PmlUnit.Tests
             WindowMock.Raise(window => window.Closed += null, WindowMock.Object, EventArgs.Empty);
             // Assert
             Assert.IsFalse(Command.Checked);
-        }
-
-        [Test]
-        public void LoadsTestsWhenWindowOpens()
-        {
-            // Arrange
-            ProviderMock.Verify(provider => provider.GetTestCases(), Times.Never);
-            // Act
-            WindowMock.Raise(window => window.Shown += null, WindowMock.Object, EventArgs.Empty);
-            // Assert
-            ProviderMock.Verify(provider => provider.GetTestCases(), Times.Once);
         }
     }
 }

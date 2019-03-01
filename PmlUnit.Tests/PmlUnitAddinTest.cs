@@ -1,5 +1,6 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Windows.Forms;
@@ -22,6 +23,7 @@ namespace PmlUnit.Tests
         private Mock<ICommandManager> CommandManagerMock;
         private Mock<ServiceProvider> ServiceProviderMock;
         private Mock<TestRunner> TestRunnerMock;
+        private Mock<TestCaseProvider> TestCaseProviderMock;
         private PmlUnitAddin Addin;
 
         [SetUp]
@@ -41,8 +43,11 @@ namespace PmlUnit.Tests
             ServiceProviderMock.Setup(provider => provider.GetService<IWindowManager>())
                 .Returns(windowManagerMock.Object);
 
+            TestCaseProviderMock = new Mock<TestCaseProvider>();
+            TestCaseProviderMock.Setup(provider => provider.GetTestCases())
+                .Returns(new List<TestCase>());
             TestRunnerMock = new Mock<TestRunner>();
-            Addin = new PmlUnitAddin(TestRunnerMock.Object);
+            Addin = new PmlUnitAddin(TestCaseProviderMock.Object, TestRunnerMock.Object);
         }
 
         [TearDown]
@@ -59,6 +64,17 @@ namespace PmlUnit.Tests
             // Assert
             CommandManagerMock.Verify(
                 manager => manager.Commands.Add(It.IsNotNull<ShowTestRunnerCommand>())
+            );
+        }
+
+        [Test]
+        public void Start_LoadsTestCases()
+        {
+            // Act
+            Addin.Start(ServiceProviderMock.Object);
+            // Assert
+            TestCaseProviderMock.Verify(
+                provider => provider.GetTestCases(), Times.Once()
             );
         }
 

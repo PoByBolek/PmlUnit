@@ -39,13 +39,15 @@ namespace PmlUnit
             }
         }
 
-        internal PmlUnitAddin(TestRunner testRunner)
+        internal PmlUnitAddin(TestCaseProvider provider, TestRunner runner)
         {
-            if (testRunner == null)
-                throw new ArgumentNullException(nameof(testRunner));
+            if (provider == null)
+                throw new ArgumentNullException(nameof(provider));
+            if (runner == null)
+                throw new ArgumentNullException(nameof(runner));
 
-            TestRunner = testRunner;
-            TestCaseProvider = new EnvironmentVariableTestCaseProvider();
+            TestCaseProvider = provider;
+            TestRunner = runner;
             RunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner);
         }
 
@@ -98,6 +100,7 @@ namespace PmlUnit
             try
             {
                 RunnerControl.LoadTests();
+
                 var windowManager = provider.GetService<IWindowManager>();
                 var commandManager = provider.GetService<ICommandManager>();
                 if (windowManager != null && commandManager != null)
