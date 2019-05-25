@@ -2,7 +2,10 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using Aveva.ApplicationFramework.Presentation;
+
+#if E3D_21
 using PmlUnit.Properties;
+#endif
 
 namespace PmlUnit
 {
@@ -22,7 +25,9 @@ namespace PmlUnit
             Window = windowManager.CreateDockedWindow(
                 "PmlUnit.TestRunner", "PML Unit", control, DockedPosition.Right
             );
+#if E3D_21
             Window.Image = Resources.TestRunner;
+#endif
             Window.SaveLayout = true;
             Window.Shown += OnWindowShown;
             Window.Closed += OnWindowClosed;
