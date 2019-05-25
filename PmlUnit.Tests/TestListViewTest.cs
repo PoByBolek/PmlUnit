@@ -17,7 +17,7 @@ namespace PmlUnit.Tests
         private CultureInfo InitialCulture;
 
         private TestListView TestList;
-        private ListView InnerList;
+        private TreeView InnerList;
 
         [OneTimeSetUp]
         public void ClassSetup()
@@ -37,7 +37,7 @@ namespace PmlUnit.Tests
         public void Setup()
         {
             TestList = new TestListView();
-            InnerList = TestList.FindControl<ListView>("TestList");
+            InnerList = TestList.FindControl<TreeView>("TestList");
         }
 
         [TearDown]
@@ -60,9 +60,11 @@ namespace PmlUnit.Tests
             // Act
             TestList.SetTests(testCase.Tests);
             // Assert
-            Assert.AreEqual(testCase.Tests.Count, InnerList.Items.Count);
+            Assert.AreEqual(1, InnerList.Nodes.Count);
+            var node = InnerList.Nodes[0];
+            Assert.AreEqual(testCase.Tests.Count, node.Nodes.Count);
             for (int i = 0; i < testCase.Tests.Count; i++)
-                Assert.AreEqual(testCase.Tests[i].Name, InnerList.Items[i].Text);
+                Assert.AreEqual(testCase.Tests[i].Name, node.Nodes[i].Text);
         }
 
         [Test]
@@ -74,13 +76,13 @@ namespace PmlUnit.Tests
             // Act
             TestList.SetTests(first.Tests.Concat(second.Tests));
             // Assert
-            Assert.AreEqual(2, InnerList.Groups.Count);
-            Assert.AreEqual(first.Tests.Count, InnerList.Groups[0].Items.Count);
+            Assert.AreEqual(2, InnerList.Nodes.Count);
+            Assert.AreEqual(first.Tests.Count, InnerList.Nodes[0].Nodes.Count);
             for (int i = 0; i < first.Tests.Count; i++)
-                Assert.AreEqual(first.Tests[i].Name, InnerList.Groups[0].Items[i].Text);
-            Assert.AreEqual(second.Tests.Count, InnerList.Groups[1].Items.Count);
+                Assert.AreEqual(first.Tests[i].Name, InnerList.Nodes[0].Nodes[i].Text);
+            Assert.AreEqual(second.Tests.Count, InnerList.Nodes[1].Nodes.Count);
             for (int i = 0; i < second.Tests.Count; i++)
-                Assert.AreEqual(second.Tests[i].Name, InnerList.Groups[1].Items[i].Text);
+                Assert.AreEqual(second.Tests[i].Name, InnerList.Nodes[1].Nodes[i].Text);
         }
 
         [Test]
@@ -163,7 +165,7 @@ namespace PmlUnit.Tests
             // Act
             TestList.SetTests(testCase.Tests);
             // Assert
-            Assert.AreEqual("Unknown", InnerList.Items[0].ImageKey);
+            Assert.AreEqual("Unknown", InnerList.Nodes[0].Nodes[0].ImageKey);
         }
 
         [Test]
@@ -175,7 +177,7 @@ namespace PmlUnit.Tests
             // Act
             TestList.AllTests[0].Result = new TestResult(TimeSpan.FromSeconds(1));
             // Assert
-            Assert.AreEqual("Success", InnerList.Items[0].ImageKey);
+            Assert.AreEqual("Success", InnerList.Nodes[0].Nodes[0].ImageKey);
         }
 
         [Test]
@@ -187,7 +189,7 @@ namespace PmlUnit.Tests
             // Act
             TestList.AllTests[0].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("error"));
             // Assert
-            Assert.AreEqual("Failure", InnerList.Items[0].ImageKey);
+            Assert.AreEqual("Failure", InnerList.Nodes[0].Nodes[0].ImageKey);
         }
 
         [Test]
@@ -200,7 +202,7 @@ namespace PmlUnit.Tests
             TestList.AllTests[0].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("error"));
             TestList.AllTests[0].Result = null;
             // Assert
-            Assert.AreEqual("Unknown", InnerList.Items[0].ImageKey);
+            Assert.AreEqual("Unknown", InnerList.Nodes[0].Nodes[0].ImageKey);
         }
 
         [TestCase(0, "< 1 ms")]
@@ -225,8 +227,8 @@ namespace PmlUnit.Tests
             TestList.AllTests[0].Result = new TestResult(TimeSpan.FromMilliseconds(milliseconds));
             TestList.AllTests[1].Result = new TestResult(TimeSpan.FromMilliseconds(milliseconds), new PmlException("foobar"));
             // Assert
-            Assert.AreEqual(expected, InnerList.Items[0].SubItems[1].Text);
-            Assert.AreEqual(expected, InnerList.Items[1].SubItems[1].Text);
+            Assert.AreEqual(expected, InnerList.Nodes[0].Nodes[0].Text);
+            Assert.AreEqual(expected, InnerList.Nodes[0].Nodes[1].Text);
         }
     }
 }

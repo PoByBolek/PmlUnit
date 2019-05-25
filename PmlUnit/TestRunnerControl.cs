@@ -88,7 +88,6 @@ namespace PmlUnit
             finally
             {
                 Enabled = true;
-                TestList.ResetColumnWidths();
                 ResetTestSummary(entries);
                 ResetTestDetails(entries.FirstOrDefault());
             }

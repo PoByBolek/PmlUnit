@@ -32,42 +32,30 @@ namespace PmlUnit
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.TestList = new System.Windows.Forms.ListView();
-            this.TestNameColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.ExecutionTimeColumn = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.TestStatusImageList = new System.Windows.Forms.ImageList(this.components);
+            this.TestList = new System.Windows.Forms.TreeView();
             this.SuspendLayout();
-            // 
-            // TestList
-            // 
-            this.TestList.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.TestList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.TestNameColumn,
-            this.ExecutionTimeColumn});
-            this.TestList.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.TestList.FullRowSelect = true;
-            this.TestList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
-            this.TestList.HideSelection = false;
-            this.TestList.Location = new System.Drawing.Point(0, 0);
-            this.TestList.Name = "TestList";
-            this.TestList.Size = new System.Drawing.Size(150, 150);
-            this.TestList.SmallImageList = this.TestStatusImageList;
-            this.TestList.TabIndex = 0;
-            this.TestList.UseCompatibleStateImageBehavior = false;
-            this.TestList.View = System.Windows.Forms.View.Details;
-            this.TestList.SelectedIndexChanged += new System.EventHandler(this.OnSelectedIndexChanged);
-            // 
-            // TestNameColumn
-            // 
-            this.TestNameColumn.Text = "Name";
-            // 
-            // ExecutionTimeColumn
-            // 
-            this.ExecutionTimeColumn.Text = "Time";
             // 
             // TestStatusImageList
             // 
+            this.TestStatusImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.TestStatusImageList.ImageSize = new System.Drawing.Size(16, 16);
             this.TestStatusImageList.TransparentColor = System.Drawing.Color.Transparent;
+            // 
+            // TestList
+            // 
+            this.TestList.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TestList.FullRowSelect = true;
+            this.TestList.HideSelection = false;
+            this.TestList.ImageIndex = 0;
+            this.TestList.ImageList = this.TestStatusImageList;
+            this.TestList.Location = new System.Drawing.Point(0, 0);
+            this.TestList.Name = "TestList";
+            this.TestList.SelectedImageIndex = 0;
+            this.TestList.ShowRootLines = false;
+            this.TestList.Size = new System.Drawing.Size(150, 150);
+            this.TestList.TabIndex = 0;
+            this.TestList.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.OnAfterSelect);
             // 
             // TestListView
             // 
@@ -75,16 +63,12 @@ namespace PmlUnit
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.TestList);
             this.Name = "TestListView";
-            this.SizeChanged += new System.EventHandler(this.OnSizeChanged);
             this.ResumeLayout(false);
 
         }
 
         #endregion
-
-        private System.Windows.Forms.ListView TestList;
-        private System.Windows.Forms.ColumnHeader TestNameColumn;
-        private System.Windows.Forms.ColumnHeader ExecutionTimeColumn;
         private System.Windows.Forms.ImageList TestStatusImageList;
+        private System.Windows.Forms.TreeView TestList;
     }
 }

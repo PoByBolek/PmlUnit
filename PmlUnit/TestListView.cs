@@ -18,7 +18,6 @@ namespace PmlUnit
         public TestListView()
         {
             InitializeComponent();
-            ResetColumnWidths();
 
             TestStatusImageList.Images.Add("Unknown", Resources.Unknown);
             TestStatusImageList.Images.Add("Failure", Resources.Failure);
@@ -27,29 +26,20 @@ namespace PmlUnit
 
         public void SetTests(IEnumerable<Test> tests)
         {
-            TestList.Items.Clear();
-            TestList.Groups.Clear();
+            TestList.Nodes.Clear();
 
             foreach (var testGroup in tests.GroupBy(test => test.TestCase))
             {
                 var groupName = string.Format(CultureInfo.CurrentCulture, "{0} ({1})", testGroup.Key.Name, testGroup.Count());
-                var group = TestList.Groups.Add(testGroup.Key.Name, groupName);
+                var group = TestList.Nodes.Add(testGroup.Key.Name, groupName);
                 foreach (var test in testGroup)
                 {
-                    var item = TestList.Items.Add(test.Name);
-                    item.Group = group;
-                    item.SubItems.Add("");
-                    item.Tag = new Entry(test, item);
+                    var node = group.Nodes.Add(test.Name);
+                    node.Tag = new Entry(test, node);
                 }
             }
 
-            ResetColumnWidths();
-        }
-
-        public void ResetColumnWidths()
-        {
-            ExecutionTimeColumn.AutoResize(ColumnHeaderAutoResizeStyle.ColumnContent);
-            TestNameColumn.Width = Math.Max(0, TestList.ClientSize.Width - ExecutionTimeColumn.Width);
+            TestList.ExpandAll();
         }
 
         [Browsable(false)]
@@ -75,21 +65,19 @@ namespace PmlUnit
         private List<TestListEntry> FilterTests(Func<Entry, bool> predicate)
         {
             var result = new List<TestListEntry>();
-            foreach (ListViewItem item in TestList.Items)
+            foreach (TreeNode groupNode in TestList.Nodes)
             {
-                var entry = item.Tag as Entry;
-                if (entry != null && predicate(entry))
-                    result.Add(entry);
+                foreach (TreeNode node in groupNode.Nodes)
+                {
+                    var entry = node.Tag as Entry;
+                    if (entry != null && predicate(entry))
+                        result.Add(entry);
+                }
             }
             return result;
         }
 
-        private void OnSizeChanged(object sender, EventArgs e)
-        {
-            ResetColumnWidths();
-        }
-
-        private void OnSelectedIndexChanged(object sender, EventArgs e)
+        private void OnAfterSelect(object sender, TreeViewEventArgs e)
         {
             SelectionChanged?.Invoke(this, e);
         }
@@ -98,19 +86,20 @@ namespace PmlUnit
         {
             public Test Test { get; }
 
-            private readonly ListViewItem Item;
+            private readonly TreeNode Node;
             private TestResult ResultField;
 
-            public Entry(Test test, ListViewItem item)
+            public Entry(Test test, TreeNode node)
             {
                 if (test == null)
                     throw new ArgumentNullException(nameof(test));
-                if (item == null)
-                    throw new ArgumentNullException(nameof(item));
+                if (node == null)
+                    throw new ArgumentNullException(nameof(node));
 
                 Test = test;
-                Item = item;
-                Item.ImageKey = GetImageKey();
+                Node = node;
+                Node.ImageKey = GetImageKey();
+                Node.SelectedImageKey = Node.ImageKey;
             }
 
             public TestResult Result
@@ -119,8 +108,8 @@ namespace PmlUnit
                 set
                 {
                     ResultField = value;
-                    Item.ImageKey = GetImageKey();
-                    Item.SubItems[1].Text = FormatDuration();
+                    Node.ImageKey = GetImageKey();
+                    Node.SelectedImageKey = Node.ImageKey;
                 }
             }
 
@@ -132,8 +121,8 @@ namespace PmlUnit
 
             public bool Selected
             {
-                get { return Item.Selected; }
-                set { Item.Selected = value; }
+                get { return Node.IsSelected; }
+                set { Node.TreeView.SelectedNode = value ? Node : null; }
             }
 
             private string GetImageKey()
