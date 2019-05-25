@@ -46,9 +46,10 @@
             this.NameLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.NameLabel.AutoEllipsis = true;
-            this.NameLabel.Location = new System.Drawing.Point(19, 0);
+            this.NameLabel.Location = new System.Drawing.Point(17, 0);
+            this.NameLabel.Margin = new System.Windows.Forms.Padding(1, 0, 5, 0);
             this.NameLabel.Name = "NameLabel";
-            this.NameLabel.Size = new System.Drawing.Size(118, 16);
+            this.NameLabel.Size = new System.Drawing.Size(128, 16);
             this.NameLabel.TabIndex = 1;
             this.NameLabel.Text = "Test Name";
             this.NameLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -56,10 +57,11 @@
             // DurationLabel
             // 
             this.DurationLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.DurationLabel.Location = new System.Drawing.Point(140, 0);
+            this.DurationLabel.AutoSize = true;
+            this.DurationLabel.Location = new System.Drawing.Point(150, 0);
             this.DurationLabel.Margin = new System.Windows.Forms.Padding(0);
             this.DurationLabel.Name = "DurationLabel";
-            this.DurationLabel.Size = new System.Drawing.Size(10, 18);
+            this.DurationLabel.Size = new System.Drawing.Size(0, 13);
             this.DurationLabel.TabIndex = 2;
             this.DurationLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
@@ -71,10 +73,11 @@
             this.Controls.Add(this.NameLabel);
             this.Controls.Add(this.ImageLabel);
             this.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
-            this.MinimumSize = new System.Drawing.Size(29, 16);
+            this.MinimumSize = new System.Drawing.Size(19, 16);
             this.Name = "TestListViewEntry";
             this.Size = new System.Drawing.Size(150, 16);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 

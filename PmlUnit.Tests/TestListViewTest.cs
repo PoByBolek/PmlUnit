@@ -2,9 +2,7 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Linq;
-using System.Windows.Forms;
 using NUnit.Framework;
 
 namespace PmlUnit.Tests
@@ -14,30 +12,12 @@ namespace PmlUnit.Tests
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class TestListViewTest
     {
-        private CultureInfo InitialCulture;
-
         private TestListView TestList;
-        private TreeView InnerList;
-
-        [OneTimeSetUp]
-        public void ClassSetup()
-        {
-            InitialCulture = CultureInfo.CurrentCulture;
-            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
-        }
-
-        [OneTimeTearDown]
-        public void ClassTearDown()
-        {
-            CultureInfo.CurrentCulture = InitialCulture;
-        }
-
 
         [SetUp]
         public void Setup()
         {
             TestList = new TestListView();
-            InnerList = TestList.FindControl<TreeView>("TestList");
         }
 
         [TearDown]
@@ -60,11 +40,13 @@ namespace PmlUnit.Tests
             // Act
             TestList.SetTests(testCase.Tests);
             // Assert
-            Assert.AreEqual(1, InnerList.Nodes.Count);
-            var node = InnerList.Nodes[0];
-            Assert.AreEqual(testCase.Tests.Count, node.Nodes.Count);
-            for (int i = 0; i < testCase.Tests.Count; i++)
-                Assert.AreEqual(testCase.Tests[i].Name, node.Nodes[i].Text);
+            Assert.AreEqual(1, TestList.Controls.Count);
+
+            var group = TestList.Controls[0] as TestListGroupEntry;
+            Assert.AreEqual(testCase.Tests.Count, group.Entries.Count());
+            int index = 0;
+            foreach (var entry in group.Entries)
+                Assert.AreSame(testCase.Tests[index++], entry.Test);
         }
 
         [Test]
@@ -76,13 +58,19 @@ namespace PmlUnit.Tests
             // Act
             TestList.SetTests(first.Tests.Concat(second.Tests));
             // Assert
-            Assert.AreEqual(2, InnerList.Nodes.Count);
-            Assert.AreEqual(first.Tests.Count, InnerList.Nodes[0].Nodes.Count);
-            for (int i = 0; i < first.Tests.Count; i++)
-                Assert.AreEqual(first.Tests[i].Name, InnerList.Nodes[0].Nodes[i].Text);
-            Assert.AreEqual(second.Tests.Count, InnerList.Nodes[1].Nodes.Count);
-            for (int i = 0; i < second.Tests.Count; i++)
-                Assert.AreEqual(second.Tests[i].Name, InnerList.Nodes[1].Nodes[i].Text);
+            Assert.AreEqual(2, TestList.Controls.Count);
+
+            var firstGroup = TestList.Controls[0] as TestListGroupEntry;
+            Assert.AreEqual(first.Tests.Count, firstGroup.Entries.Count());
+            int index = 0;
+            foreach (var entry in firstGroup.Entries)
+                Assert.AreSame(first.Tests[index++], entry.Test);
+
+            var secondGroup = TestList.Controls[1] as TestListGroupEntry;
+            Assert.AreEqual(second.Tests.Count, secondGroup.Entries.Count());
+            index = 0;
+            foreach (var entry in firstGroup.Entries)
+                Assert.AreSame(first.Tests[index++], entry.Test);
         }
 
         [Test]
@@ -158,14 +146,16 @@ namespace PmlUnit.Tests
         }
 
         [Test]
-        public void SetTests_AssignsUnknownTestStatusIconToListItems()
+        public void SetTests_ClearsResultOfNewTests()
         {
             // Arrange
             var testCase = new TestCaseBuilder("TestCase").AddTest("one").Build();
             // Act
             TestList.SetTests(testCase.Tests);
             // Assert
-            Assert.AreEqual("Unknown", InnerList.Nodes[0].Nodes[0].ImageKey);
+            var group = TestList.Controls[0] as TestListGroupEntry;
+            foreach (var entry in group.Entries)
+                Assert.IsNull(entry.Result);
         }
     }
 }

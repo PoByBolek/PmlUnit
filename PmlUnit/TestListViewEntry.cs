@@ -74,8 +74,11 @@ namespace PmlUnit
                 }
 
                 DurationLabel.Text = FormatDuration();
-                MinimumSize = new Size(ImageLabel.Width + NameLabel.Margin.Horizontal + DurationLabel.Width, ImageLabel.Height);
+                DurationLabel.Left = Width - DurationLabel.Width;
+
                 NameLabel.Width = Width - ImageLabel.Width - NameLabel.Padding.Horizontal - DurationLabel.Width;
+
+                MinimumSize = new Size(ImageLabel.Width + NameLabel.Margin.Horizontal + DurationLabel.Width, ImageLabel.Height);
             }
         }
 
