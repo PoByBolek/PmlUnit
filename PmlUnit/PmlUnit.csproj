@@ -132,6 +132,7 @@
     <Compile Include="TestDetailsView.Designer.cs">
       <DependentUpon>TestDetailsView.cs</DependentUpon>
     </Compile>
+    <Compile Include="TestListEntryCollection.cs" />
     <Compile Include="TestListView.cs">
       <SubType>UserControl</SubType>
     </Compile>

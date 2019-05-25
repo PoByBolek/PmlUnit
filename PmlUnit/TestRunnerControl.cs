@@ -34,7 +34,7 @@ namespace PmlUnit
         private void SetTests(IEnumerable<TestCase> testCases)
         {
             TestList.SetTests(testCases.SelectMany(testCase => testCase.Tests));
-            ResetTestSummary(TestList.AllTests);
+            TestSummary.UpdateSummary(TestList.AllTests);
             ResetTestDetails(TestList.SelectedTests.FirstOrDefault());
         }
 
@@ -88,7 +88,7 @@ namespace PmlUnit
             finally
             {
                 Enabled = true;
-                ResetTestSummary(entries);
+                TestSummary.UpdateSummary(entries);
                 ResetTestDetails(entries.FirstOrDefault());
             }
         }
@@ -137,16 +137,6 @@ namespace PmlUnit
             ResetTestDetails(selected.FirstOrDefault());
             TestSummary.Visible = selected.Count != 1;
             TestDetails.Visible = selected.Count == 1;
-        }
-
-        private void ResetTestSummary(ICollection<TestListEntry> selected)
-        {
-            TestSummary.TestEntries.Clear();
-
-            if (selected.Count > 0)
-                TestSummary.TestEntries.AddRange(selected);
-            else
-                TestSummary.TestEntries.AddRange(TestList.AllTests);
         }
 
         private void ResetTestDetails(TestListEntry selected)

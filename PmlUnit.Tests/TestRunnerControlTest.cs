@@ -206,34 +206,6 @@ namespace PmlUnit.Tests
                 Assert.AreSame(results[i], tests[i].Result);
         }
 
-        [Test]
-        public void RunSelected_AssignsExecutedEntriesToSummary()
-        {
-            // Arrange
-            var entries = TestList.AllTests;
-            // Act
-            RunEventHandler("OnRunSelectedTestsMenuItemClick");
-            // Assert
-            Assert.AreEqual(2, TestSummary.TestEntries.Count);
-            Assert.AreSame(entries[1], TestSummary.TestEntries[0]);
-            Assert.AreSame(entries[3], TestSummary.TestEntries[1]);
-        }
-
-        [Test]
-        public void RunAll_AssignsExecutedEntriesToSummary()
-        {
-            // Arrange
-            var entries = TestList.AllTests;
-            // Act
-            RunEventHandler("OnRunAllLinkClick");
-            // Assert
-            Assert.AreEqual(4, TestSummary.TestEntries.Count);
-            Assert.AreSame(entries[0], TestSummary.TestEntries[0]);
-            Assert.AreSame(entries[1], TestSummary.TestEntries[1]);
-            Assert.AreSame(entries[2], TestSummary.TestEntries[2]);
-            Assert.AreSame(entries[3], TestSummary.TestEntries[3]);
-        }
-
         private void SetupTestResult(Test test, TestResult result)
         {
             RunnerMock.Setup(runner => runner.Run(test)).Returns(result);
