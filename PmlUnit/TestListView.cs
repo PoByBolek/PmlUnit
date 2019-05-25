@@ -144,11 +144,4 @@ namespace PmlUnit
             }
         }
     }
-
-    interface TestListEntry
-    {
-        Test Test { get; }
-        TestResult Result { get; set; }
-        bool Selected { get; set; }
-    }
 }
