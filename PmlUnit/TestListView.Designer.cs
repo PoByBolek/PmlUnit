@@ -9,6 +9,15 @@ namespace PmlUnit
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && components != null)
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
         #region Windows Form Designer generated code
 
         /// <summary> 
@@ -20,6 +29,7 @@ namespace PmlUnit
         {
             this.components = new System.ComponentModel.Container();
             this.TestStatusImageList = new System.Windows.Forms.ImageList(this.components);
+            this.GroupPanel = new PmlUnit.StretchingVerticalFlowLayoutPanel(this.components);
             this.SuspendLayout();
             // 
             // TestStatusImageList
@@ -28,11 +38,22 @@ namespace PmlUnit
             this.TestStatusImageList.ImageSize = new System.Drawing.Size(16, 16);
             this.TestStatusImageList.TransparentColor = System.Drawing.Color.Transparent;
             // 
+            // GroupPanel
+            // 
+            this.GroupPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.GroupPanel.Location = new System.Drawing.Point(0, 0);
+            this.GroupPanel.Margin = new System.Windows.Forms.Padding(0);
+            this.GroupPanel.Name = "GroupPanel";
+            this.GroupPanel.Size = new System.Drawing.Size(150, 0);
+            this.GroupPanel.TabIndex = 0;
+            // 
             // TestListView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoScroll = true;
+            this.Controls.Add(this.GroupPanel);
             this.Name = "TestListView";
             this.ResumeLayout(false);
 
@@ -40,5 +61,6 @@ namespace PmlUnit
 
         #endregion
         private System.Windows.Forms.ImageList TestStatusImageList;
+        private StretchingVerticalFlowLayoutPanel GroupPanel;
     }
 }

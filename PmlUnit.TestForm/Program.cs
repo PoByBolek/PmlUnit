@@ -1,6 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿// Copyright (c) 2019 Florian Zimmermann.
+// Licensed under the MIT License: https://opensource.org/licenses/MIT
+using System;
 using System.Windows.Forms;
 
 namespace TestForm

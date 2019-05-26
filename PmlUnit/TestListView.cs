@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using PmlUnit.Properties;
@@ -24,47 +23,21 @@ namespace PmlUnit
             TestStatusImageList.Images.Add("Success", Resources.Success);
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (components != null)
-                    components.Dispose();
-                DisposeChildControls();
-            }
-            base.Dispose(disposing);
-        }
-
-        private void DisposeChildControls()
-        {
-            var children = Controls.OfType<Control>().ToList();
-            Controls.Clear();
-            foreach (var child in children)
-                child.Dispose();
-        }
-
         public void SetTests(IEnumerable<Test> tests)
         {
-            DisposeChildControls();
-
-            var minimumSize = new Size();
+            GroupPanel.Clear();
 
             foreach (var testGroup in tests.GroupBy(test => test.TestCase))
             {
                 var group = new TestListGroupEntry(testGroup.Key.Name);
                 try
                 {
-                    Controls.Add(group);
-                    group.Top = minimumSize.Height;
-                    group.Width = Width;
-                    group.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+                    GroupPanel.Controls.Add(group);
                     group.ImageList = TestStatusImageList;
 
                     foreach (var test in testGroup)
                         group.Add(test);
 
-                    minimumSize.Width = Math.Max(minimumSize.Width, group.MinimumSize.Width);
-                    minimumSize.Height += group.Height;
                 }
                 catch
                 {
@@ -72,9 +45,6 @@ namespace PmlUnit
                     throw;
                 }
             }
-
-            Height = minimumSize.Height;
-            MinimumSize = minimumSize;
         }
 
         [Browsable(false)]
@@ -100,7 +70,7 @@ namespace PmlUnit
         private List<TestListEntry> FilterTests(Func<TestListEntry, bool> predicate)
         {
             var result = new List<TestListEntry>();
-            foreach (Control child in Controls)
+            foreach (Control child in GroupPanel.Controls)
             {
                 var group = child as TestListGroupEntry;
                 if (group != null)

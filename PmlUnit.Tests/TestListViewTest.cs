@@ -3,6 +3,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Windows.Forms;
 using NUnit.Framework;
 
 namespace PmlUnit.Tests
@@ -13,11 +14,13 @@ namespace PmlUnit.Tests
     public class TestListViewTest
     {
         private TestListView TestList;
+        private Panel GroupPanel;
 
         [SetUp]
         public void Setup()
         {
             TestList = new TestListView();
+            GroupPanel = TestList.FindControl<Panel>(nameof(GroupPanel));
         }
 
         [TearDown]
@@ -42,7 +45,7 @@ namespace PmlUnit.Tests
             // Assert
             Assert.AreEqual(1, TestList.Controls.Count);
 
-            var group = TestList.Controls[0] as TestListGroupEntry;
+            var group = GroupPanel.Controls[0] as TestListGroupEntry;
             Assert.AreEqual(testCase.Tests.Count, group.Entries.Count());
             int index = 0;
             foreach (var entry in group.Entries)
@@ -58,15 +61,15 @@ namespace PmlUnit.Tests
             // Act
             TestList.SetTests(first.Tests.Concat(second.Tests));
             // Assert
-            Assert.AreEqual(2, TestList.Controls.Count);
+            Assert.AreEqual(2, GroupPanel.Controls.Count);
 
-            var firstGroup = TestList.Controls[0] as TestListGroupEntry;
+            var firstGroup = GroupPanel.Controls[0] as TestListGroupEntry;
             Assert.AreEqual(first.Tests.Count, firstGroup.Entries.Count());
             int index = 0;
             foreach (var entry in firstGroup.Entries)
                 Assert.AreSame(first.Tests[index++], entry.Test);
 
-            var secondGroup = TestList.Controls[1] as TestListGroupEntry;
+            var secondGroup = GroupPanel.Controls[1] as TestListGroupEntry;
             Assert.AreEqual(second.Tests.Count, secondGroup.Entries.Count());
             index = 0;
             foreach (var entry in firstGroup.Entries)
@@ -153,7 +156,7 @@ namespace PmlUnit.Tests
             // Act
             TestList.SetTests(testCase.Tests);
             // Assert
-            var group = TestList.Controls[0] as TestListGroupEntry;
+            var group = GroupPanel.Controls[0] as TestListGroupEntry;
             foreach (var entry in group.Entries)
                 Assert.IsNull(entry.Result);
         }

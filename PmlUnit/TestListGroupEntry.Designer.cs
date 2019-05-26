@@ -7,6 +7,15 @@
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && components != null)
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
         #region Vom Komponenten-Designer generierter Code
 
         /// <summary> 
@@ -15,10 +24,11 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.ImageLabel = new System.Windows.Forms.Label();
             this.NameLabel = new System.Windows.Forms.Label();
             this.CountLabel = new System.Windows.Forms.Label();
-            this.EntryPanel = new System.Windows.Forms.Panel();
+            this.EntryPanel = new PmlUnit.StretchingVerticalFlowLayoutPanel(this.components);
             this.SuspendLayout();
             // 
             // ImageLabel
@@ -56,13 +66,12 @@
             // 
             // EntryPanel
             // 
-            this.EntryPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+            this.EntryPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.EntryPanel.Location = new System.Drawing.Point(22, 13);
             this.EntryPanel.Margin = new System.Windows.Forms.Padding(19, 0, 0, 0);
             this.EntryPanel.Name = "EntryPanel";
-            this.EntryPanel.Size = new System.Drawing.Size(128, 147);
+            this.EntryPanel.Size = new System.Drawing.Size(128, 0);
             this.EntryPanel.TabIndex = 3;
             // 
             // TestListGroupEntry
@@ -86,6 +95,6 @@
         private System.Windows.Forms.Label ImageLabel;
         private System.Windows.Forms.Label NameLabel;
         private System.Windows.Forms.Label CountLabel;
-        private System.Windows.Forms.Panel EntryPanel;
+        private StretchingVerticalFlowLayoutPanel EntryPanel;
     }
 }

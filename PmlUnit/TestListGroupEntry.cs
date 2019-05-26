@@ -2,7 +2,6 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
@@ -11,41 +10,19 @@ namespace PmlUnit
 {
     partial class TestListGroupEntry : UserControl
     {
-        private readonly Size MinimumCollapsedSize;
-        private Size MinimumExpandedSize;
         private ImageList ImageListField;
 
         public TestListGroupEntry()
         {
             InitializeComponent();
 
-            MinimumCollapsedSize = new Size(ImageLabel.Width + NameLabel.Margin.Horizontal, ImageLabel.Height);
-            MinimumExpandedSize = MinimumCollapsedSize;
+            Height = ImageLabel.Height;
         }
 
         public TestListGroupEntry(string name)
             : this()
         {
             Text = name;
-        }
-        
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                if (components != null)
-                    components.Dispose();
-                DisposeChildControls();
-            }
-            base.Dispose(disposing);
-        }
-
-        private void DisposeChildControls()
-        {
-            var children = Controls.OfType<Control>().ToList();
-            Controls.Clear();
-            foreach (var child in children)
-                child.Dispose();
         }
 
         public ImageList ImageList
@@ -87,20 +64,10 @@ namespace PmlUnit
             var entry = new TestListViewEntry(test);
             try
             {
-                entry.Top = EntryPanel.Controls.Count * entry.Height;
-                entry.Width = EntryPanel.Width;
-                entry.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
                 entry.ImageList = ImageListField;
-
                 EntryPanel.Controls.Add(entry);
-                
-                MinimumExpandedSize.Width = Math.Max(MinimumExpandedSize.Width, EntryPanel.Margin.Left + entry.MinimumSize.Width);
-                MinimumExpandedSize.Height += entry.Height;
                 if (IsExpanded)
-                {
-                    MinimumSize = MinimumExpandedSize;
-                    Height = MinimumSize.Height;
-                }
+                    Height = ImageLabel.Height + EntryPanel.Height;
 
                 CountLabel.Text = string.Format(CultureInfo.CurrentCulture, "({0})", EntryPanel.Controls.Count);
 
@@ -118,29 +85,9 @@ namespace PmlUnit
             if (entry == null)
                 throw new ArgumentNullException(nameof(entry));
 
-            int index = EntryPanel.Controls.Count;
-            for (int i = 0; i < EntryPanel.Controls.Count; i++)
-            {
-                if (EntryPanel.Controls[i] == entry)
-                {
-                    MinimumExpandedSize.Height -= entry.Height;
-                    if (IsExpanded)
-                    {
-                        MinimumSize = MinimumExpandedSize;
-                        Height = MinimumSize.Height;
-                    }
-
-                    EntryPanel.Controls.RemoveAt(i);
-                    index = i;
-                    break;
-                }
-            }
-
-            for (int i = index; i < EntryPanel.Controls.Count; i++)
-            {
-                var other = EntryPanel.Controls[i];
-                other.Location = new Point(0, i * entry.Height);
-            }
+            EntryPanel.Controls.Remove(entry);
+            if (IsExpanded)
+                Height = ImageLabel.Height + EntryPanel.Height;
 
             CountLabel.Text = string.Format(CultureInfo.CurrentCulture, "({0})", EntryPanel.Controls.Count);
         }
@@ -148,15 +95,13 @@ namespace PmlUnit
         public void Expand()
         {
             EntryPanel.Visible = true;
-            MinimumSize = MinimumExpandedSize;
-            Height = MinimumExpandedSize.Height;
+            Height = ImageLabel.Height + EntryPanel.Height;
         }
 
         public void Collapse()
         {
             EntryPanel.Visible = false;
-            MinimumSize = MinimumCollapsedSize;
-            Height = MinimumCollapsedSize.Height;
+            Height = ImageLabel.Height;
         }
 
         public bool IsExpanded
