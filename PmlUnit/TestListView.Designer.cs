@@ -29,7 +29,7 @@ namespace PmlUnit
         {
             this.components = new System.ComponentModel.Container();
             this.TestStatusImageList = new System.Windows.Forms.ImageList(this.components);
-            this.GroupPanel = new PmlUnit.StretchingVerticalFlowLayoutPanel(this.components);
+            this.GroupPanel = new PmlUnit.StretchingVerticalFlowLayoutPanel();
             this.SuspendLayout();
             // 
             // TestStatusImageList

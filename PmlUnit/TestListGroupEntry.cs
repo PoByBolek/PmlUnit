@@ -66,10 +66,7 @@ namespace PmlUnit
             {
                 entry.ImageList = ImageListField;
                 EntryPanel.Controls.Add(entry);
-                if (IsExpanded)
-                    Height = ImageLabel.Height + EntryPanel.Height;
-
-                CountLabel.Text = string.Format(CultureInfo.CurrentCulture, "({0})", EntryPanel.Controls.Count);
+                OnEntriesChanged();
 
                 return entry;
             }
@@ -86,27 +83,31 @@ namespace PmlUnit
                 throw new ArgumentNullException(nameof(entry));
 
             EntryPanel.Controls.Remove(entry);
-            if (IsExpanded)
-                Height = ImageLabel.Height + EntryPanel.Height;
-
-            CountLabel.Text = string.Format(CultureInfo.CurrentCulture, "({0})", EntryPanel.Controls.Count);
+            OnEntriesChanged();
         }
 
         public void Expand()
         {
             EntryPanel.Visible = true;
-            Height = ImageLabel.Height + EntryPanel.Height;
+            Height = ExpandedHeight;
         }
 
         public void Collapse()
         {
             EntryPanel.Visible = false;
-            Height = ImageLabel.Height;
+            Height = CollapsedHeight;
         }
 
         public bool IsExpanded
         {
             get { return EntryPanel.Visible; }
+        }
+
+        private void OnEntriesChanged()
+        {
+            if (IsExpanded)
+                Height = ExpandedHeight;
+            CountLabel.Text = string.Format(CultureInfo.CurrentCulture, "({0})", EntryPanel.Controls.Count);
         }
 
         private void OnToggleExpanded(object sender, EventArgs e)
@@ -115,6 +116,16 @@ namespace PmlUnit
                 Collapse();
             else
                 Expand();
+        }
+
+        private int ExpandedHeight
+        {
+            get { return ImageLabel.Height + TestListViewEntry.ItemHeight * EntryPanel.Controls.Count; }
+        }
+
+        private int CollapsedHeight
+        {
+            get { return ImageLabel.Height; }
         }
     }
 }

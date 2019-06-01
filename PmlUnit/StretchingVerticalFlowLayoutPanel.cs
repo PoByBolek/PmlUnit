@@ -1,7 +1,5 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
-using System;
-using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -15,14 +13,6 @@ namespace PmlUnit
 
         public StretchingVerticalFlowLayoutPanel()
         {
-        }
-
-        public StretchingVerticalFlowLayoutPanel(IContainer container)
-        {
-            if (container == null)
-                throw new ArgumentNullException(nameof(container));
-
-            container.Add(this);
         }
 
         public void Clear()
@@ -41,12 +31,6 @@ namespace PmlUnit
                     LayoutEngineField = new StretchingVerticalFlowLayoutEngine();
                 return LayoutEngineField;
             }
-        }
-
-        protected override void OnSizeChanged(EventArgs e)
-        {
-            PerformLayout();
-            base.OnSizeChanged(e);
         }
     }
 
@@ -73,8 +57,6 @@ namespace PmlUnit
 
                 nextControlLocation.Y += size.Height + child.Margin.Bottom;
             }
-
-            parent.Height = nextControlLocation.Y;
 
             return false;
         }

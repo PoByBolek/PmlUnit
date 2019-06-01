@@ -33,6 +33,7 @@ namespace PmlUnit
                 try
                 {
                     GroupPanel.Controls.Add(group);
+                    group.SizeChanged += OnGroupSizeChanged;
                     group.ImageList = TestStatusImageList;
 
                     foreach (var test in testGroup)
@@ -77,6 +78,11 @@ namespace PmlUnit
                     result.AddRange(group.Entries.Where(predicate));
             }
             return result;
+        }
+
+        private void OnGroupSizeChanged(object sender, EventArgs e)
+        {
+            GroupPanel.Height = GroupPanel.Controls.OfType<Control>().Sum(c => c.Height);
         }
     }
 }

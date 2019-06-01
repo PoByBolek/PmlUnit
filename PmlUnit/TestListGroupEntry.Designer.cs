@@ -24,11 +24,10 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.ImageLabel = new System.Windows.Forms.Label();
             this.NameLabel = new System.Windows.Forms.Label();
             this.CountLabel = new System.Windows.Forms.Label();
-            this.EntryPanel = new PmlUnit.StretchingVerticalFlowLayoutPanel(this.components);
+            this.EntryPanel = new PmlUnit.StretchingVerticalFlowLayoutPanel();
             this.SuspendLayout();
             // 
             // ImageLabel
@@ -66,12 +65,13 @@
             // 
             // EntryPanel
             // 
-            this.EntryPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            this.EntryPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.EntryPanel.Location = new System.Drawing.Point(22, 13);
             this.EntryPanel.Margin = new System.Windows.Forms.Padding(19, 0, 0, 0);
             this.EntryPanel.Name = "EntryPanel";
-            this.EntryPanel.Size = new System.Drawing.Size(128, 0);
+            this.EntryPanel.Size = new System.Drawing.Size(128, 147);
             this.EntryPanel.TabIndex = 3;
             // 
             // TestListGroupEntry
@@ -82,6 +82,7 @@
             this.Controls.Add(this.CountLabel);
             this.Controls.Add(this.NameLabel);
             this.Controls.Add(this.ImageLabel);
+            this.Margin = new System.Windows.Forms.Padding(0);
             this.MinimumSize = new System.Drawing.Size(19, 16);
             this.Name = "TestListGroupEntry";
             this.Size = new System.Drawing.Size(150, 160);

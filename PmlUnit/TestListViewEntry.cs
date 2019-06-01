@@ -16,6 +16,8 @@ namespace PmlUnit
 
     partial class TestListViewEntry : UserControl, TestListEntry
     {
+        public const int ItemHeight = 16;
+
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Test Test { get; }

@@ -72,7 +72,7 @@
             this.Controls.Add(this.DurationLabel);
             this.Controls.Add(this.NameLabel);
             this.Controls.Add(this.ImageLabel);
-            this.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
+            this.Margin = new System.Windows.Forms.Padding(0);
             this.MinimumSize = new System.Drawing.Size(19, 16);
             this.Name = "TestListViewEntry";
             this.Size = new System.Drawing.Size(150, 16);
