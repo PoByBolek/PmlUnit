@@ -31,7 +31,7 @@ namespace PmlUnit
             set
             {
                 ImageListField = value;
-                foreach (Control child in Controls)
+                foreach (Control child in EntryPanel.Controls)
                 {
                     var entry = child as TestListViewEntry;
                     if (entry != null)

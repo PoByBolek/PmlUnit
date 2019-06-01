@@ -55,10 +55,7 @@ namespace PmlUnit
             set
             {
                 ImageLabel.ImageList = value;
-                if (value != null)
-                {
-                    ImageLabel.ImageKey = GetImageKey();
-                }
+                ImageLabel.ImageKey = GetImageKey();
             }
         }
 
@@ -70,17 +67,12 @@ namespace PmlUnit
             set
             {
                 ResultField = value;
-                if (ImageLabel.ImageList != null)
-                {
-                    ImageLabel.ImageKey = GetImageKey();
-                }
+                ImageLabel.ImageKey = GetImageKey();
 
                 DurationLabel.Text = FormatDuration();
                 DurationLabel.Left = Width - DurationLabel.Width;
 
                 NameLabel.Width = Width - ImageLabel.Width - NameLabel.Padding.Horizontal - DurationLabel.Width;
-
-                MinimumSize = new Size(ImageLabel.Width + NameLabel.Margin.Horizontal + DurationLabel.Width, ImageLabel.Height);
             }
         }
 
