@@ -40,6 +40,7 @@
             this.ImageLabel.Name = "ImageLabel";
             this.ImageLabel.Size = new System.Drawing.Size(16, 16);
             this.ImageLabel.TabIndex = 0;
+            this.ImageLabel.Click += new System.EventHandler(this.OnLabelClick);
             // 
             // NameLabel
             // 
@@ -53,6 +54,7 @@
             this.NameLabel.TabIndex = 1;
             this.NameLabel.Text = "Test Name";
             this.NameLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.NameLabel.Click += new System.EventHandler(this.OnLabelClick);
             // 
             // DurationLabel
             // 
@@ -64,6 +66,7 @@
             this.DurationLabel.Size = new System.Drawing.Size(0, 13);
             this.DurationLabel.TabIndex = 2;
             this.DurationLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.DurationLabel.Click += new System.EventHandler(this.OnLabelClick);
             // 
             // TestListViewEntry
             // 

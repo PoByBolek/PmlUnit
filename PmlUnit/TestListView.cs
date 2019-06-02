@@ -32,13 +32,14 @@ namespace PmlUnit
                 var group = new TestListGroupEntry(testGroup.Key.Name);
                 try
                 {
-                    GroupPanel.Controls.Add(group);
-                    group.SizeChanged += OnGroupSizeChanged;
-                    group.ImageList = TestStatusImageList;
-
                     foreach (var test in testGroup)
                         group.Add(test);
 
+                    group.ImageList = TestStatusImageList;
+                    group.EntryClick += OnEntryClick;
+                    group.SizeChanged += OnGroupSizeChanged;
+
+                    GroupPanel.Controls.Add(group);
                 }
                 catch
                 {
@@ -75,6 +76,20 @@ namespace PmlUnit
         private void OnGroupSizeChanged(object sender, EventArgs e)
         {
             GroupPanel.Height = GroupPanel.Controls.OfType<Control>().Sum(c => c.Height);
+        }
+
+        private void OnEntryClick(object sender, EntryClickEventArgs e)
+        {
+            if (ModifierKeys == Keys.Control)
+            {
+                e.Entry.Selected = !e.Entry.Selected;
+            }
+            else if (ModifierKeys == Keys.None)
+            {
+                foreach (var entry in Entries)
+                    entry.Selected = false;
+                e.Entry.Selected = true;
+            }
         }
     }
 }

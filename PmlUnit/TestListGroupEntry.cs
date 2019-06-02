@@ -10,6 +10,8 @@ namespace PmlUnit
 {
     partial class TestListGroupEntry : UserControl
     {
+        public event EventHandler<EntryClickEventArgs> EntryClick;
+
         private ImageList ImageListField;
 
         public TestListGroupEntry()
@@ -65,6 +67,7 @@ namespace PmlUnit
             try
             {
                 entry.ImageList = ImageListField;
+                entry.Click += OnEntryClick;
                 EntryPanel.Controls.Add(entry);
                 OnEntriesChanged();
 
@@ -103,6 +106,23 @@ namespace PmlUnit
             get { return EntryPanel.Visible; }
         }
 
+        private int ExpandedHeight
+        {
+            get { return ImageLabel.Height + TestListViewEntry.ItemHeight * EntryPanel.Controls.Count; }
+        }
+
+        private int CollapsedHeight
+        {
+            get { return ImageLabel.Height; }
+        }
+
+        private void OnEntryClick(object sender, EventArgs e)
+        {
+            var entry = sender as TestListViewEntry;
+            if (entry != null)
+                EntryClick?.Invoke(this, new EntryClickEventArgs(entry));
+        }
+
         private void OnEntriesChanged()
         {
             if (IsExpanded)
@@ -117,15 +137,17 @@ namespace PmlUnit
             else
                 Expand();
         }
+    }
 
-        private int ExpandedHeight
-        {
-            get { return ImageLabel.Height + TestListViewEntry.ItemHeight * EntryPanel.Controls.Count; }
-        }
+    class EntryClickEventArgs : EventArgs
+    {
+        public TestListViewEntry Entry { get; }
 
-        private int CollapsedHeight
+        public EntryClickEventArgs(TestListViewEntry entry)
         {
-            get { return ImageLabel.Height; }
+            if (entry == null)
+                throw new ArgumentNullException(nameof(entry));
+            Entry = entry;
         }
     }
 }

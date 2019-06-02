@@ -84,7 +84,7 @@ namespace PmlUnit
             set
             {
                 IsSelectedField = value;
-                BackColor = value ? SystemColors.Highlight : SystemColors.Control;
+                BackColor = value ? SystemColors.Highlight : SystemColors.Window;
                 NameLabel.ForeColor = value ? SystemColors.HighlightText : SystemColors.ControlText;
                 DurationLabel.ForeColor = value ? SystemColors.HighlightText : SystemColors.ControlText;
             }
@@ -106,6 +106,11 @@ namespace PmlUnit
                 return "";
             else
                 return Result.Duration.Format();
+        }
+
+        private void OnLabelClick(object sender, EventArgs e)
+        {
+            OnClick(e);
         }
     }
 }
