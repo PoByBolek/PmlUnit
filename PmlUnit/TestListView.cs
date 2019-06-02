@@ -20,9 +20,9 @@ namespace PmlUnit
         {
             InitializeComponent();
 
-            TestStatusImageList.Images.Add("Unknown", Resources.Unknown);
-            TestStatusImageList.Images.Add("Failure", Resources.Failure);
-            TestStatusImageList.Images.Add("Success", Resources.Success);
+            TestStatusImageList.Images.Add(TestListViewEntry.NotExecutedImageKey, Resources.Unknown);
+            TestStatusImageList.Images.Add(TestListViewEntry.FailureImageKey, Resources.Failure);
+            TestStatusImageList.Images.Add(TestListViewEntry.SuccessImageKey, Resources.Success);
         }
 
         public void SetTests(IEnumerable<Test> tests)

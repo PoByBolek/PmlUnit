@@ -18,6 +18,10 @@ namespace PmlUnit
     {
         public const int ItemHeight = 16;
 
+        public const string SuccessImageKey = "Success";
+        public const string FailureImageKey = "Failure";
+        public const string NotExecutedImageKey = "Unknown";
+
         [Category("Behavior")]
         public event EventHandler SelectionChanged;
 
@@ -100,11 +104,11 @@ namespace PmlUnit
         private string GetImageKey()
         {
             if (Result == null)
-                return "Unknown";
+                return NotExecutedImageKey;
             else if (Result.Success)
-                return "Success";
+                return SuccessImageKey;
             else
-                return "Failure";
+                return FailureImageKey;
         }
 
         private string FormatDuration()
