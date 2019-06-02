@@ -14,6 +14,8 @@ namespace PmlUnit
         [Category("Behavior")]
         public event EventHandler SelectionChanged;
 
+        private bool IgnoreSelectionChanged;
+
         public TestListView()
         {
             InitializeComponent();
@@ -36,8 +38,9 @@ namespace PmlUnit
                         group.Add(test);
 
                     group.ImageList = TestStatusImageList;
-                    group.EntryClick += OnEntryClick;
                     group.SizeChanged += OnGroupSizeChanged;
+                    group.EntryClick += OnEntryClick;
+                    group.SelectionChanged += OnSelectionChanged;
 
                     GroupPanel.Controls.Add(group);
                 }
@@ -86,10 +89,25 @@ namespace PmlUnit
             }
             else if (ModifierKeys == Keys.None)
             {
-                foreach (var entry in Entries)
-                    entry.Selected = false;
+                try
+                {
+                    IgnoreSelectionChanged = true;
+                    foreach (var entry in Entries)
+                        entry.Selected = false;
+                }
+                finally
+                {
+                    IgnoreSelectionChanged = false;
+                }
+
                 e.Entry.Selected = true;
             }
+        }
+
+        private void OnSelectionChanged(object sender, EventArgs e)
+        {
+            if (!IgnoreSelectionChanged)
+                SelectionChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }

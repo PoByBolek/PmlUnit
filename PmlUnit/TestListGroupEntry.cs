@@ -2,6 +2,7 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
@@ -10,7 +11,10 @@ namespace PmlUnit
 {
     partial class TestListGroupEntry : UserControl
     {
+        [Category("Behavior")]
         public event EventHandler<EntryClickEventArgs> EntryClick;
+        [Category("Behavior")]
+        public event EventHandler SelectionChanged;
 
         private ImageList ImageListField;
 
@@ -68,6 +72,7 @@ namespace PmlUnit
             {
                 entry.ImageList = ImageListField;
                 entry.Click += OnEntryClick;
+                entry.SelectionChanged += OnSelectionChanged;
                 EntryPanel.Controls.Add(entry);
                 OnEntriesChanged();
 
@@ -116,6 +121,14 @@ namespace PmlUnit
             get { return ImageLabel.Height; }
         }
 
+        private void OnToggleExpanded(object sender, EventArgs e)
+        {
+            if (IsExpanded)
+                Collapse();
+            else
+                Expand();
+        }
+
         private void OnEntryClick(object sender, EventArgs e)
         {
             var entry = sender as TestListViewEntry;
@@ -130,12 +143,9 @@ namespace PmlUnit
             CountLabel.Text = string.Format(CultureInfo.CurrentCulture, "({0})", EntryPanel.Controls.Count);
         }
 
-        private void OnToggleExpanded(object sender, EventArgs e)
+        private void OnSelectionChanged(object sender, EventArgs e)
         {
-            if (IsExpanded)
-                Collapse();
-            else
-                Expand();
+            SelectionChanged?.Invoke(sender, e);
         }
     }
 

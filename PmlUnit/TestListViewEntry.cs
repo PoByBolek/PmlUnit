@@ -18,6 +18,9 @@ namespace PmlUnit
     {
         public const int ItemHeight = 16;
 
+        [Category("Behavior")]
+        public event EventHandler SelectionChanged;
+
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Test Test { get; }
@@ -83,10 +86,14 @@ namespace PmlUnit
             get { return IsSelectedField; }
             set
             {
+                bool oldValue = IsSelectedField;
                 IsSelectedField = value;
                 BackColor = value ? SystemColors.Highlight : SystemColors.Window;
                 NameLabel.ForeColor = value ? SystemColors.HighlightText : SystemColors.ControlText;
                 DurationLabel.ForeColor = value ? SystemColors.HighlightText : SystemColors.ControlText;
+
+                if (value != oldValue)
+                    SelectionChanged?.Invoke(this, EventArgs.Empty);
             }
         }
 
