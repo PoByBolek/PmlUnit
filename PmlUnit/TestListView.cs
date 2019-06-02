@@ -50,35 +50,27 @@ namespace PmlUnit
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> AllTests => FilterTests(entry => true);
+        public List<TestListEntry> AllTests => Entries.ToList();
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> SucceededTests => FilterTests(entry => entry.Result != null && entry.Result.Error == null);
+        public List<TestListEntry> SucceededTests => Entries.Where(entry => entry.Result != null && entry.Result.Error == null).ToList();
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> FailedTests => FilterTests(entry => entry.Result?.Error != null);
+        public List<TestListEntry> FailedTests => Entries.Where(entry => entry.Result?.Error != null).ToList();
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> NotExecutedTests => FilterTests(entry => entry.Result == null);
+        public List<TestListEntry> NotExecutedTests => Entries.Where(entry => entry.Result == null).ToList();
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> SelectedTests => FilterTests(entry => entry.Selected);
+        public List<TestListEntry> SelectedTests => Entries.Where(entry => entry.Selected).ToList();
 
-        private List<TestListEntry> FilterTests(Func<TestListEntry, bool> predicate)
-        {
-            var result = new List<TestListEntry>();
-            foreach (Control child in GroupPanel.Controls)
-            {
-                var group = child as TestListGroupEntry;
-                if (group != null)
-                    result.AddRange(group.Entries.Where(predicate));
-            }
-            return result;
-        }
+        private IEnumerable<TestListEntry> Entries => Groups.SelectMany(group => group.Entries);
+
+        private IEnumerable<TestListGroupEntry> Groups => GroupPanel.Controls.OfType<TestListGroupEntry>();
 
         private void OnGroupSizeChanged(object sender, EventArgs e)
         {
