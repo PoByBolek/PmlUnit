@@ -37,14 +37,16 @@
             this.ImageLabel.Name = "ImageLabel";
             this.ImageLabel.Size = new System.Drawing.Size(16, 16);
             this.ImageLabel.TabIndex = 0;
-            this.ImageLabel.Click += new System.EventHandler(this.OnToggleExpanded);
+            this.ImageLabel.Click += new System.EventHandler(this.OnImageLabelClick);
+            this.ImageLabel.MouseEnter += new System.EventHandler(this.OnImageLabelMouseEnter);
+            this.ImageLabel.MouseLeave += new System.EventHandler(this.OnImageLabelMouseLeave);
             // 
             // NameLabel
             // 
             this.NameLabel.AutoSize = true;
             this.NameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.NameLabel.Location = new System.Drawing.Point(19, 0);
-            this.NameLabel.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
+            this.NameLabel.Location = new System.Drawing.Point(16, 2);
+            this.NameLabel.Margin = new System.Windows.Forms.Padding(0);
             this.NameLabel.Name = "NameLabel";
             this.NameLabel.Size = new System.Drawing.Size(77, 13);
             this.NameLabel.TabIndex = 1;
@@ -55,7 +57,7 @@
             // 
             this.CountLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.CountLabel.Location = new System.Drawing.Point(96, 0);
+            this.CountLabel.Location = new System.Drawing.Point(96, 2);
             this.CountLabel.Margin = new System.Windows.Forms.Padding(0);
             this.CountLabel.Name = "CountLabel";
             this.CountLabel.Size = new System.Drawing.Size(54, 16);
@@ -68,10 +70,10 @@
             this.EntryPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.EntryPanel.Location = new System.Drawing.Point(22, 13);
+            this.EntryPanel.Location = new System.Drawing.Point(19, 16);
             this.EntryPanel.Margin = new System.Windows.Forms.Padding(19, 0, 0, 0);
             this.EntryPanel.Name = "EntryPanel";
-            this.EntryPanel.Size = new System.Drawing.Size(128, 147);
+            this.EntryPanel.Size = new System.Drawing.Size(131, 144);
             this.EntryPanel.TabIndex = 3;
             // 
             // TestListGroupEntry

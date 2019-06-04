@@ -197,15 +197,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Images\Collapsed.png" />
+    <None Include="Images\CollapsedHighlight.png" />
+    <None Include="Images\Expanded.png" />
+    <None Include="Images\ExpandedHighlight.png" />
     <None Include="Images\Failure.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Images\Success.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Images\TestRunner.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Images\Unknown.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -28,15 +28,22 @@ namespace PmlUnit
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.TestStatusImageList = new System.Windows.Forms.ImageList(this.components);
+            this.ExpanderImageList = new System.Windows.Forms.ImageList(this.components);
+            this.StatusImageList = new System.Windows.Forms.ImageList(this.components);
             this.GroupPanel = new PmlUnit.StretchingVerticalFlowLayoutPanel();
             this.SuspendLayout();
             // 
-            // TestStatusImageList
+            // ExpanderImageList
             // 
-            this.TestStatusImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
-            this.TestStatusImageList.ImageSize = new System.Drawing.Size(16, 16);
-            this.TestStatusImageList.TransparentColor = System.Drawing.Color.Transparent;
+            this.ExpanderImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.ExpanderImageList.ImageSize = new System.Drawing.Size(16, 16);
+            this.ExpanderImageList.TransparentColor = System.Drawing.Color.Transparent;
+            // 
+            // StatusImageList
+            // 
+            this.StatusImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.StatusImageList.ImageSize = new System.Drawing.Size(16, 16);
+            this.StatusImageList.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // GroupPanel
             // 
@@ -60,7 +67,8 @@ namespace PmlUnit
         }
 
         #endregion
-        private System.Windows.Forms.ImageList TestStatusImageList;
+        private System.Windows.Forms.ImageList ExpanderImageList;
+        private System.Windows.Forms.ImageList StatusImageList;
         private StretchingVerticalFlowLayoutPanel GroupPanel;
     }
 }

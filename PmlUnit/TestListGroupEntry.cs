@@ -11,18 +11,24 @@ namespace PmlUnit
 {
     partial class TestListGroupEntry : UserControl
     {
+        public const string ExpandedImageKey = "Expanded";
+        public const string ExpandedHighlightImageKey = "ExpandedHighlight";
+        public const string CollapsedImageKey = "Collapsed";
+        public const string CollapsedHighlightImageKey = "CollapsedHighlight";
+
         [Category("Behavior")]
         public event EventHandler<EntryClickEventArgs> EntryClick;
         [Category("Behavior")]
         public event EventHandler SelectionChanged;
 
-        private ImageList ImageListField;
+        private ImageList StatusImageListField;
 
         public TestListGroupEntry()
         {
             InitializeComponent();
 
             Height = ImageLabel.Height;
+            ImageLabel.ImageKey = ExpandedImageKey;
         }
 
         public TestListGroupEntry(string name)
@@ -31,12 +37,20 @@ namespace PmlUnit
             Text = name;
         }
 
-        public ImageList ImageList
+        [Category("Appearance")]
+        public ImageList ExpanderImageList
         {
-            get { return ImageListField; }
+            get { return ImageLabel.ImageList; }
+            set { ImageLabel.ImageList = value; }
+        }
+
+        [Category("Appearance")]
+        public ImageList StatusImageList
+        {
+            get { return StatusImageListField; }
             set
             {
-                ImageListField = value;
+                StatusImageListField = value;
                 foreach (Control child in EntryPanel.Controls)
                 {
                     var entry = child as TestListViewEntry;
@@ -70,7 +84,7 @@ namespace PmlUnit
             var entry = new TestListViewEntry(test);
             try
             {
-                entry.ImageList = ImageListField;
+                entry.ImageList = StatusImageListField;
                 entry.Click += OnEntryClick;
                 entry.SelectionChanged += OnSelectionChanged;
                 EntryPanel.Controls.Add(entry);
@@ -97,12 +111,14 @@ namespace PmlUnit
         public void Expand()
         {
             EntryPanel.Visible = true;
+            ImageLabel.ImageKey = ExpandedImageKey;
             Height = ExpandedHeight;
         }
 
         public void Collapse()
         {
             EntryPanel.Visible = false;
+            ImageLabel.ImageKey = CollapsedImageKey;
             Height = CollapsedHeight;
         }
 
@@ -146,6 +162,22 @@ namespace PmlUnit
         private void OnSelectionChanged(object sender, EventArgs e)
         {
             SelectionChanged?.Invoke(sender, e);
+        }
+
+        private void OnImageLabelMouseEnter(object sender, EventArgs e)
+        {
+            ImageLabel.ImageKey = IsExpanded ? ExpandedHighlightImageKey : CollapsedHighlightImageKey;
+        }
+
+        private void OnImageLabelClick(object sender, EventArgs e)
+        {
+            OnToggleExpanded(sender, e);
+            OnImageLabelMouseEnter(sender, e);
+        }
+
+        private void OnImageLabelMouseLeave(object sender, EventArgs e)
+        {
+            ImageLabel.ImageKey = IsExpanded ? ExpandedImageKey : CollapsedImageKey;
         }
     }
 

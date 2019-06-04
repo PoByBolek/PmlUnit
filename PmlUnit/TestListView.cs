@@ -20,9 +20,14 @@ namespace PmlUnit
         {
             InitializeComponent();
 
-            TestStatusImageList.Images.Add(TestListViewEntry.NotExecutedImageKey, Resources.Unknown);
-            TestStatusImageList.Images.Add(TestListViewEntry.FailureImageKey, Resources.Failure);
-            TestStatusImageList.Images.Add(TestListViewEntry.SuccessImageKey, Resources.Success);
+            ExpanderImageList.Images.Add(TestListGroupEntry.ExpandedImageKey, Resources.Expanded);
+            ExpanderImageList.Images.Add(TestListGroupEntry.ExpandedHighlightImageKey, Resources.ExpandedHighlight);
+            ExpanderImageList.Images.Add(TestListGroupEntry.CollapsedImageKey, Resources.Collapsed);
+            ExpanderImageList.Images.Add(TestListGroupEntry.CollapsedHighlightImageKey, Resources.CollapsedHighlight);
+
+            StatusImageList.Images.Add(TestListViewEntry.NotExecutedImageKey, Resources.Unknown);
+            StatusImageList.Images.Add(TestListViewEntry.FailureImageKey, Resources.Failure);
+            StatusImageList.Images.Add(TestListViewEntry.SuccessImageKey, Resources.Success);
         }
 
         public void SetTests(IEnumerable<Test> tests)
@@ -37,7 +42,8 @@ namespace PmlUnit
                     foreach (var test in testGroup)
                         group.Add(test);
 
-                    group.ImageList = TestStatusImageList;
+                    group.ExpanderImageList = ExpanderImageList;
+                    group.StatusImageList = StatusImageList;
                     group.SizeChanged += OnGroupSizeChanged;
                     group.EntryClick += OnEntryClick;
                     group.SelectionChanged += OnSelectionChanged;
