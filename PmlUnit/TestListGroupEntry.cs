@@ -179,6 +179,11 @@ namespace PmlUnit
         {
             ImageLabel.ImageKey = IsExpanded ? ExpandedImageKey : CollapsedImageKey;
         }
+
+        private void OnGroupHeaderClick(object sender, EventArgs e)
+        {
+            OnClick(e);
+        }
     }
 
     class EntryClickEventArgs : EventArgs

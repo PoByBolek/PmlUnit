@@ -15,7 +15,7 @@ namespace PmlUnit
         public event EventHandler SelectionChanged;
 
         private bool IgnoreSelectionChanged;
-        private TestListEntry LastSelectedEntry;
+        private TestListEntry FocusedEntry;
 
         public TestListView()
         {
@@ -34,7 +34,7 @@ namespace PmlUnit
         public void SetTests(IEnumerable<Test> tests)
         {
             GroupPanel.Clear();
-            LastSelectedEntry = null;
+            FocusedEntry = null;
 
             foreach (var testGroup in tests.GroupBy(test => test.TestCase))
             {
@@ -47,6 +47,7 @@ namespace PmlUnit
                     group.ExpanderImageList = ExpanderImageList;
                     group.StatusImageList = StatusImageList;
                     group.SizeChanged += OnGroupSizeChanged;
+                    group.Click += OnGroupClick;
                     group.EntryClick += OnEntryClick;
                     group.SelectionChanged += OnSelectionChanged;
 
@@ -89,29 +90,51 @@ namespace PmlUnit
             GroupPanel.Height = GroupPanel.Controls.OfType<Control>().Sum(c => c.Height);
         }
 
+        private void OnGroupClick(object sender, EventArgs e)
+        {
+            var group = sender as TestListGroupEntry;
+            if (group == null)
+                return;
+
+            try
+            {
+                IgnoreSelectionChanged = true;
+                foreach (var entry in Entries)
+                    entry.Selected = false;
+                foreach (var entry in group.Entries)
+                    entry.Selected = true;
+                FocusedEntry = group.Entries.FirstOrDefault();
+            }
+            finally
+            {
+                IgnoreSelectionChanged = false;
+                OnSelectionChanged(this, EventArgs.Empty);
+            }
+        }
+
         private void OnEntryClick(object sender, EntryClickEventArgs e)
         {
             if (ModifierKeys == Keys.Control)
             {
                 e.Entry.Selected = !e.Entry.Selected;
                 if (e.Entry.Selected)
-                    LastSelectedEntry = e.Entry;
+                    FocusedEntry = e.Entry;
             }
             else if (ModifierKeys == Keys.Shift)
             {
                 try
                 {
                     IgnoreSelectionChanged = true;
-                    if (LastSelectedEntry == null)
-                        LastSelectedEntry = Entries.FirstOrDefault();
+                    if (FocusedEntry == null)
+                        FocusedEntry = Entries.FirstOrDefault();
 
                     var selected = false;
                     foreach (var entry in Entries)
                     {
-                        if (entry == e.Entry || entry == LastSelectedEntry)
+                        if (entry == e.Entry || entry == FocusedEntry)
                         {
                             entry.Selected = true;
-                            selected = e.Entry == LastSelectedEntry ? false : !selected;
+                            selected = e.Entry == FocusedEntry ? false : !selected;
                         }
                         else
                         {
@@ -139,7 +162,7 @@ namespace PmlUnit
                 }
 
                 e.Entry.Selected = true;
-                LastSelectedEntry = e.Entry;
+                FocusedEntry = e.Entry;
             }
         }
 

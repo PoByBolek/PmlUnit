@@ -51,6 +51,7 @@
             this.NameLabel.Size = new System.Drawing.Size(77, 13);
             this.NameLabel.TabIndex = 1;
             this.NameLabel.Text = "Group Name";
+            this.NameLabel.Click += new System.EventHandler(this.OnGroupHeaderClick);
             this.NameLabel.DoubleClick += new System.EventHandler(this.OnToggleExpanded);
             // 
             // CountLabel
@@ -63,6 +64,7 @@
             this.CountLabel.Size = new System.Drawing.Size(54, 16);
             this.CountLabel.TabIndex = 2;
             this.CountLabel.Text = "(0)";
+            this.CountLabel.Click += new System.EventHandler(this.OnGroupHeaderClick);
             this.CountLabel.DoubleClick += new System.EventHandler(this.OnToggleExpanded);
             // 
             // EntryPanel
@@ -70,10 +72,11 @@
             this.EntryPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.EntryPanel.Location = new System.Drawing.Point(19, 16);
-            this.EntryPanel.Margin = new System.Windows.Forms.Padding(19, 0, 0, 0);
+            this.EntryPanel.Location = new System.Drawing.Point(0, 16);
+            this.EntryPanel.Margin = new System.Windows.Forms.Padding(0, 0, 0, 0);
             this.EntryPanel.Name = "EntryPanel";
-            this.EntryPanel.Size = new System.Drawing.Size(131, 144);
+            this.EntryPanel.Padding = new System.Windows.Forms.Padding(19, 0, 0, 0);
+            this.EntryPanel.Size = new System.Drawing.Size(150, 144);
             this.EntryPanel.TabIndex = 3;
             // 
             // TestListGroupEntry

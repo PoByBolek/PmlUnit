@@ -41,7 +41,7 @@ namespace PmlUnit
             Control parent = container as Control;
 
             var displayBounds = parent.DisplayRectangle;
-            var nextControlLocation = new Point();
+            var nextControlLocation = new Point(parent.Padding.Left, parent.Padding.Top);
 
             foreach (Control child in parent.Controls)
             {
@@ -51,7 +51,7 @@ namespace PmlUnit
                 nextControlLocation.Y += child.Margin.Top;
 
                 var size = child.GetPreferredSize(displayBounds.Size);
-                size.Width = displayBounds.Width;
+                size.Width = displayBounds.Width - parent.Padding.Horizontal;
                 child.Size = size;
                 child.Location = nextControlLocation;
 
