@@ -15,6 +15,7 @@ namespace PmlUnit
         public event EventHandler SelectionChanged;
 
         private bool IgnoreSelectionChanged;
+        private TestListEntry LastSelectedEntry;
 
         public TestListView()
         {
@@ -33,6 +34,7 @@ namespace PmlUnit
         public void SetTests(IEnumerable<Test> tests)
         {
             GroupPanel.Clear();
+            LastSelectedEntry = null;
 
             foreach (var testGroup in tests.GroupBy(test => test.TestCase))
             {
@@ -92,6 +94,36 @@ namespace PmlUnit
             if (ModifierKeys == Keys.Control)
             {
                 e.Entry.Selected = !e.Entry.Selected;
+                if (e.Entry.Selected)
+                    LastSelectedEntry = e.Entry;
+            }
+            else if (ModifierKeys == Keys.Shift)
+            {
+                try
+                {
+                    IgnoreSelectionChanged = true;
+                    if (LastSelectedEntry == null)
+                        LastSelectedEntry = Entries.FirstOrDefault();
+
+                    var selected = false;
+                    foreach (var entry in Entries)
+                    {
+                        if (entry == e.Entry || entry == LastSelectedEntry)
+                        {
+                            entry.Selected = true;
+                            selected = e.Entry == LastSelectedEntry ? false : !selected;
+                        }
+                        else
+                        {
+                            entry.Selected = selected;
+                        }
+                    }
+                }
+                finally
+                {
+                    IgnoreSelectionChanged = false;
+                    OnSelectionChanged(this, EventArgs.Empty);
+                }
             }
             else if (ModifierKeys == Keys.None)
             {
@@ -107,6 +139,7 @@ namespace PmlUnit
                 }
 
                 e.Entry.Selected = true;
+                LastSelectedEntry = e.Entry;
             }
         }
 
