@@ -43,7 +43,7 @@
             pathLabel.Location = new System.Drawing.Point(9, 13);
             pathLabel.Name = "pathLabel";
             pathLabel.Size = new System.Drawing.Size(32, 13);
-            pathLabel.TabIndex = 1;
+            pathLabel.TabIndex = 0;
             pathLabel.Text = "Path:";
             // 
             // browseButton
@@ -52,7 +52,7 @@
             browseButton.Location = new System.Drawing.Point(400, 8);
             browseButton.Name = "browseButton";
             browseButton.Size = new System.Drawing.Size(75, 23);
-            browseButton.TabIndex = 3;
+            browseButton.TabIndex = 2;
             browseButton.Text = "&Browse...";
             browseButton.UseVisualStyleBackColor = true;
             browseButton.Click += new System.EventHandler(this.OnBrowseButtonClick);
@@ -66,7 +66,7 @@
             this.ControlPanel.Margin = new System.Windows.Forms.Padding(0, 3, 0, 0);
             this.ControlPanel.Name = "ControlPanel";
             this.ControlPanel.Size = new System.Drawing.Size(466, 415);
-            this.ControlPanel.TabIndex = 0;
+            this.ControlPanel.TabIndex = 3;
             // 
             // PathComboBox
             // 
@@ -78,7 +78,7 @@
             this.PathComboBox.Location = new System.Drawing.Point(47, 10);
             this.PathComboBox.Name = "PathComboBox";
             this.PathComboBox.Size = new System.Drawing.Size(347, 21);
-            this.PathComboBox.TabIndex = 2;
+            this.PathComboBox.TabIndex = 1;
             this.PathComboBox.TextChanged += new System.EventHandler(this.OnPathComboBoxTextChanged);
             // 
             // FolderBrowser
