@@ -142,17 +142,12 @@
       <DependentUpon>TestListGroupEntry.cs</DependentUpon>
     </Compile>
     <Compile Include="TestListView.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="TestListView.Designer.cs">
       <DependentUpon>TestListView.cs</DependentUpon>
     </Compile>
-    <Compile Include="TestListViewEntry.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="TestListViewEntry.Designer.cs">
-      <DependentUpon>TestListViewEntry.cs</DependentUpon>
-    </Compile>
+    <Compile Include="TestListViewEntry.cs" />
     <Compile Include="TestResult.cs" />
     <Compile Include="TestRunner.cs" />
     <Compile Include="TestRunnerControl.cs">

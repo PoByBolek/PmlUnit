@@ -50,13 +50,13 @@ namespace PmlUnit
             get { return StatusImageListField; }
             set
             {
-                StatusImageListField = value;
-                foreach (Control child in EntryPanel.Controls)
-                {
-                    var entry = child as TestListViewEntry;
-                    if (entry != null)
-                        entry.ImageList = value;
-                }
+                //StatusImageListField = value;
+                //foreach (Control child in EntryPanel.Controls)
+                //{
+                //    var entry = child as TestListViewEntry;
+                //    if (entry != null)
+                //        entry.ImageList = value;
+                //}
             }
         }
 
@@ -80,23 +80,24 @@ namespace PmlUnit
         {
             if (test == null)
                 throw new ArgumentNullException(nameof(test));
-            
-            var entry = new TestListViewEntry(test);
-            try
-            {
-                entry.ImageList = StatusImageListField;
-                entry.Click += OnEntryClick;
-                entry.SelectionChanged += OnSelectionChanged;
-                EntryPanel.Controls.Add(entry);
-                OnEntriesChanged();
 
-                return entry;
-            }
-            catch
-            {
-                entry.Dispose();
-                throw;
-            }
+            //var entry = new TestListViewEntry(test);
+            //try
+            //{
+            //    entry.ImageList = StatusImageListField;
+            //    entry.Click += OnEntryClick;
+            //    entry.SelectionChanged += OnSelectionChanged;
+            //    EntryPanel.Controls.Add(entry);
+            //    OnEntriesChanged();
+
+            //    return entry;
+            //}
+            //catch
+            //{
+            //    entry.Dispose();
+            //    throw;
+            //}
+            return null;
         }
 
         public void Remove(TestListViewEntry entry)
@@ -104,7 +105,7 @@ namespace PmlUnit
             if (entry == null)
                 throw new ArgumentNullException(nameof(entry));
 
-            EntryPanel.Controls.Remove(entry);
+            //EntryPanel.Controls.Remove(entry);
             OnEntriesChanged();
         }
 
@@ -129,7 +130,7 @@ namespace PmlUnit
 
         private int ExpandedHeight
         {
-            get { return ImageLabel.Height + TestListViewEntry.ItemHeight * EntryPanel.Controls.Count; }
+            get { return ImageLabel.Height + 16 * EntryPanel.Controls.Count; }
         }
 
         private int CollapsedHeight

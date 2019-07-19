@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
-using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -14,91 +13,76 @@ namespace PmlUnit
         bool Selected { get; set; }
     }
 
-    partial class TestListViewEntry : UserControl, TestListEntry
+    class TestListViewEntry : TestListEntry
     {
-        public const int ItemHeight = 16;
-
         public const string SuccessImageKey = "Success";
         public const string FailureImageKey = "Failure";
         public const string NotExecutedImageKey = "Unknown";
 
-        [Category("Behavior")]
         public event EventHandler SelectionChanged;
+        public event EventHandler ResultChanged;
 
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public Test Test { get; }
 
-        private TestResult ResultField;
-        private bool IsSelectedField;
+        private readonly TestListView View;
 
-        public TestListViewEntry(Test test)
+        private TestResult ResultField;
+        private bool SelectedField;
+
+        public TestListViewEntry(Test test, TestListView view)
         {
             if (test == null)
                 throw new ArgumentNullException(nameof(test));
+            if (view == null)
+                throw new ArgumentNullException(nameof(view));
 
             Test = test;
-
-            InitializeComponent();
-
-            NameLabel.Text = test.Name;
+            View = view;
         }
 
-        public override Font Font
-        {
-            get { return base.Font; }
-            set
-            {
-                base.Font = value;
-                NameLabel.Font = value;
-                DurationLabel.Font = value;
-            }
-        }
-
-        [Category("Appearance")]
-        public ImageList ImageList
-        {
-            get { return ImageLabel.ImageList; }
-            set
-            {
-                ImageLabel.ImageList = value;
-                ImageLabel.ImageKey = GetImageKey();
-            }
-        }
-
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public TestResult Result
         {
             get { return ResultField; }
             set
             {
-                ResultField = value;
-                ImageLabel.ImageKey = GetImageKey();
-
-                DurationLabel.Text = FormatDuration();
-                DurationLabel.Left = Width - DurationLabel.Width;
-
-                NameLabel.Width = Width - ImageLabel.Width - NameLabel.Padding.Horizontal - DurationLabel.Width;
+                if (value != ResultField)
+                {
+                    ResultField = value;
+                    ResultChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
+        
+        public bool Selected
+        {
+            get { return SelectedField; }
+            set
+            {
+                if (value != SelectedField)
+                {
+                    SelectedField = value;
+                    SelectionChanged?.Invoke(this, EventArgs.Empty);
+                }
             }
         }
 
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public bool Selected
+        public void Paint(Graphics g, Rectangle bounds, ImageList icons, Brush brush, StringFormat format)
         {
-            get { return IsSelectedField; }
-            set
-            {
-                bool oldValue = IsSelectedField;
-                IsSelectedField = value;
-                BackColor = value ? SystemColors.Highlight : SystemColors.Window;
-                NameLabel.ForeColor = value ? SystemColors.HighlightText : SystemColors.ControlText;
-                DurationLabel.ForeColor = value ? SystemColors.HighlightText : SystemColors.ControlText;
+            int padding = 2;
+            var y = bounds.Top + padding;
 
-                if (value != oldValue)
-                    SelectionChanged?.Invoke(this, EventArgs.Empty);
+            g.DrawImage(icons.Images[GetImageKey()], padding, y);
+
+            int durationWidth = 0;
+            if (bounds.Width > 20 && Result != null)
+            {
+                var duration = Result.Duration.Format();
+                durationWidth = (int)Math.Ceiling(g.MeasureString(duration, View.Font).Width) + padding;
+                int x = Math.Max(20, bounds.Width - durationWidth);
+                g.DrawString(duration, View.Font, brush, x, y);
             }
+
+            g.DrawString(Test.Name, View.Font, brush, new RectangleF(20, y, bounds.Width - durationWidth - 20 - padding, 16), format);
         }
 
         private string GetImageKey()
@@ -117,11 +101,6 @@ namespace PmlUnit
                 return "";
             else
                 return Result.Duration.Format();
-        }
-
-        private void OnLabelClick(object sender, EventArgs e)
-        {
-            OnClick(e);
         }
     }
 }

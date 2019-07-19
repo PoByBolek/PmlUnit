@@ -3,23 +3,29 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using PmlUnit.Properties;
 
 namespace PmlUnit
 {
-    partial class TestListView : UserControl
+    partial class TestListView : ScrollableControl
     {
         [Category("Behavior")]
         public event EventHandler SelectionChanged;
 
         private bool IgnoreSelectionChanged;
         private TestListEntry FocusedEntry;
+        private readonly List<TestListViewEntry> Entries;
+
+        private const int EntryHeight = 20;
 
         public TestListView()
         {
             InitializeComponent();
+
+            Entries = new List<TestListViewEntry>();
 
             ExpanderImageList.Images.Add(TestListGroupEntry.ExpandedImageKey, Resources.Expanded);
             ExpanderImageList.Images.Add(TestListGroupEntry.ExpandedHighlightImageKey, Resources.ExpandedHighlight);
@@ -33,61 +39,72 @@ namespace PmlUnit
 
         public void SetTests(IEnumerable<Test> tests)
         {
-            GroupPanel.Clear();
-            FocusedEntry = null;
-
-            foreach (var testGroup in tests.GroupBy(test => test.TestCase))
-            {
-                var group = new TestListGroupEntry(testGroup.Key.Name);
-                try
-                {
-                    foreach (var test in testGroup)
-                        group.Add(test);
-
-                    group.ExpanderImageList = ExpanderImageList;
-                    group.StatusImageList = StatusImageList;
-                    group.SizeChanged += OnGroupSizeChanged;
-                    group.Click += OnGroupClick;
-                    group.EntryClick += OnEntryClick;
-                    group.SelectionChanged += OnSelectionChanged;
-
-                    GroupPanel.Controls.Add(group);
-                }
-                catch
-                {
-                    group.Dispose();
-                    throw;
-                }
-            }
+            Entries.Clear();
+            Entries.AddRange(tests.Select(test => new TestListViewEntry(test, this)));
+            AutoScrollMinSize = new Size(0, EntryHeight * Entries.Count);
         }
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> AllTests => Entries.ToList();
+        public List<TestListEntry> AllTests => AllEntries.ToList();
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> SucceededTests => Entries.Where(entry => entry.Result != null && entry.Result.Error == null).ToList();
+        public List<TestListEntry> SucceededTests => AllEntries.Where(entry => entry.Result != null && entry.Result.Error == null).ToList();
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> FailedTests => Entries.Where(entry => entry.Result?.Error != null).ToList();
+        public List<TestListEntry> FailedTests => AllEntries.Where(entry => entry.Result?.Error != null).ToList();
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> NotExecutedTests => Entries.Where(entry => entry.Result == null).ToList();
+        public List<TestListEntry> NotExecutedTests => AllEntries.Where(entry => entry.Result == null).ToList();
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> SelectedTests => Entries.Where(entry => entry.Selected).ToList();
+        public List<TestListEntry> SelectedTests => AllEntries.Where(entry => entry.Selected).ToList();
 
-        private IEnumerable<TestListEntry> Entries => Groups.SelectMany(group => group.Entries);
+        private IEnumerable<TestListGroupEntry> Groups => Enumerable.Empty<TestListGroupEntry>();
 
-        private IEnumerable<TestListGroupEntry> Groups => GroupPanel.Controls.OfType<TestListGroupEntry>();
+        private IEnumerable<TestListEntry> AllEntries => Entries.OfType<TestListEntry>();
+
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            base.OnPaint(e);
+
+            var g = e.Graphics;
+
+            using (var brush = new SolidBrush(BackColor))
+            {
+                g.FillRectangle(new SolidBrush(BackColor), e.ClipRectangle);
+            }
+
+            using (var brush = new SolidBrush(ForeColor))
+            using (var format = new StringFormat(StringFormatFlags.NoWrap))
+            {
+                format.Trimming = StringTrimming.EllipsisCharacter;
+                
+                int offset = VerticalScroll.Value;
+                int width = ClientSize.Width;
+                int startIndex = Math.Max(0, (e.ClipRectangle.Top + offset) / EntryHeight);
+                int endIndex = Math.Min((e.ClipRectangle.Bottom + offset) / EntryHeight + 1, Entries.Count);
+
+                for (int i = startIndex; i < endIndex; i++)
+                {
+                    var bounds = new Rectangle(0, i * EntryHeight - offset, width, EntryHeight);
+                    Entries[i].Paint(g, bounds, StatusImageList, brush, format);
+                }
+            }
+        }
+
+        protected override void OnClientSizeChanged(EventArgs e)
+        {
+            base.OnClientSizeChanged(e);
+            Invalidate(); // We need to repaint everything because of the ellipsis characters in too long test names
+        }
 
         private void OnGroupSizeChanged(object sender, EventArgs e)
         {
-            GroupPanel.Height = GroupPanel.Controls.OfType<Control>().Sum(c => c.Height);
         }
 
         private void OnGroupClick(object sender, EventArgs e)
