@@ -2,102 +2,41 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Globalization;
-using System.Linq;
-using System.Windows.Forms;
+using System.Drawing;
 
 namespace PmlUnit
 {
-    partial class TestListGroupEntry : UserControl
+    class TestListGroupEntry
     {
         public const string ExpandedImageKey = "Expanded";
         public const string ExpandedHighlightImageKey = "ExpandedHighlight";
         public const string CollapsedImageKey = "Collapsed";
         public const string CollapsedHighlightImageKey = "CollapsedHighlight";
 
-        [Category("Behavior")]
-        public event EventHandler<EntryClickEventArgs> EntryClick;
-        [Category("Behavior")]
-        public event EventHandler SelectionChanged;
+        public string Name { get; }
 
-        private ImageList StatusImageListField;
-
-        public TestListGroupEntry()
-        {
-            InitializeComponent();
-
-            Height = ImageLabel.Height;
-            ImageLabel.ImageKey = ExpandedImageKey;
-        }
+        private readonly List<TestListViewEntry> EntriesField;
 
         public TestListGroupEntry(string name)
-            : this()
         {
-            Text = name;
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException(nameof(name));
+
+            Name = name;
+            EntriesField = new List<TestListViewEntry>();
         }
 
-        [Category("Appearance")]
-        public ImageList ExpanderImageList
+        public ICollection<TestListViewEntry> Entries
         {
-            get { return ImageLabel.ImageList; }
-            set { ImageLabel.ImageList = value; }
+            get { return EntriesField.AsReadOnly(); }
         }
 
-        [Category("Appearance")]
-        public ImageList StatusImageList
+        public void Add(TestListViewEntry entry)
         {
-            get { return StatusImageListField; }
-            set
-            {
-                //StatusImageListField = value;
-                //foreach (Control child in EntryPanel.Controls)
-                //{
-                //    var entry = child as TestListViewEntry;
-                //    if (entry != null)
-                //        entry.ImageList = value;
-                //}
-            }
-        }
+            if (entry == null)
+                throw new ArgumentNullException(nameof(entry));
 
-        public override string Text
-        {
-            get { return NameLabel.Text; }
-            set
-            {
-                NameLabel.Text = value;
-                CountLabel.Left = NameLabel.Right;
-                CountLabel.Width = Width - CountLabel.Left;
-            }
-        }
-
-        public IEnumerable<TestListEntry> Entries
-        {
-            get { return EntryPanel.Controls.OfType<TestListEntry>(); }
-        }
-
-        public TestListViewEntry Add(Test test)
-        {
-            if (test == null)
-                throw new ArgumentNullException(nameof(test));
-
-            //var entry = new TestListViewEntry(test);
-            //try
-            //{
-            //    entry.ImageList = StatusImageListField;
-            //    entry.Click += OnEntryClick;
-            //    entry.SelectionChanged += OnSelectionChanged;
-            //    EntryPanel.Controls.Add(entry);
-            //    OnEntriesChanged();
-
-            //    return entry;
-            //}
-            //catch
-            //{
-            //    entry.Dispose();
-            //    throw;
-            //}
-            return null;
+            EntriesField.Add(entry);
         }
 
         public void Remove(TestListViewEntry entry)
@@ -105,85 +44,37 @@ namespace PmlUnit
             if (entry == null)
                 throw new ArgumentNullException(nameof(entry));
 
-            //EntryPanel.Controls.Remove(entry);
-            OnEntriesChanged();
+            EntriesField.Remove(entry);
         }
 
         public void Expand()
         {
-            EntryPanel.Visible = true;
-            ImageLabel.ImageKey = ExpandedImageKey;
-            Height = ExpandedHeight;
         }
 
         public void Collapse()
         {
-            EntryPanel.Visible = false;
-            ImageLabel.ImageKey = CollapsedImageKey;
-            Height = CollapsedHeight;
         }
 
         public bool IsExpanded
         {
-            get { return EntryPanel.Visible; }
+            get { return true; }
         }
 
-        private int ExpandedHeight
+        public void Paint(Graphics g, Rectangle bounds, TestListPaintOptions options)
         {
-            get { return ImageLabel.Height + 16 * EntryPanel.Controls.Count; }
-        }
+            int padding = 2;
+            int x = bounds.Left + padding;
+            int y = bounds.Top + padding;
 
-        private int CollapsedHeight
-        {
-            get { return ImageLabel.Height; }
-        }
+            g.DrawImage(options.ExpanderImageList.Images[IsExpanded ? ExpandedImageKey : CollapsedImageKey], x, y);
+            x += 16 + padding;
 
-        private void OnToggleExpanded(object sender, EventArgs e)
-        {
-            if (IsExpanded)
-                Collapse();
-            else
-                Expand();
-        }
+            int nameWidth = (int)Math.Ceiling(g.MeasureString(Name, options.HeaderFont).Width);
+            g.DrawString(Name, options.HeaderFont, options.ForeBrush, x, y);
+            x += nameWidth;
 
-        private void OnEntryClick(object sender, EventArgs e)
-        {
-            var entry = sender as TestListViewEntry;
-            if (entry != null)
-                EntryClick?.Invoke(this, new EntryClickEventArgs(entry));
-        }
-
-        private void OnEntriesChanged()
-        {
-            if (IsExpanded)
-                Height = ExpandedHeight;
-            CountLabel.Text = string.Format(CultureInfo.CurrentCulture, "({0})", EntryPanel.Controls.Count);
-        }
-
-        private void OnSelectionChanged(object sender, EventArgs e)
-        {
-            SelectionChanged?.Invoke(sender, e);
-        }
-
-        private void OnImageLabelMouseEnter(object sender, EventArgs e)
-        {
-            ImageLabel.ImageKey = IsExpanded ? ExpandedHighlightImageKey : CollapsedHighlightImageKey;
-        }
-
-        private void OnImageLabelClick(object sender, EventArgs e)
-        {
-            OnToggleExpanded(sender, e);
-            OnImageLabelMouseEnter(sender, e);
-        }
-
-        private void OnImageLabelMouseLeave(object sender, EventArgs e)
-        {
-            ImageLabel.ImageKey = IsExpanded ? ExpandedImageKey : CollapsedImageKey;
-        }
-
-        private void OnGroupHeaderClick(object sender, EventArgs e)
-        {
-            OnClick(e);
+            var count = " (" + Entries.Count + ")";
+            g.DrawString(count, options.EntryFont, options.ForeBrush, x, y);
         }
     }
 

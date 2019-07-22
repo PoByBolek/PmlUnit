@@ -2,7 +2,6 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Drawing;
-using System.Windows.Forms;
 
 namespace PmlUnit
 {
@@ -24,20 +23,15 @@ namespace PmlUnit
 
         public Test Test { get; }
 
-        private readonly TestListView View;
-
         private TestResult ResultField;
         private bool SelectedField;
 
-        public TestListViewEntry(Test test, TestListView view)
+        public TestListViewEntry(Test test)
         {
             if (test == null)
                 throw new ArgumentNullException(nameof(test));
-            if (view == null)
-                throw new ArgumentNullException(nameof(view));
 
             Test = test;
-            View = view;
         }
 
         public TestResult Result
@@ -66,23 +60,30 @@ namespace PmlUnit
             }
         }
 
-        public void Paint(Graphics g, Rectangle bounds, ImageList icons, Brush brush, StringFormat format)
+        public void Paint(Graphics g, Rectangle bounds, TestListPaintOptions options)
         {
             int padding = 2;
-            var y = bounds.Top + padding;
+            int left = bounds.Left + padding;
+            int right = bounds.Right - padding;
+            int y = bounds.Top + padding;
 
-            g.DrawImage(icons.Images[GetImageKey()], padding, y);
-
-            int durationWidth = 0;
-            if (bounds.Width > 20 && Result != null)
+            g.DrawImage(options.StatusImageList.Images[GetImageKey()], left, y);
+            left += 16 + padding;
+            
+            if (left < right && Result != null)
             {
-                var duration = Result.Duration.Format();
-                durationWidth = (int)Math.Ceiling(g.MeasureString(duration, View.Font).Width) + padding;
-                int x = Math.Max(20, bounds.Width - durationWidth);
-                g.DrawString(duration, View.Font, brush, x, y);
+                string duration = Result.Duration.Format();
+                int durationWidth = (int)Math.Ceiling(g.MeasureString(duration, options.EntryFont).Width);
+                int durationX = Math.Max(left, right - durationWidth);
+                g.DrawString(duration, options.EntryFont, options.ForeBrush, durationX, y);
+                right = durationX - padding;
             }
 
-            g.DrawString(Test.Name, View.Font, brush, new RectangleF(20, y, bounds.Width - durationWidth - 20 - padding, 16), format);
+            if (left < right)
+            {
+                var nameBounds = new RectangleF(left, y, right - left, 16);
+                g.DrawString(Test.Name, options.EntryFont, options.ForeBrush, nameBounds, options.EntryFormat);
+            }
         }
 
         private string GetImageKey()

@@ -17,7 +17,7 @@ namespace PmlUnit
 
         private bool IgnoreSelectionChanged;
         private TestListEntry FocusedEntry;
-        private readonly List<TestListViewEntry> Entries;
+        private readonly List<TestListGroupEntry> Groups;
 
         private const int EntryHeight = 20;
 
@@ -25,7 +25,7 @@ namespace PmlUnit
         {
             InitializeComponent();
 
-            Entries = new List<TestListViewEntry>();
+            Groups = new List<TestListGroupEntry>();
 
             ExpanderImageList.Images.Add(TestListGroupEntry.ExpandedImageKey, Resources.Expanded);
             ExpanderImageList.Images.Add(TestListGroupEntry.ExpandedHighlightImageKey, Resources.ExpandedHighlight);
@@ -39,9 +39,17 @@ namespace PmlUnit
 
         public void SetTests(IEnumerable<Test> tests)
         {
-            Entries.Clear();
-            Entries.AddRange(tests.Select(test => new TestListViewEntry(test, this)));
-            AutoScrollMinSize = new Size(0, EntryHeight * Entries.Count);
+            Groups.Clear();
+
+            foreach (var grouping in tests.GroupBy(test => test.TestCase.Name))
+            {
+                var group = new TestListGroupEntry(grouping.Key);
+                foreach (var test in grouping)
+                    group.Add(new TestListViewEntry(test));
+                Groups.Add(group);
+            }
+
+            AutoScrollMinSize = new Size(0, EntryHeight * Groups.Sum(group => 1 + group.Entries.Count));
         }
 
         [Browsable(false)]
@@ -64,9 +72,7 @@ namespace PmlUnit
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public List<TestListEntry> SelectedTests => AllEntries.Where(entry => entry.Selected).ToList();
 
-        private IEnumerable<TestListGroupEntry> Groups => Enumerable.Empty<TestListGroupEntry>();
-
-        private IEnumerable<TestListEntry> AllEntries => Entries.OfType<TestListEntry>();
+        private IEnumerable<TestListEntry> AllEntries => Groups.SelectMany(group => group.Entries);
 
         protected override void OnPaint(PaintEventArgs e)
         {
@@ -79,20 +85,47 @@ namespace PmlUnit
                 g.FillRectangle(new SolidBrush(BackColor), e.ClipRectangle);
             }
 
-            using (var brush = new SolidBrush(ForeColor))
-            using (var format = new StringFormat(StringFormatFlags.NoWrap))
+            using (var options = new TestListPaintOptions(this, StatusImageList, ExpanderImageList))
             {
-                format.Trimming = StringTrimming.EllipsisCharacter;
-                
-                int offset = VerticalScroll.Value;
                 int width = ClientSize.Width;
-                int startIndex = Math.Max(0, (e.ClipRectangle.Top + offset) / EntryHeight);
-                int endIndex = Math.Min((e.ClipRectangle.Bottom + offset) / EntryHeight + 1, Entries.Count);
+                int minY = e.ClipRectangle.Top;
+                int maxY = e.ClipRectangle.Bottom;
+                int y = -VerticalScroll.Value;
 
-                for (int i = startIndex; i < endIndex; i++)
+                foreach (var group in Groups)
                 {
-                    var bounds = new Rectangle(0, i * EntryHeight - offset, width, EntryHeight);
-                    Entries[i].Paint(g, bounds, StatusImageList, brush, format);
+                    if (y > maxY)
+                        break;
+
+                    if (y + EntryHeight >= minY)
+                    {
+                        var headerBounds = new Rectangle(0, y, width, EntryHeight);
+                        group.Paint(g, headerBounds, options);
+                    }
+                    y += EntryHeight;
+
+                    if (group.IsExpanded)
+                    {
+                        int totalHeight = group.Entries.Count * EntryHeight;
+                        if (y + totalHeight < minY)
+                        {
+                            y += totalHeight;
+                            continue;
+                        }
+
+                        foreach (var entry in group.Entries)
+                        {
+                            if (y > maxY)
+                                break;
+
+                            if (y + EntryHeight >= minY)
+                            {
+                                var entryBounds = new Rectangle(20, y, width - 20, EntryHeight);
+                                entry.Paint(g, entryBounds, options);
+                            }
+                            y += EntryHeight;
+                        }
+                    }
                 }
             }
         }
@@ -116,10 +149,10 @@ namespace PmlUnit
             try
             {
                 IgnoreSelectionChanged = true;
-                foreach (var entry in Entries)
-                    entry.Selected = false;
-                foreach (var entry in group.Entries)
-                    entry.Selected = true;
+                //foreach (var entry in Groups)
+                //    entry.Selected = false;
+                //foreach (var entry in group.Entries)
+                //    entry.Selected = true;
                 FocusedEntry = group.Entries.FirstOrDefault();
             }
             finally
@@ -141,23 +174,23 @@ namespace PmlUnit
             {
                 try
                 {
-                    IgnoreSelectionChanged = true;
-                    if (FocusedEntry == null)
-                        FocusedEntry = Entries.FirstOrDefault();
+                    //IgnoreSelectionChanged = true;
+                    //if (FocusedEntry == null)
+                    //    FocusedEntry = Groups.FirstOrDefault();
 
-                    var selected = false;
-                    foreach (var entry in Entries)
-                    {
-                        if (entry == e.Entry || entry == FocusedEntry)
-                        {
-                            entry.Selected = true;
-                            selected = e.Entry == FocusedEntry ? false : !selected;
-                        }
-                        else
-                        {
-                            entry.Selected = selected;
-                        }
-                    }
+                    //var selected = false;
+                    //foreach (var entry in Groups)
+                    //{
+                    //    if (entry == e.Entry || entry == FocusedEntry)
+                    //    {
+                    //        entry.Selected = true;
+                    //        selected = e.Entry == FocusedEntry ? false : !selected;
+                    //    }
+                    //    else
+                    //    {
+                    //        entry.Selected = selected;
+                    //    }
+                    //}
                 }
                 finally
                 {
@@ -170,8 +203,8 @@ namespace PmlUnit
                 try
                 {
                     IgnoreSelectionChanged = true;
-                    foreach (var entry in Entries)
-                        entry.Selected = false;
+                    //foreach (var entry in Groups)
+                    //    entry.Selected = false;
                 }
                 finally
                 {
@@ -187,6 +220,65 @@ namespace PmlUnit
         {
             if (!IgnoreSelectionChanged)
                 SelectionChanged?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    class TestListPaintOptions : IDisposable
+    {
+        public Brush ForeBrush { get; }
+        public ImageList StatusImageList { get; }
+        public ImageList ExpanderImageList { get; }
+        public Font EntryFont { get; }
+        public Font HeaderFont { get; }
+        public StringFormat EntryFormat { get; }
+
+        public TestListPaintOptions(TestListView view, ImageList statusImageList, ImageList expanderImageList)
+        {
+            if (view == null)
+                throw new ArgumentNullException(nameof(view));
+            if (statusImageList == null)
+                throw new ArgumentNullException(nameof(statusImageList));
+            if (expanderImageList == null)
+                throw new ArgumentNullException(nameof(expanderImageList));
+
+            try
+            {
+                ForeBrush = new SolidBrush(view.ForeColor);
+                StatusImageList = statusImageList;
+                ExpanderImageList = expanderImageList;
+                EntryFont = view.Font;
+                HeaderFont = new Font(view.Font, FontStyle.Bold);
+                EntryFormat = new StringFormat(StringFormatFlags.NoWrap);
+                EntryFormat.Trimming = StringTrimming.EllipsisCharacter;
+            }
+            catch
+            {
+                if (HeaderFont != null)
+                    HeaderFont.Dispose();
+                if (EntryFormat != null)
+                    EntryFormat.Dispose();
+                throw;
+            }
+        }
+
+        ~TestListPaintOptions()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                HeaderFont.Dispose();
+                EntryFormat.Dispose();
+            }
         }
     }
 }

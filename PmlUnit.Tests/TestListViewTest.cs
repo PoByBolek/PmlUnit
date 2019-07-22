@@ -3,7 +3,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Windows.Forms;
+
 using NUnit.Framework;
 
 namespace PmlUnit.Tests
@@ -14,13 +14,11 @@ namespace PmlUnit.Tests
     public class TestListViewTest
     {
         private TestListView TestList;
-        private Panel GroupPanel;
 
         [SetUp]
         public void Setup()
         {
             TestList = new TestListView();
-            GroupPanel = TestList.FindControl<Panel>(nameof(GroupPanel));
         }
 
         [TearDown]
@@ -33,47 +31,6 @@ namespace PmlUnit.Tests
         public void SetTests_ChecksForNullArgument()
         {
             Assert.Throws<ArgumentNullException>(() => TestList.SetTests(null));
-        }
-
-        [Test]
-        public void SetTests_AssignsTestsToList()
-        {
-            // Arrange
-            var testCase = new TestCaseBuilder("TestCase").AddTest("one").AddTest("two").AddTest("three").Build();
-            // Act
-            TestList.SetTests(testCase.Tests);
-            // Assert
-            Assert.AreEqual(1, TestList.Controls.Count);
-
-            var group = GroupPanel.Controls[0] as TestListGroupEntry;
-            Assert.AreEqual(testCase.Tests.Count, group.Entries.Count());
-            int index = 0;
-            foreach (var entry in group.Entries)
-                Assert.AreSame(testCase.Tests[index++], entry.Test);
-        }
-
-        [Test]
-        public void SetTests_GroupsTestsByTestCase()
-        {
-            // Arrange
-            var first = new TestCaseBuilder("TestCaseOne").AddTest("one").AddTest("two").AddTest("three").Build();
-            var second = new TestCaseBuilder("TestCaseTwo").AddTest("four").AddTest("five").Build();
-            // Act
-            TestList.SetTests(first.Tests.Concat(second.Tests));
-            // Assert
-            Assert.AreEqual(2, GroupPanel.Controls.Count);
-
-            var firstGroup = GroupPanel.Controls[0] as TestListGroupEntry;
-            Assert.AreEqual(first.Tests.Count, firstGroup.Entries.Count());
-            int index = 0;
-            foreach (var entry in firstGroup.Entries)
-                Assert.AreSame(first.Tests[index++], entry.Test);
-
-            var secondGroup = GroupPanel.Controls[1] as TestListGroupEntry;
-            Assert.AreEqual(second.Tests.Count, secondGroup.Entries.Count());
-            index = 0;
-            foreach (var entry in firstGroup.Entries)
-                Assert.AreSame(first.Tests[index++], entry.Test);
         }
 
         [Test]
@@ -156,8 +113,7 @@ namespace PmlUnit.Tests
             // Act
             TestList.SetTests(testCase.Tests);
             // Assert
-            var group = GroupPanel.Controls[0] as TestListGroupEntry;
-            foreach (var entry in group.Entries)
+            foreach (var entry in TestList.AllTests)
                 Assert.IsNull(entry.Result);
         }
     }
