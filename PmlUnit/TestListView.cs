@@ -155,6 +155,8 @@ namespace PmlUnit
         protected override void OnMouseClick(MouseEventArgs e)
         {
             base.OnMouseClick(e);
+            Select();
+
             var clicked = FindEntry(e.Location);
             bool left = e.Button == MouseButtons.Left;
             bool right = e.Button == MouseButtons.Right;
