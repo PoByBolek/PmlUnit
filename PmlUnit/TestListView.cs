@@ -26,6 +26,7 @@ namespace PmlUnit
         {
             InitializeComponent();
 
+            DoubleBuffered = true;
             Groups = new List<TestListGroupEntry>();
 
             ExpanderImageList.Images.Add(TestListGroupEntry.ExpandedImageKey, Resources.Expanded);
