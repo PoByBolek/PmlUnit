@@ -15,9 +15,10 @@ namespace PmlUnit
         [Category("Behavior")]
         public event EventHandler SelectionChanged;
 
-        private bool IgnoreSelectionChanged;
-        private TestListEntry FocusedEntry;
         private readonly List<TestListGroupEntry> Groups;
+        private bool IgnoreSelectionChanged;
+        private TestListBaseEntry SelectionStartEntry;
+        private TestListBaseEntry FocusedEntry;
 
         private const int EntryHeight = 20;
 
@@ -49,30 +50,45 @@ namespace PmlUnit
                 Groups.Add(group);
             }
 
+            FocusedEntry = null;
+            SelectionStartEntry = Groups.FirstOrDefault();
             AutoScrollMinSize = new Size(0, EntryHeight * Groups.Sum(group => 1 + group.Entries.Count));
         }
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> AllTests => AllEntries.ToList();
+        public List<TestListEntry> AllTests => AllTestEntries.ToList();
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> SucceededTests => AllEntries.Where(entry => entry.Result != null && entry.Result.Error == null).ToList();
+        public List<TestListEntry> SucceededTests => AllTestEntries.Where(entry => entry.Result != null && entry.Result.Error == null).ToList();
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> FailedTests => AllEntries.Where(entry => entry.Result?.Error != null).ToList();
+        public List<TestListEntry> FailedTests => AllTestEntries.Where(entry => entry.Result?.Error != null).ToList();
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> NotExecutedTests => AllEntries.Where(entry => entry.Result == null).ToList();
+        public List<TestListEntry> NotExecutedTests => AllTestEntries.Where(entry => entry.Result == null).ToList();
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> SelectedTests => AllEntries.Where(entry => entry.Selected).ToList();
+        public List<TestListEntry> SelectedTests => AllTestEntries.Where(entry => entry.Selected).ToList();
 
-        private IEnumerable<TestListEntry> AllEntries => Groups.SelectMany(group => group.Entries);
+        private IEnumerable<TestListEntry> AllTestEntries => Groups.SelectMany(group => group.Entries);
+
+        private IEnumerable<TestListBaseEntry> AllEntries
+        {
+            get
+            {
+                foreach (var group in Groups)
+                {
+                    yield return group;
+                    foreach (var entry in group.Entries)
+                        yield return entry;
+                }
+            }
+        }
 
         protected override void OnPaint(PaintEventArgs e)
         {
@@ -134,6 +150,82 @@ namespace PmlUnit
         {
             base.OnClientSizeChanged(e);
             Invalidate(); // We need to repaint everything because of the ellipsis characters in too long test names
+        }
+
+        protected override void OnMouseClick(MouseEventArgs e)
+        {
+            base.OnMouseClick(e);
+            var clicked = FindEntry(e.Location);
+            bool left = e.Button == MouseButtons.Left;
+            bool right = e.Button == MouseButtons.Right;
+
+            if ((left || right) && ModifierKeys == Keys.None)
+            {
+                foreach (var entry in AllEntries)
+                    entry.Selected = false;
+
+                if (clicked != null)
+                {
+                    clicked.Selected = true;
+                    FocusedEntry = clicked;
+                    SelectionStartEntry = clicked;
+                }
+
+                Invalidate();
+            }
+            else if (left && ModifierKeys == Keys.Control && clicked != null)
+            {
+                clicked.Selected = !clicked.Selected;
+                FocusedEntry = clicked;
+                SelectionStartEntry = clicked;
+
+                Invalidate();
+            }
+            else if (left && ModifierKeys == Keys.Shift && clicked != null)
+            {
+                bool selected = false;
+                foreach (var entry in AllEntries)
+                {
+                    if (entry == clicked || entry == SelectionStartEntry)
+                    {
+                        entry.Selected = true;
+                        selected = clicked == SelectionStartEntry ? false : !selected;
+                    }
+                    else
+                    {
+                        entry.Selected = selected;
+                    }
+                }
+
+                Invalidate();
+            }
+        }
+
+        private TestListBaseEntry FindEntry(Point location)
+        {
+            int y = -VerticalScroll.Value;
+            int target = location.Y;
+
+            foreach (var group in Groups)
+            {
+                if (target < y)
+                    return null;
+                if (target >= y && target < y + EntryHeight)
+                    return group;
+                y += EntryHeight;
+
+                if (group.IsExpanded)
+                {
+                    int height = group.Entries.Count * EntryHeight;
+                    if (target >= y && target < height)
+                    {
+                        int index = (target - y) / EntryHeight;
+                        return group.Entries[index];
+                    }
+                    y += height;
+                }
+            }
+            return null;
         }
 
         private void OnGroupSizeChanged(object sender, EventArgs e)
@@ -223,9 +315,17 @@ namespace PmlUnit
         }
     }
 
+    interface TestListBaseEntry
+    {
+        bool Selected { get; set; }
+        void Paint(Graphics g, Rectangle bounds, TestListPaintOptions options);
+    }
+
     class TestListPaintOptions : IDisposable
     {
-        public Brush ForeBrush { get; }
+        public Brush NormalTextBrush { get; }
+        public Brush SelectedTextBrush { get; }
+        public Brush SelectedBackBrush { get; }
         public ImageList StatusImageList { get; }
         public ImageList ExpanderImageList { get; }
         public Font EntryFont { get; }
@@ -243,16 +343,20 @@ namespace PmlUnit
 
             try
             {
-                ForeBrush = new SolidBrush(view.ForeColor);
                 StatusImageList = statusImageList;
                 ExpanderImageList = expanderImageList;
                 EntryFont = view.Font;
+                NormalTextBrush = new SolidBrush(view.ForeColor);
+                SelectedTextBrush = SystemBrushes.HighlightText; // don't dispose the system brushes
+                SelectedBackBrush = SystemBrushes.Highlight; // don't dispose the system brushes
                 HeaderFont = new Font(view.Font, FontStyle.Bold);
                 EntryFormat = new StringFormat(StringFormatFlags.NoWrap);
                 EntryFormat.Trimming = StringTrimming.EllipsisCharacter;
             }
             catch
             {
+                if (NormalTextBrush != null)
+                    NormalTextBrush.Dispose();
                 if (HeaderFont != null)
                     HeaderFont.Dispose();
                 if (EntryFormat != null)
@@ -276,6 +380,7 @@ namespace PmlUnit
         {
             if (disposing)
             {
+                NormalTextBrush.Dispose();
                 HeaderFont.Dispose();
                 EntryFormat.Dispose();
             }

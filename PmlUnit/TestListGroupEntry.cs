@@ -6,16 +6,19 @@ using System.Drawing;
 
 namespace PmlUnit
 {
-    class TestListGroupEntry
+    class TestListGroupEntry : TestListBaseEntry
     {
         public const string ExpandedImageKey = "Expanded";
         public const string ExpandedHighlightImageKey = "ExpandedHighlight";
         public const string CollapsedImageKey = "Collapsed";
         public const string CollapsedHighlightImageKey = "CollapsedHighlight";
 
+        public event EventHandler SelectionChanged;
+
         public string Name { get; }
 
         private readonly List<TestListViewEntry> EntriesField;
+        private bool SelectedField;
 
         public TestListGroupEntry(string name)
         {
@@ -26,9 +29,22 @@ namespace PmlUnit
             EntriesField = new List<TestListViewEntry>();
         }
 
-        public ICollection<TestListViewEntry> Entries
+        public IList<TestListViewEntry> Entries
         {
             get { return EntriesField.AsReadOnly(); }
+        }
+
+        public bool Selected
+        {
+            get { return SelectedField; }
+            set
+            {
+                if (value != SelectedField)
+                {
+                    SelectedField = value;
+                    SelectionChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
         }
 
         public void Add(TestListViewEntry entry)
@@ -66,15 +82,22 @@ namespace PmlUnit
             int x = bounds.Left + padding;
             int y = bounds.Top + padding;
 
+            var textBrush = options.NormalTextBrush;
+            if (Selected)
+            {
+                textBrush = options.SelectedTextBrush;
+                g.FillRectangle(options.SelectedBackBrush, bounds);
+            }
+
             g.DrawImage(options.ExpanderImageList.Images[IsExpanded ? ExpandedImageKey : CollapsedImageKey], x, y);
             x += 16 + padding;
 
             int nameWidth = (int)Math.Ceiling(g.MeasureString(Name, options.HeaderFont).Width);
-            g.DrawString(Name, options.HeaderFont, options.ForeBrush, x, y);
+            g.DrawString(Name, options.HeaderFont, textBrush, x, y);
             x += nameWidth;
 
             var count = " (" + Entries.Count + ")";
-            g.DrawString(count, options.EntryFont, options.ForeBrush, x, y);
+            g.DrawString(count, options.EntryFont, textBrush, x, y);
         }
     }
 

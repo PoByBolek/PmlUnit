@@ -12,7 +12,7 @@ namespace PmlUnit
         bool Selected { get; set; }
     }
 
-    class TestListViewEntry : TestListEntry
+    class TestListViewEntry : TestListBaseEntry, TestListEntry
     {
         public const string SuccessImageKey = "Success";
         public const string FailureImageKey = "Failure";
@@ -67,6 +67,13 @@ namespace PmlUnit
             int right = bounds.Right - padding;
             int y = bounds.Top + padding;
 
+            var textBrush = options.NormalTextBrush;
+            if (Selected)
+            {
+                textBrush = options.SelectedTextBrush;
+                g.FillRectangle(options.SelectedBackBrush, bounds);
+            }
+
             g.DrawImage(options.StatusImageList.Images[GetImageKey()], left, y);
             left += 16 + padding;
             
@@ -75,14 +82,14 @@ namespace PmlUnit
                 string duration = Result.Duration.Format();
                 int durationWidth = (int)Math.Ceiling(g.MeasureString(duration, options.EntryFont).Width);
                 int durationX = Math.Max(left, right - durationWidth);
-                g.DrawString(duration, options.EntryFont, options.ForeBrush, durationX, y);
+                g.DrawString(duration, options.EntryFont, textBrush, durationX, y);
                 right = durationX - padding;
             }
 
             if (left < right)
             {
                 var nameBounds = new RectangleF(left, y, right - left, 16);
-                g.DrawString(Test.Name, options.EntryFont, options.ForeBrush, nameBounds, options.EntryFormat);
+                g.DrawString(Test.Name, options.EntryFont, textBrush, nameBounds, options.EntryFormat);
             }
         }
 
