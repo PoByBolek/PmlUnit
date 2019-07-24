@@ -50,6 +50,7 @@ namespace PmlUnit
             {
                 var group = new TestListGroupEntry(grouping.Key);
                 group.SelectionChanged += OnSelectionChanged;
+                group.ExpandedChanged += OnGroupExpandedChanged;
                 foreach (var test in grouping)
                 {
                     var entry = new TestListViewEntry(test);
@@ -61,7 +62,7 @@ namespace PmlUnit
 
             FocusedEntry = null;
             SelectionStartEntry = Groups.FirstOrDefault();
-            AutoScrollMinSize = new Size(0, EntryHeight * Groups.Sum(group => 1 + group.Entries.Count));
+            AutoScrollMinSize = new Size(0, Groups.Sum(group => group.Height));
 
             Invalidate();
         }
@@ -217,6 +218,17 @@ namespace PmlUnit
             }
         }
 
+        protected override void OnMouseDoubleClick(MouseEventArgs e)
+        {
+            base.OnMouseDoubleClick(e);
+
+            if (ModifierKeys == Keys.None && e.Button == MouseButtons.Left)
+            {
+                var group = FindEntry(e.Location) as TestListGroupEntry;
+                group.IsExpanded = !group.IsExpanded;
+            }
+        }
+
         private TestListBaseEntry FindEntry(Point location)
         {
             int y = -VerticalScroll.Value;
@@ -244,30 +256,10 @@ namespace PmlUnit
             return null;
         }
 
-        private void OnGroupSizeChanged(object sender, EventArgs e)
+        private void OnGroupExpandedChanged(object sender, EventArgs e)
         {
-        }
-
-        private void OnGroupClick(object sender, EventArgs e)
-        {
-            var group = sender as TestListGroupEntry;
-            if (group == null)
-                return;
-
-            try
-            {
-                IgnoreSelectionChanged = true;
-                //foreach (var entry in Groups)
-                //    entry.Selected = false;
-                //foreach (var entry in group.Entries)
-                //    entry.Selected = true;
-                FocusedEntry = group.Entries.FirstOrDefault();
-            }
-            finally
-            {
-                IgnoreSelectionChanged = false;
-                OnSelectionChanged(this, EventArgs.Empty);
-            }
+            AutoScrollMinSize = new Size(0, Groups.Sum(group => group.Height));
+            Invalidate();
         }
 
         private void BeginUpdate()

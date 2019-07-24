@@ -14,11 +14,13 @@ namespace PmlUnit
         public const string CollapsedHighlightImageKey = "CollapsedHighlight";
 
         public event EventHandler SelectionChanged;
+        public event EventHandler ExpandedChanged;
 
         public string Name { get; }
 
         private readonly List<TestListViewEntry> EntriesField;
         private bool SelectedField;
+        private bool ExpandedField;
 
         public TestListGroupEntry(string name)
         {
@@ -27,6 +29,8 @@ namespace PmlUnit
 
             Name = name;
             EntriesField = new List<TestListViewEntry>();
+            SelectedField = false;
+            ExpandedField = true;
         }
 
         public IList<TestListViewEntry> Entries
@@ -74,17 +78,17 @@ namespace PmlUnit
             EntriesField.Remove(entry);
         }
 
-        public void Expand()
-        {
-        }
-
-        public void Collapse()
-        {
-        }
-
         public bool IsExpanded
         {
-            get { return true; }
+            get { return ExpandedField; }
+            set
+            {
+                if (value != ExpandedField)
+                {
+                    ExpandedField = value;
+                    ExpandedChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
         }
 
         public void Paint(Graphics g, Rectangle bounds, TestListPaintOptions options)
