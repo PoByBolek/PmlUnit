@@ -71,7 +71,7 @@ namespace PmlUnit
             if (Selected)
             {
                 textBrush = options.SelectedTextBrush;
-                g.FillRectangle(options.SelectedBackBrush, bounds);
+                g.FillRectangle(options.SelectedBackBrush, 0, bounds.Top, bounds.Right, bounds.Height);
             }
 
             g.DrawImage(options.StatusImageList.Images[GetImageKey()], left, y);
