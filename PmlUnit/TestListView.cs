@@ -83,7 +83,30 @@ namespace PmlUnit
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> SelectedTests => AllTestEntries.Where(entry => entry.Selected).ToList();
+        public List<TestListEntry> SelectedTests
+        {
+            get
+            {
+                var result = new HashSet<TestListEntry>();
+                foreach (var group in Groups)
+                {
+                    if (group.Selected)
+                    {
+                        foreach (var entry in group.Entries)
+                            result.Add(entry);
+                    }
+                    else
+                    {
+                        foreach (var entry in group.Entries)
+                        {
+                            if (entry.Selected)
+                                result.Add(entry);
+                        }
+                    }
+                }
+                return result.ToList();
+            }
+        }
 
         private IEnumerable<TestListEntry> AllTestEntries => Groups.SelectMany(group => group.Entries);
 
