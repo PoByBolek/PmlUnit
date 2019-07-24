@@ -49,6 +49,7 @@ namespace PmlUnit
             foreach (var grouping in tests.GroupBy(test => test.TestCase.Name))
             {
                 var group = new TestListGroupEntry(grouping.Key);
+                group.SelectionChanged += OnSelectionChanged;
                 foreach (var test in grouping)
                 {
                     var entry = new TestListViewEntry(test);
@@ -297,6 +298,8 @@ namespace PmlUnit
 
     interface TestListBaseEntry
     {
+        event EventHandler SelectionChanged;
+
         bool Selected { get; set; }
         void Paint(Graphics g, Rectangle bounds, TestListPaintOptions options);
     }
