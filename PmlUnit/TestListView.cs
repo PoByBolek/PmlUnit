@@ -54,6 +54,8 @@ namespace PmlUnit
             FocusedEntry = null;
             SelectionStartEntry = Groups.FirstOrDefault();
             AutoScrollMinSize = new Size(0, EntryHeight * Groups.Sum(group => 1 + group.Entries.Count));
+
+            Invalidate();
         }
 
         [Browsable(false)]
