@@ -19,6 +19,7 @@ namespace PmlUnit
 
         private readonly List<TestListGroupEntry> Groups;
         private bool IgnoreSelectionChanged;
+        private int IgnoredSelectionChanges;
         private TestListBaseEntry SelectionStartEntry;
         private TestListBaseEntry FocusedEntry;
 
@@ -28,6 +29,8 @@ namespace PmlUnit
 
             DoubleBuffered = true;
             Groups = new List<TestListGroupEntry>();
+            IgnoreSelectionChanged = false;
+            IgnoredSelectionChanges = 0;
 
             ExpanderImageList.Images.Add(TestListGroupEntry.ExpandedImageKey, Resources.Expanded);
             ExpanderImageList.Images.Add(TestListGroupEntry.ExpandedHighlightImageKey, Resources.ExpandedHighlight);
@@ -47,7 +50,11 @@ namespace PmlUnit
             {
                 var group = new TestListGroupEntry(grouping.Key);
                 foreach (var test in grouping)
-                    group.Add(new TestListViewEntry(test));
+                {
+                    var entry = new TestListViewEntry(test);
+                    entry.SelectionChanged += OnSelectionChanged;
+                    group.Add(entry);
+                }
                 Groups.Add(group);
             }
 
@@ -142,45 +149,47 @@ namespace PmlUnit
             bool left = e.Button == MouseButtons.Left;
             bool right = e.Button == MouseButtons.Right;
 
-            if ((left || right) && ModifierKeys == Keys.None)
+            BeginUpdate();
+            try
             {
-                foreach (var entry in AllEntries)
-                    entry.Selected = false;
-
-                if (clicked != null)
+                if ((left || right) && ModifierKeys == Keys.None)
                 {
-                    clicked.Selected = true;
+                    foreach (var entry in AllEntries)
+                        entry.Selected = false;
+
+                    if (clicked != null)
+                    {
+                        clicked.Selected = true;
+                        FocusedEntry = clicked;
+                        SelectionStartEntry = clicked;
+                    }
+                }
+                else if (left && ModifierKeys == Keys.Control && clicked != null)
+                {
+                    clicked.Selected = !clicked.Selected;
                     FocusedEntry = clicked;
                     SelectionStartEntry = clicked;
                 }
-
-                Invalidate();
-            }
-            else if (left && ModifierKeys == Keys.Control && clicked != null)
-            {
-                clicked.Selected = !clicked.Selected;
-                FocusedEntry = clicked;
-                SelectionStartEntry = clicked;
-
-                Invalidate();
-            }
-            else if (left && ModifierKeys == Keys.Shift && clicked != null)
-            {
-                bool selected = false;
-                foreach (var entry in AllEntries)
+                else if (left && ModifierKeys == Keys.Shift && clicked != null)
                 {
-                    if (entry == clicked || entry == SelectionStartEntry)
+                    bool selected = false;
+                    foreach (var entry in AllEntries)
                     {
-                        entry.Selected = true;
-                        selected = clicked == SelectionStartEntry ? false : !selected;
-                    }
-                    else
-                    {
-                        entry.Selected = selected;
+                        if (entry == clicked || entry == SelectionStartEntry)
+                        {
+                            entry.Selected = true;
+                            selected = clicked == SelectionStartEntry ? false : !selected;
+                        }
+                        else
+                        {
+                            entry.Selected = selected;
+                        }
                     }
                 }
-
-                Invalidate();
+            }
+            finally
+            {
+                EndUpdate();
             }
         }
 
@@ -237,63 +246,28 @@ namespace PmlUnit
             }
         }
 
-        private void OnEntryClick(object sender, EntryClickEventArgs e)
+        private void BeginUpdate()
         {
-            if (ModifierKeys == Keys.Control)
-            {
-                e.Entry.Selected = !e.Entry.Selected;
-                if (e.Entry.Selected)
-                    FocusedEntry = e.Entry;
-            }
-            else if (ModifierKeys == Keys.Shift)
-            {
-                try
-                {
-                    //IgnoreSelectionChanged = true;
-                    //if (FocusedEntry == null)
-                    //    FocusedEntry = Groups.FirstOrDefault();
+            IgnoreSelectionChanged = true;
+            IgnoredSelectionChanges = 0;
+        }
 
-                    //var selected = false;
-                    //foreach (var entry in Groups)
-                    //{
-                    //    if (entry == e.Entry || entry == FocusedEntry)
-                    //    {
-                    //        entry.Selected = true;
-                    //        selected = e.Entry == FocusedEntry ? false : !selected;
-                    //    }
-                    //    else
-                    //    {
-                    //        entry.Selected = selected;
-                    //    }
-                    //}
-                }
-                finally
-                {
-                    IgnoreSelectionChanged = false;
-                    OnSelectionChanged(this, EventArgs.Empty);
-                }
-            }
-            else if (ModifierKeys == Keys.None)
+        private void EndUpdate()
+        {
+            IgnoreSelectionChanged = false;
+            if (IgnoredSelectionChanges > 0)
             {
-                try
-                {
-                    IgnoreSelectionChanged = true;
-                    //foreach (var entry in Groups)
-                    //    entry.Selected = false;
-                }
-                finally
-                {
-                    IgnoreSelectionChanged = false;
-                }
-
-                e.Entry.Selected = true;
-                FocusedEntry = e.Entry;
+                IgnoredSelectionChanges = 0;
+                Invalidate();
+                OnSelectionChanged(this, EventArgs.Empty);
             }
         }
 
         private void OnSelectionChanged(object sender, EventArgs e)
         {
-            if (!IgnoreSelectionChanged)
+            if (IgnoreSelectionChanged)
+                IgnoredSelectionChanges++;
+            else
                 SelectionChanged?.Invoke(this, EventArgs.Empty);
         }
     }

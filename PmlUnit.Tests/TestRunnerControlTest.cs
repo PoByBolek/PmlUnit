@@ -256,7 +256,7 @@ namespace PmlUnit.Tests
         }
 
         [Test]
-        public void SelectedIndexChange_AssignsTestOfSingleSelectedEntryToTestDetails()
+        public void SelectionChanged_AssignsTestOfSingleSelectedEntryToTestDetails()
         {
             // Arrange
             var entries = TestList.AllTests;
@@ -270,7 +270,7 @@ namespace PmlUnit.Tests
         }
 
         [Test]
-        public void SelectedIndexChange_AssignsResultOfSingleSelectedEntryToTestDetails()
+        public void SelectionChanged_AssignsResultOfSingleSelectedEntryToTestDetails()
         {
             // Arrange
             var entries = TestList.AllTests;
@@ -287,7 +287,7 @@ namespace PmlUnit.Tests
         }
 
         [Test]
-        public void SelectedIndexChange_ShowsTestDetailsIfExactlyOneEntryIsSelected()
+        public void SelectionChanged_ShowsTestDetailsIfExactlyOneEntryIsSelected()
         {
             // Arrange
             var entries = TestList.AllTests;
@@ -302,7 +302,7 @@ namespace PmlUnit.Tests
         }
 
         [Test]
-        public void SelectedIndexChange_ShowsTestSummaryUnlessExactlyOneEntryIsSelected()
+        public void SelectionChanged_ShowsTestSummaryUnlessExactlyOneEntryIsSelected()
         {
             // Arrange
             var entries = TestList.AllTests;
