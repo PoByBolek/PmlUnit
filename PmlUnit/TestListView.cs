@@ -12,6 +12,8 @@ namespace PmlUnit
 {
     partial class TestListView : ScrollableControl
     {
+        public const int EntryHeight = 20;
+
         [Category("Behavior")]
         public event EventHandler SelectionChanged;
 
@@ -19,8 +21,6 @@ namespace PmlUnit
         private bool IgnoreSelectionChanged;
         private TestListBaseEntry SelectionStartEntry;
         private TestListBaseEntry FocusedEntry;
-
-        private const int EntryHeight = 20;
 
         public TestListView()
         {
@@ -102,7 +102,7 @@ namespace PmlUnit
                 g.FillRectangle(new SolidBrush(BackColor), e.ClipRectangle);
             }
 
-            using (var options = new TestListPaintOptions(this, StatusImageList, ExpanderImageList))
+            using (var options = new TestListPaintOptions(this, e.ClipRectangle, StatusImageList, ExpanderImageList))
             {
                 int width = ClientSize.Width;
                 int minY = e.ClipRectangle.Top;
@@ -114,35 +114,13 @@ namespace PmlUnit
                     if (y > maxY)
                         break;
 
-                    if (y + EntryHeight >= minY)
+                    int height = group.Height;
+                    if (y + height >= minY)
                     {
-                        var headerBounds = new Rectangle(0, y, width, EntryHeight);
-                        group.Paint(g, headerBounds, options);
+                        var bounds = new Rectangle(0, y, width, height);
+                        group.Paint(g, bounds, options);
                     }
-                    y += EntryHeight;
-
-                    if (group.IsExpanded)
-                    {
-                        int totalHeight = group.Entries.Count * EntryHeight;
-                        if (y + totalHeight < minY)
-                        {
-                            y += totalHeight;
-                            continue;
-                        }
-
-                        foreach (var entry in group.Entries)
-                        {
-                            if (y > maxY)
-                                break;
-
-                            if (y + EntryHeight >= minY)
-                            {
-                                var entryBounds = new Rectangle(20, y, width - 20, EntryHeight);
-                                entry.Paint(g, entryBounds, options);
-                            }
-                            y += EntryHeight;
-                        }
-                    }
+                    y += height;
                 }
             }
         }
@@ -326,6 +304,7 @@ namespace PmlUnit
 
     class TestListPaintOptions : IDisposable
     {
+        public Rectangle ClipRectangle { get; }
         public Brush NormalTextBrush { get; }
         public Brush SelectedTextBrush { get; }
         public Brush SelectedBackBrush { get; }
@@ -335,7 +314,7 @@ namespace PmlUnit
         public Font HeaderFont { get; }
         public StringFormat EntryFormat { get; }
 
-        public TestListPaintOptions(TestListView view, ImageList statusImageList, ImageList expanderImageList)
+        public TestListPaintOptions(TestListView view, Rectangle clipRectangle, ImageList statusImageList, ImageList expanderImageList)
         {
             if (view == null)
                 throw new ArgumentNullException(nameof(view));
@@ -346,6 +325,7 @@ namespace PmlUnit
 
             try
             {
+                ClipRectangle = clipRectangle;
                 StatusImageList = statusImageList;
                 ExpanderImageList = expanderImageList;
                 EntryFont = view.Font;
