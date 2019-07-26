@@ -121,9 +121,6 @@
     </Compile>
     <Compile Include="ServiceManagerExtensions.cs" />
     <Compile Include="ShowTestRunnerCommand.cs" />
-    <Compile Include="StretchingVerticalFlowLayoutPanel.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Test.cs" />
     <Compile Include="TestCase.cs" />
     <Compile Include="TestCaseBuilder.cs" />
