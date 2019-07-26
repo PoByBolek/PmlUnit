@@ -38,6 +38,8 @@ namespace PmlUnit
             get { return EntriesField.AsReadOnly(); }
         }
 
+        public Rectangle IconBounds => new Rectangle(0, 0, 20, TestListView.EntryHeight);
+
         public bool Selected
         {
             get { return SelectedField; }

@@ -177,16 +177,25 @@ namespace PmlUnit
             BeginUpdate();
             try
             {
-                if ((left || right) && ModifierKeys == Keys.None)
+                if (ModifierKeys == Keys.None)
                 {
-                    foreach (var entry in AllEntries)
-                        entry.Selected = false;
-
-                    if (clicked != null)
+                    var group = clicked as TestListGroupEntry;
+                    var relativeClickLocation = new Point(e.X, (e.Y + VerticalScroll.Value) % EntryHeight);
+                    if (left && group != null && group.IconBounds.Contains(relativeClickLocation))
                     {
-                        clicked.Selected = true;
-                        FocusedEntry = clicked;
-                        SelectionStartEntry = clicked;
+                        group.IsExpanded = !group.IsExpanded;
+                    }
+                    else if (left || right)
+                    {
+                        foreach (var entry in AllEntries)
+                            entry.Selected = false;
+
+                        if (clicked != null)
+                        {
+                            clicked.Selected = true;
+                            FocusedEntry = clicked;
+                            SelectionStartEntry = clicked;
+                        }
                     }
                 }
                 else if (left && ModifierKeys == Keys.Control && clicked != null)
