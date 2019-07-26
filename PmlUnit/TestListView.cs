@@ -55,6 +55,7 @@ namespace PmlUnit
                 {
                     var entry = new TestListViewEntry(test);
                     entry.SelectionChanged += OnSelectionChanged;
+                    entry.ResultChanged += OnTestResultChanged;
                     group.Add(entry);
                 }
                 Groups.Add(group);
@@ -306,6 +307,11 @@ namespace PmlUnit
                 IgnoredSelectionChanges++;
             else
                 SelectionChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OnTestResultChanged(object sender, EventArgs e)
+        {
+            Invalidate();
         }
     }
 
