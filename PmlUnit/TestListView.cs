@@ -165,6 +165,18 @@ namespace PmlUnit
             Invalidate(); // We need to repaint everything because of the ellipsis characters in too long test names
         }
 
+        protected override void OnGotFocus(EventArgs e)
+        {
+            base.OnGotFocus(e);
+            Invalidate();
+        }
+
+        protected override void OnLostFocus(EventArgs e)
+        {
+            base.OnLostFocus(e);
+            Invalidate();
+        }
+
         protected override void OnMouseClick(MouseEventArgs e)
         {
             base.OnMouseClick(e);
@@ -333,8 +345,8 @@ namespace PmlUnit
                 ExpanderImageList = expanderImageList;
                 EntryFont = view.Font;
                 NormalTextBrush = new SolidBrush(view.ForeColor);
-                SelectedTextBrush = SystemBrushes.HighlightText; // don't dispose the system brushes
-                SelectedBackBrush = SystemBrushes.Highlight; // don't dispose the system brushes
+                SelectedTextBrush = view.Focused ? SystemBrushes.HighlightText.Clone() as Brush : new SolidBrush(view.ForeColor);
+                SelectedBackBrush = view.Focused ? SystemBrushes.Highlight.Clone() as Brush : SystemBrushes.Control.Clone() as Brush;
                 HeaderFont = new Font(view.Font, FontStyle.Bold);
                 EntryFormat = new StringFormat(StringFormatFlags.NoWrap);
                 EntryFormat.Trimming = StringTrimming.EllipsisCharacter;
@@ -343,6 +355,10 @@ namespace PmlUnit
             {
                 if (NormalTextBrush != null)
                     NormalTextBrush.Dispose();
+                if (SelectedTextBrush != null)
+                    SelectedTextBrush.Dispose();
+                if (SelectedBackBrush != null)
+                    SelectedBackBrush.Dispose();
                 if (HeaderFont != null)
                     HeaderFont.Dispose();
                 if (EntryFormat != null)
@@ -367,6 +383,8 @@ namespace PmlUnit
             if (disposing)
             {
                 NormalTextBrush.Dispose();
+                SelectedTextBrush.Dispose();
+                SelectedBackBrush.Dispose();
                 HeaderFont.Dispose();
                 EntryFormat.Dispose();
             }
