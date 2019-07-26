@@ -134,7 +134,7 @@ namespace PmlUnit
 
             using (var brush = new SolidBrush(BackColor))
             {
-                g.FillRectangle(new SolidBrush(BackColor), e.ClipRectangle);
+                g.FillRectangle(brush, e.ClipRectangle);
             }
 
             using (var options = new TestListPaintOptions(this, e.ClipRectangle, StatusImageList, ExpanderImageList))
