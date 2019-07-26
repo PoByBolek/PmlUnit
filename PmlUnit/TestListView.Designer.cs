@@ -34,13 +34,13 @@ namespace PmlUnit
             // 
             // ExpanderImageList
             // 
-            this.ExpanderImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.ExpanderImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
             this.ExpanderImageList.ImageSize = new System.Drawing.Size(16, 16);
             this.ExpanderImageList.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // StatusImageList
             // 
-            this.StatusImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.StatusImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
             this.StatusImageList.ImageSize = new System.Drawing.Size(16, 16);
             this.StatusImageList.TransparentColor = System.Drawing.Color.Transparent;
             // 
