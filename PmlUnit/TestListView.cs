@@ -247,7 +247,8 @@ namespace PmlUnit
             if (ModifierKeys == Keys.None && e.Button == MouseButtons.Left)
             {
                 var group = FindEntry(e.Location) as TestListGroupEntry;
-                group.IsExpanded = !group.IsExpanded;
+                if (group != null)
+                    group.IsExpanded = !group.IsExpanded;
             }
         }
 
