@@ -5,13 +5,6 @@ using System.Drawing;
 
 namespace PmlUnit
 {
-    interface TestListEntry
-    {
-        Test Test { get; }
-        TestResult Result { get; set; }
-        bool Selected { get; set; }
-    }
-
     class TestListViewEntry : TestListBaseEntry, TestListEntry
     {
         public const string SuccessImageKey = "Success";

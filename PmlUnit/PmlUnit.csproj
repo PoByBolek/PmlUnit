@@ -132,7 +132,9 @@
     <Compile Include="TestDetailsView.Designer.cs">
       <DependentUpon>TestDetailsView.cs</DependentUpon>
     </Compile>
+    <Compile Include="TestListEntry.cs" />
     <Compile Include="TestListGroupEntry.cs" />
+    <Compile Include="TestListPaintOptions.cs" />
     <Compile Include="TestListView.cs">
       <SubType>Component</SubType>
     </Compile>
