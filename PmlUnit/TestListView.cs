@@ -318,6 +318,8 @@ namespace PmlUnit
                     SelectRange(target);
                 else if (e.Modifiers == Keys.Control)
                     FocusedEntry = target;
+
+                ScrollEntryIntoView(target);
             }
         }
 
@@ -396,6 +398,32 @@ namespace PmlUnit
                 }
             }
             return null;
+        }
+
+        private void ScrollEntryIntoView(TestListBaseEntry entry)
+        {
+            int offset = 0;
+            foreach (var e in VisibleEntries)
+            {
+                if (e == entry)
+                {
+                    int top = VerticalScroll.Value;
+                    int bottom = VerticalScroll.Value + ClientSize.Height;
+                    int min = VerticalScroll.Minimum;
+                    int max = VerticalScroll.Maximum;
+                    if (offset < top)
+                    {
+                        AutoScrollPosition = new Point(0, Math.Max(min, Math.Min(offset, max)));
+                    }
+                    else if (offset + EntryHeight > bottom)
+                    {
+                        offset -= ClientSize.Height - EntryHeight;
+                        AutoScrollPosition = new Point(0, Math.Max(min, Math.Min(offset, max)));
+                    }
+                    return;
+                }
+                offset += EntryHeight;
+            }
         }
 
         private void SelectOnly(TestListBaseEntry target)
