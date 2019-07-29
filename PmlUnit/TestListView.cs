@@ -21,7 +21,7 @@ namespace PmlUnit
         private bool IgnoreSelectionChanged;
         private int IgnoredSelectionChanges;
         private TestListBaseEntry SelectionStartEntry;
-        private TestListBaseEntry FocusedEntry;
+        private TestListBaseEntry FocusedEntryField;
 
         public TestListView()
         {
@@ -126,6 +126,35 @@ namespace PmlUnit
             }
         }
 
+        private IEnumerable<TestListBaseEntry> VisibleEntries
+        {
+            get
+            {
+                foreach (var group in Groups)
+                {
+                    yield return group;
+                    if (group.IsExpanded)
+                    {
+                        foreach (var entry in group.Entries)
+                            yield return entry;
+                    }
+                }
+            }
+        }
+
+        private TestListBaseEntry FocusedEntry
+        {
+            get { return FocusedEntryField; }
+            set
+            {
+                if (value != FocusedEntryField)
+                {
+                    FocusedEntryField = value;
+                    Invalidate();
+                }
+            }
+        }
+
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
@@ -137,7 +166,7 @@ namespace PmlUnit
                 g.FillRectangle(brush, e.ClipRectangle);
             }
 
-            using (var options = new TestListPaintOptions(this, e.ClipRectangle, StatusImageList, ExpanderImageList))
+            using (var options = new TestListPaintOptions(this, e.ClipRectangle, FocusedEntry, StatusImageList, ExpanderImageList))
             {
                 int width = ClientSize.Width;
                 int minY = e.ClipRectangle.Top;
@@ -176,6 +205,103 @@ namespace PmlUnit
         {
             base.OnLostFocus(e);
             Invalidate();
+        }
+
+        protected override bool IsInputKey(Keys keys)
+        {
+            switch (keys)
+            {
+                case Keys.Up:
+                case Keys.Down:
+                case Keys.Left:
+                case Keys.Right:
+                case Keys.Control | Keys.Up:
+                case Keys.Control | Keys.Down:
+                case Keys.Control | Keys.Left:
+                case Keys.Control | Keys.Right:
+                case Keys.Shift | Keys.Up:
+                case Keys.Shift | Keys.Down:
+                case Keys.Shift | Keys.Left:
+                case Keys.Shift | Keys.Right:
+                    return true;
+                default:
+                    return base.IsInputKey(keys);
+            }
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+            if (FocusedEntry == null)
+                return;
+
+            if (e.KeyCode == Keys.Up)
+            {
+                TestListBaseEntry previous = Groups.FirstOrDefault();
+                foreach (var entry in VisibleEntries)
+                {
+                    if (entry == FocusedEntry)
+                    {
+                        FocusedEntry = previous;
+                        break;
+                    }
+                    previous = entry;
+                }
+            }
+            else if (e.KeyCode == Keys.Down)
+            {
+                bool useNext = false;
+                foreach (var entry in VisibleEntries)
+                {
+                    if (useNext)
+                    {
+                        FocusedEntry = entry;
+                        break;
+                    }
+                    else if (entry == FocusedEntry)
+                    {
+                        useNext = true;
+                    }
+                }
+            }
+            else if (e.KeyCode == Keys.Left)
+            {
+                var focusedGroup = FocusedEntry as TestListGroupEntry;
+                if (focusedGroup != null)
+                {
+                    focusedGroup.IsExpanded = false;
+                }
+                else
+                {
+                    foreach (var group in Groups)
+                    {
+                        foreach (var entry in group.Entries)
+                        {
+                            if (entry == FocusedEntry)
+                            {
+                                FocusedEntry = group;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            else if (e.KeyCode == Keys.Right)
+            {
+                var focusedGroup = FocusedEntry as TestListGroupEntry;
+                if (focusedGroup != null)
+                {
+                    if (focusedGroup.IsExpanded)
+                    {
+                        if (focusedGroup.Entries.Count > 0)
+                            FocusedEntry = focusedGroup.Entries[0];
+                    }
+                    else
+                    {
+                        focusedGroup.IsExpanded = true;
+                    }
+                }
+            }
         }
 
         protected override void OnMouseClick(MouseEventArgs e)
@@ -219,6 +345,8 @@ namespace PmlUnit
                 }
                 else if (left && ModifierKeys == Keys.Shift && clicked != null)
                 {
+                    FocusedEntry = clicked;
+
                     bool selected = false;
                     foreach (var entry in AllEntries)
                     {
@@ -327,6 +455,8 @@ namespace PmlUnit
     class TestListPaintOptions : IDisposable
     {
         public Rectangle ClipRectangle { get; }
+        public TestListBaseEntry FocusedEntry { get; }
+        public Pen FocusRectanglePen { get; }
         public Brush NormalTextBrush { get; }
         public Brush SelectedTextBrush { get; }
         public Brush SelectedBackBrush { get; }
@@ -336,7 +466,7 @@ namespace PmlUnit
         public Font HeaderFont { get; }
         public StringFormat EntryFormat { get; }
 
-        public TestListPaintOptions(TestListView view, Rectangle clipRectangle, ImageList statusImageList, ImageList expanderImageList)
+        public TestListPaintOptions(TestListView view, Rectangle clipRectangle, TestListBaseEntry focusedEntry, ImageList statusImageList, ImageList expanderImageList)
         {
             if (view == null)
                 throw new ArgumentNullException(nameof(view));
@@ -348,6 +478,8 @@ namespace PmlUnit
             try
             {
                 ClipRectangle = clipRectangle;
+                FocusedEntry = view.Focused ? focusedEntry : null;
+                FocusRectanglePen = view.Focused ? SystemPens.Highlight.Clone() as Pen : SystemPens.Control.Clone() as Pen;
                 StatusImageList = statusImageList;
                 ExpanderImageList = expanderImageList;
                 EntryFont = view.Font;
@@ -360,6 +492,8 @@ namespace PmlUnit
             }
             catch
             {
+                if (FocusRectanglePen != null)
+                    FocusRectanglePen.Dispose();
                 if (NormalTextBrush != null)
                     NormalTextBrush.Dispose();
                 if (SelectedTextBrush != null)
@@ -389,6 +523,7 @@ namespace PmlUnit
         {
             if (disposing)
             {
+                FocusRectanglePen.Dispose();
                 NormalTextBrush.Dispose();
                 SelectedTextBrush.Dispose();
                 SelectedBackBrush.Dispose();

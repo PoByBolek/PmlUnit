@@ -132,6 +132,10 @@ namespace PmlUnit
                 textBrush = options.SelectedTextBrush;
                 g.FillRectangle(options.SelectedBackBrush, 0, bounds.Top, bounds.Right, bounds.Height);
             }
+            else if (options.FocusedEntry == this)
+            {
+                g.DrawRectangle(options.FocusRectanglePen, 0, bounds.Top, bounds.Right - 1, bounds.Height);
+            }
 
             g.DrawImage(options.ExpanderImageList.Images[IsExpanded ? ExpandedImageKey : CollapsedImageKey], x, y);
             x += 16 + padding;

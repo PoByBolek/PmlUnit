@@ -46,7 +46,7 @@ namespace PmlUnit
                 }
             }
         }
-        
+
         public bool Selected
         {
             get { return SelectedField; }
@@ -73,10 +73,14 @@ namespace PmlUnit
                 textBrush = options.SelectedTextBrush;
                 g.FillRectangle(options.SelectedBackBrush, 0, bounds.Top, bounds.Right, bounds.Height);
             }
+            else if (options.FocusedEntry == this)
+            {
+                g.DrawRectangle(options.FocusRectanglePen, 0, bounds.Top, bounds.Right - 1, bounds.Height);
+            }
 
             g.DrawImage(options.StatusImageList.Images[GetImageKey()], left, y);
             left += 16 + padding;
-            
+
             if (left < right && Result != null)
             {
                 string duration = Result.Duration.Format();
