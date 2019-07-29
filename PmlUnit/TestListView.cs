@@ -235,33 +235,38 @@ namespace PmlUnit
             if (FocusedEntry == null)
                 return;
 
-            if (e.KeyCode == Keys.Up)
+            TestListBaseEntry target = null;
+
+            if (e.KeyCode == Keys.Space)
             {
-                TestListBaseEntry previous = Groups.FirstOrDefault();
+                if (e.Modifiers == Keys.None)
+                    FocusedEntry.Selected = true;
+                else if (e.Modifiers == Keys.Control)
+                    FocusedEntry.Selected = !FocusedEntry.Selected;
+                else if (e.Modifiers == Keys.Shift)
+                    SelectRange(FocusedEntry);
+                return;
+            }
+            else if (e.KeyCode == Keys.Up)
+            {
+                target = Groups.FirstOrDefault();
                 foreach (var entry in VisibleEntries)
                 {
                     if (entry == FocusedEntry)
-                    {
-                        FocusedEntry = previous;
                         break;
-                    }
-                    previous = entry;
+                    target = entry;
                 }
             }
             else if (e.KeyCode == Keys.Down)
             {
-                bool useNext = false;
+                bool stop = false;
                 foreach (var entry in VisibleEntries)
                 {
-                    if (useNext)
-                    {
-                        FocusedEntry = entry;
+                    target = entry;
+                    if (stop)
                         break;
-                    }
                     else if (entry == FocusedEntry)
-                    {
-                        useNext = true;
-                    }
+                        stop = true;
                 }
             }
             else if (e.KeyCode == Keys.Left)
@@ -279,10 +284,12 @@ namespace PmlUnit
                         {
                             if (entry == FocusedEntry)
                             {
-                                FocusedEntry = group;
+                                target = group;
                                 break;
                             }
                         }
+                        if (target == group)
+                            break;
                     }
                 }
             }
@@ -294,13 +301,23 @@ namespace PmlUnit
                     if (focusedGroup.IsExpanded)
                     {
                         if (focusedGroup.Entries.Count > 0)
-                            FocusedEntry = focusedGroup.Entries[0];
+                            target = focusedGroup.Entries[0];
                     }
                     else
                     {
                         focusedGroup.IsExpanded = true;
                     }
                 }
+            }
+
+            if (target != null)
+            {
+                if (e.Modifiers == Keys.None)
+                    SelectOnly(target);
+                else if (e.Modifiers == Keys.Shift)
+                    SelectRange(target);
+                else if (e.Modifiers == Keys.Control)
+                    FocusedEntry = target;
             }
         }
 
@@ -321,21 +338,9 @@ namespace PmlUnit
                     var group = clicked as TestListGroupEntry;
                     var relativeClickLocation = new Point(e.X, (e.Y + VerticalScroll.Value) % EntryHeight);
                     if (left && group != null && group.IconBounds.Contains(relativeClickLocation))
-                    {
                         group.IsExpanded = !group.IsExpanded;
-                    }
                     else if (left || right)
-                    {
-                        foreach (var entry in AllEntries)
-                            entry.Selected = false;
-
-                        if (clicked != null)
-                        {
-                            clicked.Selected = true;
-                            FocusedEntry = clicked;
-                            SelectionStartEntry = clicked;
-                        }
-                    }
+                        SelectOnly(clicked);
                 }
                 else if (left && ModifierKeys == Keys.Control && clicked != null)
                 {
@@ -345,21 +350,7 @@ namespace PmlUnit
                 }
                 else if (left && ModifierKeys == Keys.Shift && clicked != null)
                 {
-                    FocusedEntry = clicked;
-
-                    bool selected = false;
-                    foreach (var entry in AllEntries)
-                    {
-                        if (entry == clicked || entry == SelectionStartEntry)
-                        {
-                            entry.Selected = true;
-                            selected = clicked == SelectionStartEntry ? false : !selected;
-                        }
-                        else
-                        {
-                            entry.Selected = selected;
-                        }
-                    }
+                    SelectRange(clicked);
                 }
             }
             finally
@@ -407,6 +398,38 @@ namespace PmlUnit
             return null;
         }
 
+        private void SelectOnly(TestListBaseEntry target)
+        {
+            foreach (var entry in AllEntries)
+                entry.Selected = false;
+
+            if (target != null)
+            {
+                target.Selected = true;
+                SelectionStartEntry = target;
+                FocusedEntry = target;
+            }
+        }
+
+        private void SelectRange(TestListBaseEntry target)
+        {
+            bool selected = false;
+            foreach (var entry in AllEntries)
+            {
+                if (entry == target || entry == SelectionStartEntry)
+                {
+                    entry.Selected = true;
+                    selected = target == SelectionStartEntry ? false : !selected;
+                }
+                else
+                {
+                    entry.Selected = selected;
+                }
+            }
+
+            FocusedEntry = target;
+        }
+
         private void OnGroupExpandedChanged(object sender, EventArgs e)
         {
             AutoScrollMinSize = new Size(0, Groups.Sum(group => group.Height));
@@ -425,7 +448,6 @@ namespace PmlUnit
             if (IgnoredSelectionChanges > 0)
             {
                 IgnoredSelectionChanges = 0;
-                Invalidate();
                 OnSelectionChanged(this, EventArgs.Empty);
             }
         }
@@ -433,9 +455,14 @@ namespace PmlUnit
         private void OnSelectionChanged(object sender, EventArgs e)
         {
             if (IgnoreSelectionChanged)
+            {
                 IgnoredSelectionChanges++;
+            }
             else
+            {
+                Invalidate();
                 SelectionChanged?.Invoke(this, EventArgs.Empty);
+            }
         }
 
         private void OnTestResultChanged(object sender, EventArgs e)
