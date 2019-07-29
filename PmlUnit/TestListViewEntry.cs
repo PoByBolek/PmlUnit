@@ -68,7 +68,7 @@ namespace PmlUnit
             }
             else if (options.FocusedEntry == this)
             {
-                g.DrawRectangle(options.FocusRectanglePen, 0, bounds.Top, bounds.Right - 1, bounds.Height);
+                g.DrawRectangle(options.FocusRectanglePen, 0, bounds.Top, bounds.Right - 1, bounds.Height - 1);
             }
 
             g.DrawImage(options.StatusImageList.Images[GetImageKey()], left, y);
