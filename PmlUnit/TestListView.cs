@@ -386,14 +386,14 @@ namespace PmlUnit
             {
                 if (target < y)
                     return null;
-                if (target >= y && target < y + EntryHeight)
+                else if (target < y + EntryHeight)
                     return group;
                 y += EntryHeight;
 
                 if (group.IsExpanded)
                 {
                     int height = group.Entries.Count * EntryHeight;
-                    if (target >= y && target < y + height)
+                    if (target < y + height)
                     {
                         int index = (target - y) / EntryHeight;
                         return group.Entries[index];
