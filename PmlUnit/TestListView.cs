@@ -327,7 +327,11 @@ namespace PmlUnit
         {
             base.OnMouseClick(e);
             Select();
+            OnMouseClick(e, ModifierKeys);
+        }
 
+        private void OnMouseClick(MouseEventArgs e, Keys modifierKeys)
+        {
             var clicked = FindEntry(e.Location);
             bool left = e.Button == MouseButtons.Left;
             bool right = e.Button == MouseButtons.Right;
@@ -335,7 +339,7 @@ namespace PmlUnit
             BeginUpdate();
             try
             {
-                if (ModifierKeys == Keys.None)
+                if (modifierKeys == Keys.None)
                 {
                     var group = clicked as TestListGroupEntry;
                     var relativeClickLocation = new Point(e.X, (e.Y + VerticalScroll.Value) % EntryHeight);
@@ -344,13 +348,13 @@ namespace PmlUnit
                     else if (left || right)
                         SelectOnly(clicked);
                 }
-                else if (left && ModifierKeys == Keys.Control && clicked != null)
+                else if (left && modifierKeys == Keys.Control && clicked != null)
                 {
                     clicked.Selected = !clicked.Selected;
                     FocusedEntry = clicked;
                     SelectionStartEntry = clicked;
                 }
-                else if (left && ModifierKeys == Keys.Shift && clicked != null)
+                else if (left && modifierKeys == Keys.Shift && clicked != null)
                 {
                     SelectRange(clicked);
                 }
