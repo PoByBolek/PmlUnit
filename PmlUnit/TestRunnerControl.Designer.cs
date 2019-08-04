@@ -38,6 +38,7 @@ namespace PmlUnit
             notExecutedTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             succeededTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             selectedTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            ((System.ComponentModel.ISupportInitialize)(this.TestResultSplitContainer)).BeginInit();
             this.TestResultSplitContainer.Panel1.SuspendLayout();
             this.TestResultSplitContainer.Panel2.SuspendLayout();
             this.TestResultSplitContainer.SuspendLayout();
@@ -111,7 +112,7 @@ namespace PmlUnit
             // 
             this.TestResultSplitContainer.Panel2.Controls.Add(this.TestDetails);
             this.TestResultSplitContainer.Panel2.Controls.Add(this.TestSummary);
-            this.TestResultSplitContainer.Size = new System.Drawing.Size(399, 254);
+            this.TestResultSplitContainer.Size = new System.Drawing.Size(399, 268);
             this.TestResultSplitContainer.SplitterDistance = 167;
             this.TestResultSplitContainer.TabIndex = 4;
             this.TestResultSplitContainer.SizeChanged += new System.EventHandler(this.OnSplitContainerSizeChanged);
@@ -121,7 +122,7 @@ namespace PmlUnit
             this.TestList.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TestList.Location = new System.Drawing.Point(0, 0);
             this.TestList.Name = "TestList";
-            this.TestList.Size = new System.Drawing.Size(167, 254);
+            this.TestList.Size = new System.Drawing.Size(167, 268);
             this.TestList.TabIndex = 0;
             this.TestList.SelectionChanged += new System.EventHandler(this.OnTestListSelectionChanged);
             // 
@@ -131,8 +132,9 @@ namespace PmlUnit
             this.TestDetails.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TestDetails.Location = new System.Drawing.Point(0, 0);
             this.TestDetails.Name = "TestDetails";
-            this.TestDetails.Size = new System.Drawing.Size(228, 254);
+            this.TestDetails.Size = new System.Drawing.Size(228, 268);
             this.TestDetails.TabIndex = 1;
+            this.TestDetails.TabStop = false;
             this.TestDetails.Visible = false;
             // 
             // TestSummary
@@ -141,8 +143,9 @@ namespace PmlUnit
             this.TestSummary.Dock = System.Windows.Forms.DockStyle.Fill;
             this.TestSummary.Location = new System.Drawing.Point(0, 0);
             this.TestSummary.Name = "TestSummary";
-            this.TestSummary.Size = new System.Drawing.Size(228, 254);
+            this.TestSummary.Size = new System.Drawing.Size(228, 268);
             this.TestSummary.TabIndex = 0;
+            this.TestSummary.TabStop = false;
             // 
             // RunLinkLabel
             // 
@@ -175,6 +178,7 @@ namespace PmlUnit
             this.ExecutionProgressBar.Name = "ExecutionProgressBar";
             this.ExecutionProgressBar.Size = new System.Drawing.Size(399, 10);
             this.ExecutionProgressBar.TabIndex = 0;
+            this.ExecutionProgressBar.TabStop = false;
             // 
             // TestRunnerControl
             // 
@@ -191,6 +195,7 @@ namespace PmlUnit
             this.Size = new System.Drawing.Size(400, 300);
             this.TestResultSplitContainer.Panel1.ResumeLayout(false);
             this.TestResultSplitContainer.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.TestResultSplitContainer)).EndInit();
             this.TestResultSplitContainer.ResumeLayout(false);
             this.RunContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);

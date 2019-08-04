@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace PmlUnit
 {
-    public partial class ColorizedProgressBar : UserControl
+    partial class ColorizedProgressBar : UserControl
     {
         private int ValueField;
         private int MaximumField;

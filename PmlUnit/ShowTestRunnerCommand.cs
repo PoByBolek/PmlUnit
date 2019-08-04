@@ -2,7 +2,10 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using Aveva.ApplicationFramework.Presentation;
+
+#if E3D_21
 using PmlUnit.Properties;
+#endif
 
 #if PDMS || E3D_11
 using IWindowManager = Aveva.ApplicationFramework.Presentation.WindowManager;

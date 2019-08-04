@@ -132,12 +132,16 @@
     <Compile Include="TestDetailsView.Designer.cs">
       <DependentUpon>TestDetailsView.cs</DependentUpon>
     </Compile>
+    <Compile Include="TestListEntry.cs" />
+    <Compile Include="TestListGroupEntry.cs" />
+    <Compile Include="TestListPaintOptions.cs" />
     <Compile Include="TestListView.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="TestListView.Designer.cs">
       <DependentUpon>TestListView.cs</DependentUpon>
     </Compile>
+    <Compile Include="TestListViewEntry.cs" />
     <Compile Include="TestResult.cs" />
     <Compile Include="TestRunner.cs" />
     <Compile Include="TestRunnerControl.cs">
@@ -182,15 +186,13 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Images\Collapsed.png" />
+    <None Include="Images\CollapsedHighlight.png" />
+    <None Include="Images\Expanded.png" />
+    <None Include="Images\ExpandedHighlight.png" />
     <None Include="Images\Failure.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Images\Success.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Images\TestRunner.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Images\Unknown.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
