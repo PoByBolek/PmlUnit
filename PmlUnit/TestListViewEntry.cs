@@ -99,13 +99,5 @@ namespace PmlUnit
             else
                 return FailureImageKey;
         }
-
-        private string FormatDuration()
-        {
-            if (Result == null)
-                return "";
-            else
-                return Result.Duration.Format();
-        }
     }
 }
