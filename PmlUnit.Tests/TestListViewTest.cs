@@ -2,7 +2,6 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using NUnit.Framework;
@@ -14,24 +13,8 @@ namespace PmlUnit.Tests
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class TestListViewTest
     {
-        private CultureInfo InitialCulture;
-
         private TestListView TestList;
         private ListView InnerList;
-
-        [OneTimeSetUp]
-        public void ClassSetup()
-        {
-            InitialCulture = CultureInfo.CurrentCulture;
-            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
-        }
-
-        [OneTimeTearDown]
-        public void ClassTearDown()
-        {
-            CultureInfo.CurrentCulture = InitialCulture;
-        }
-
 
         [SetUp]
         public void Setup()
@@ -203,6 +186,7 @@ namespace PmlUnit.Tests
             Assert.AreEqual("Unknown", InnerList.Items[0].ImageKey);
         }
 
+        [SetCulture("en-US")]
         [TestCase(0, "< 1 ms")]
         [TestCase(1, "1 ms")]
         [TestCase(42, "42 ms")]

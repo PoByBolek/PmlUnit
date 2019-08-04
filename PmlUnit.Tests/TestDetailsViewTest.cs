@@ -2,7 +2,6 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Windows.Forms;
 using NUnit.Framework;
 
@@ -13,26 +12,11 @@ namespace PmlUnit.Tests
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class TestDetailsViewTest
     {
-        private CultureInfo InitialCulture;
-
         private TestDetailsView TestDetails;
         private Label TestNameLabel;
         private IconLabel StatusLabel;
         private Label ElapsedTimeLabel;
         private Label StackTraceLabel;
-
-        [OneTimeSetUp]
-        public void ClassSetup()
-        {
-            InitialCulture = CultureInfo.CurrentCulture;
-            CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
-        }
-
-        [OneTimeTearDown]
-        public void ClassTearDown()
-        {
-            CultureInfo.CurrentCulture = InitialCulture;
-        }
 
         [SetUp]
         public void Setup()
@@ -74,6 +58,7 @@ namespace PmlUnit.Tests
             Assert.AreEqual(expected, StatusLabel.Text);
         }
 
+        [SetCulture("en-US")]
         [TestCase(0, "< 1 ms")]
         [TestCase(1, "1 ms")]
         [TestCase(42, "42 ms")]
