@@ -49,7 +49,6 @@ namespace TestForm
         {
             public string Path { get; set; }
 
-            private string PathField;
             private TestCaseProvider Provider;
 
             public MutablePathTestCaseProvider(string path)
