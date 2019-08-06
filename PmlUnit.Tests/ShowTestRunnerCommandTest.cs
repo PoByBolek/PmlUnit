@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Windows.Forms;
 using Aveva.ApplicationFramework.Presentation;
@@ -55,7 +54,7 @@ namespace PmlUnit.Tests
         public void Constructor_CreatesWindowWithRunnerControl()
         {
             // Arrange
-            WindowManagerMock.ResetCalls();
+            WindowManagerMock.Invocations.Clear();
             // Act
             var command = new ShowTestRunnerCommand(WindowManagerMock.Object, Control);
             // Assert
