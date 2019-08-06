@@ -3,7 +3,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace TestForm
+namespace PmlUnit
 {
     static class Program
     {

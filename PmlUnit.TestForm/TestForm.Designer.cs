@@ -1,4 +1,4 @@
-﻿namespace TestForm
+﻿namespace PmlUnit
 {
     partial class TestForm
     {

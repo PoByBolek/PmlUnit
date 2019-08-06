@@ -4,11 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
-using PmlUnit;
 
-namespace TestForm
+namespace PmlUnit
 {
-    public partial class TestForm : Form
+    partial class TestForm : Form
     {
         private readonly TestRunnerControl RunnerControl;
         private readonly MutablePathTestCaseProvider Provider;

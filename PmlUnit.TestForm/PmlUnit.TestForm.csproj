@@ -8,7 +8,7 @@
     <ProjectGuid>{63E7B77F-6533-466C-8A88-78EBC932D088}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>PmlUnit.TestForm</RootNamespace>
+    <RootNamespace>PmlUnit</RootNamespace>
     <AssemblyName>PmlUnit.TestForm</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <OutputPath>bin\$(Configuration)\$(Platform)\</OutputPath>
