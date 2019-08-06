@@ -111,7 +111,7 @@ namespace PmlUnit
             }
         }
 
-        private IEnumerable<TestListEntry> AllTestEntries => Groups.SelectMany(group => group.Entries);
+        private IEnumerable<TestListEntry> AllTestEntries => Groups.SelectMany(group => group.Entries).OfType<TestListEntry>();
 
         private IEnumerable<TestListBaseEntry> AllEntries
         {

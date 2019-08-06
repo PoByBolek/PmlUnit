@@ -38,7 +38,9 @@ namespace PmlUnit
             notExecutedTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             succeededTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             selectedTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            ((System.ComponentModel.ISupportInitialize)(this.TestResultSplitContainer)).BeginInit();
+#if E3D
+            this.TestResultSplitContainer.BeginInit();
+#endif
             this.TestResultSplitContainer.Panel1.SuspendLayout();
             this.TestResultSplitContainer.Panel2.SuspendLayout();
             this.TestResultSplitContainer.SuspendLayout();
@@ -195,7 +197,9 @@ namespace PmlUnit
             this.Size = new System.Drawing.Size(400, 300);
             this.TestResultSplitContainer.Panel1.ResumeLayout(false);
             this.TestResultSplitContainer.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.TestResultSplitContainer)).EndInit();
+#if E3D
+            this.TestResultSplitContainer.EndInit();
+#endif
             this.TestResultSplitContainer.ResumeLayout(false);
             this.RunContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
