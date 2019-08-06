@@ -4,8 +4,8 @@
     <CustomizationFile Name="SMM" Path="Schematic Model Manager/Resources/SmmLexicon.uic" />
     <CustomizationFile Name="DST" Path="DatasheetsLexicon.uic" />
     <!--
-        You need to change the Path attribute to an absolute path the PmlUnit.uic
-        in the pdms-12.1\caf directory.
+        You need to change the Path attribute to an absolute path to the
+        PmlUnit.uic file in the pdms-12.1\caf directory.
     -->
     <CustomizationFile Name="PmlUnit" Path="PmlUnit.uic" />
   </UICustomizationFiles>
