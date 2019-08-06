@@ -70,7 +70,7 @@ your `custom_evars.bat` in your projects directory:
 Note that for PDMS 12.1 you will have to edit the `*Addins.xml` and
 `*Customization.xml` files in `D:\pml-unit\pdms-12.1\caf` so that they contain
 absolute paths to the `PmlUnit.dll` and `PmlUnit.uic`, respectively.
-Unfortunately, PDMS does not load addins and UIC files with paths names relative
+Unfortunately, PDMS does not load addins and UIC files with path names relative
 to the `CAF_ADDINS_PATH` and `CAF_UIC_PATH` environment variables.
 
 For example, if you want PML Unit to show up in the PDMS Design module, you
@@ -97,7 +97,7 @@ should edit the `D:\pml-unit\pdms-12.1\caf\DesignAddins.xml` file like this:
         <string>D:\pml-unit\pdms-12.1\bin\PmlUnit</string>
     </ArrayOfString>
 
-Also, you should also edit the `D:\pml-unit\pdms-12.1\caf\DesignCustomization.xml`
+You should also edit the `D:\pml-unit\pdms-12.1\caf\DesignCustomization.xml`
 file like this:
 
     <?xml version="1.0" encoding="utf-8"?>
@@ -219,7 +219,7 @@ roughly do the following:
     !testCase.testSomething(object PmlAssert())
     !testCase.tearDown()
 
-    !testCaes = object ExampleTest()
+    !testCase = object ExampleTest()
     !testCase.setup()
     !testCase.testSomethingThatFails(object PmlAssert())
     handle ANY
