@@ -5,6 +5,7 @@ set "BASE_DIR=%~dp0"
 
 set "PmlUnit.sln=%BASE_DIR%\PmlUnit.sln"
 set "PmlUnit=%BASE_DIR%\PmlUnit"
+set "PmlUnit.SmokeTest=%BASE_DIR%\PmlUnit.SmokeTest"
 set "PmlUnit.Tests=%BASE_DIR%\PmlUnit.Tests"
 
 for /f "delims=" %%i in ('powershell.exe -ExecutionPolicy bypass "& '%BASE_DIR%\get-version.ps1' '%PmlUnit%'"') do (
@@ -114,10 +115,22 @@ if %errorlevel% neq 0 (
     exit /B 1
 )
 call :write_info "Running tests for %platform%"
+rem We cannot run the tests from PmlUnit.SmokeTest and PmlUnit.Tests together
+rem because they may have different target framework versions. (The SmokeTest
+rem uses .NET 3.5 for PDMS and .NET 4.0 for E3D, while the unit tests always
+rem .NET 4.5 or higher.)
+rem The NUnit console runner cannot load multiple runtimes at once but we want
+rem to execute the smoke tests in the correct target framework. So we have to
+rem execute them separately.
+"%nunit.exe%" --noresult "%PmlUnit.SmokeTest%\bin\Release\%platform%\PmlUnit.SmokeTest.dll"
+if %errorlevel% neq 0 (
+    call :write_error "Smoke test for %platform% failed"
+    exit /B 2
+)
 "%nunit.exe%" --noresult "%PmlUnit.Tests%\bin\Release\%platform%\PmlUnit.Tests.dll"
 if %errorlevel% neq 0 (
     call :write_error "Tests for %platform% failed"
-    exit /B 2
+    exit /B 3
 )
 
 if not exist %bin_dir% (

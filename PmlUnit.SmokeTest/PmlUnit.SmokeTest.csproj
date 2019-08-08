@@ -1,0 +1,124 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\NUnit.3.12.0\build\NUnit.props" Condition="Exists('..\packages\NUnit.3.12.0\build\NUnit.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">PDMS 12.1</Platform>
+    <PlatformTarget>x86</PlatformTarget>
+    <ProjectGuid>{33B9EDAF-F6D0-4C21-84C9-533D58ABE696}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PmlUnit</RootNamespace>
+    <AssemblyName>PmlUnit.SmokeTest</AssemblyName>
+    <FileAlignment>512</FileAlignment>
+    <OutputPath>bin\$(Configuration)\$(Platform)\</OutputPath>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'PDMS 12.1' ">
+    <DefineConstants>$(DefineConstants);PDMS;PDMS_121</DefineConstants>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <ApplicationFrameworkVersion>1.1.20.0</ApplicationFrameworkVersion>
+    <ApplicationFrameworkPresentationVersion>108.8100.20.0</ApplicationFrameworkPresentationVersion>
+    <PmlNetVersion>12.1.0.0</PmlNetVersion>
+    <NunitPlatform>net35</NunitPlatform>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'E3D 1.1' ">
+    <DefineConstants>$(DefineConstants);E3D;E3D_11</DefineConstants>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <ApplicationFrameworkVersion>1.1.20.0</ApplicationFrameworkVersion>
+    <ApplicationFrameworkPresentationVersion>108.8100.20.0</ApplicationFrameworkPresentationVersion>
+    <PmlNetVersion>1.1.0.0</PmlNetVersion>
+    <NunitPlatform>net40</NunitPlatform>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Platform)' == 'E3D 2.1' ">
+    <DefineConstants>$(DefineConstants);E3D;E3D_21</DefineConstants>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <ApplicationFrameworkVersion>1.2.2.0</ApplicationFrameworkVersion>
+    <ApplicationFrameworkPresentationVersion>1.2.2.0</ApplicationFrameworkPresentationVersion>
+    <PmlNetVersion>1.2.0.0</PmlNetVersion>
+    <NunitPlatform>net40</NunitPlatform>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|PDMS 12.1' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|E3D 1.1' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|E3D 2.1' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|PDMS 12.1' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|E3D 1.1' ">
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|E3D 2.1' ">
+  </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\PmlUnit.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Aveva.ApplicationFramework, Version=$(ApplicationFrameworkVersion), Culture=neutral, PublicKeyToken=17c64733a9775004">
+      <HintPath>..\lib\$(Platform)\Aveva.ApplicationFramework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Aveva.ApplicationFramework.Presentation, Version=$(ApplicationFrameworkPresentationVersion), Culture=neutral, PublicKeyToken=17c64733a9775004">
+      <HintPath>..\lib\$(Platform)\Aveva.ApplicationFramework.Presentation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="nunit.framework, Version=3.12.0.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\NUnit.3.12.0\lib\$(NunitPlatform)\nunit.framework.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="PMLNet, Version=$(PmlNetVersion), Culture=neutral, PublicKeyToken=17c64733a9775004">
+      <HintPath>..\lib\$(Platform)\PMLNet.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SmokeTest.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PmlUnit\PmlUnit.csproj">
+      <Project>{03530452-7c4a-4943-aa30-7efeadade1f2}</Project>
+      <Name>PmlUnit</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Dieses Projekt verweist auf mindestens ein NuGet-Paket, das auf diesem Computer fehlt. Verwenden Sie die Wiederherstellung von NuGet-Paketen, um die fehlenden Dateien herunterzuladen. Weitere Informationen finden Sie unter "http://go.microsoft.com/fwlink/?LinkID=322105". Die fehlende Datei ist "{0}".</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\NUnit.3.12.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\NUnit.3.12.0\build\NUnit.props'))" />
+  </Target>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
