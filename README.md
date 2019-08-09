@@ -7,9 +7,9 @@ for PML code in AVEVA Everything3D, PDMS, and other products.
 
 ## Installation
 
-[Download](releases/latest) and unpack PML Unit to a directory of your choice.
-For example, if you unpacked the ZIP file to `D:\pml-unit`, you should have the
-following directory tree:
+[Download](https://github.com/PoByBolek/PmlUnit/releases/latest) and unpack
+PML Unit to a directory of your choice. For example, if you unpacked the ZIP
+file to `D:\pml-unit`, you should have the following directory tree:
 
     D:\pml-unit
     |-- e3d-1.1
