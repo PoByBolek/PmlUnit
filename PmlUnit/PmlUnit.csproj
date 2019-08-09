@@ -92,6 +92,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AboutDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AboutDialog.Designer.cs">
+      <DependentUpon>AboutDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="Clock.cs" />
     <Compile Include="ColorizedProgressBar.cs">
       <SubType>UserControl</SubType>
@@ -119,7 +126,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ServiceManagerExtensions.cs" />
+    <Compile Include="ServiceProvider.cs" />
+    <Compile Include="ShowAboutDialogCommand.cs" />
     <Compile Include="ShowTestRunnerCommand.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="TestCase.cs" />
@@ -132,12 +140,16 @@
     <Compile Include="TestDetailsView.Designer.cs">
       <DependentUpon>TestDetailsView.cs</DependentUpon>
     </Compile>
+    <Compile Include="TestListEntry.cs" />
+    <Compile Include="TestListGroupEntry.cs" />
+    <Compile Include="TestListPaintOptions.cs" />
     <Compile Include="TestListView.cs">
-      <SubType>UserControl</SubType>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="TestListView.Designer.cs">
       <DependentUpon>TestListView.cs</DependentUpon>
     </Compile>
+    <Compile Include="TestListViewEntry.cs" />
     <Compile Include="TestResult.cs" />
     <Compile Include="TestRunner.cs" />
     <Compile Include="TestRunnerControl.cs">
@@ -156,6 +168,9 @@
     <Compile Include="TimeSpanExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="AboutDialog.resx">
+      <DependentUpon>AboutDialog.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="ColorizedProgressBar.resx">
       <DependentUpon>ColorizedProgressBar.cs</DependentUpon>
     </EmbeddedResource>
@@ -182,12 +197,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Images\Collapsed.png" />
+    <None Include="Images\CollapsedHighlight.png" />
+    <None Include="Images\Expanded.png" />
+    <None Include="Images\ExpandedHighlight.png" />
     <None Include="Images\Failure.png" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Images\Success.png" />
-  </ItemGroup>
-  <ItemGroup>
+    <None Include="Images\TestRunner.png" />
+    <None Include="Images\TestRunnerLarge.png" />
     <None Include="Images\Unknown.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

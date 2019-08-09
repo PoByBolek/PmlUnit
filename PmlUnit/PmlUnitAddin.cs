@@ -2,7 +2,16 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using Aveva.ApplicationFramework;
-using Aveva.ApplicationFramework.Presentation;
+
+#if PDMS || E3D_11
+using IAddin = Aveva.ApplicationFramework.IAddin;
+using ICommandManager = Aveva.ApplicationFramework.Presentation.CommandManager;
+using IWindowManager = Aveva.ApplicationFramework.Presentation.WindowManager;
+#else
+using IAddin = Aveva.ApplicationFramework.IAddinInjected;
+using ICommandManager = Aveva.ApplicationFramework.Presentation.ICommandManager;
+using IWindowManager = Aveva.ApplicationFramework.Presentation.IWindowManager;
+#endif
 
 namespace PmlUnit
 {
@@ -10,7 +19,8 @@ namespace PmlUnit
     {
         private readonly TestRunner TestRunner;
         private readonly TestCaseProvider TestCaseProvider;
-        private readonly TestRunnerControl RunnerControl;
+        private readonly TestRunnerControl TestRunnerControl;
+        private readonly AboutDialog AboutDialog;
 
         public PmlUnitAddin()
         {
@@ -18,26 +28,43 @@ namespace PmlUnit
             {
                 TestRunner = new PmlTestRunner();
                 TestCaseProvider = new EnvironmentVariableTestCaseProvider();
-                RunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner);
+                TestRunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner);
+                AboutDialog = new AboutDialog();
             }
             catch
             {
                 if (TestRunner != null)
                     TestRunner.Dispose();
-                if (RunnerControl != null)
-                    RunnerControl.Dispose();
+                if (TestRunnerControl != null)
+                    TestRunnerControl.Dispose();
+                if (AboutDialog != null)
+                    AboutDialog.Dispose();
                 throw;
             }
         }
 
-        internal PmlUnitAddin(TestRunner testRunner)
+        internal PmlUnitAddin(TestCaseProvider provider, TestRunner runner)
         {
-            if (testRunner == null)
-                throw new ArgumentNullException(nameof(testRunner));
+            if (provider == null)
+                throw new ArgumentNullException(nameof(provider));
+            if (runner == null)
+                throw new ArgumentNullException(nameof(runner));
 
-            TestRunner = testRunner;
-            TestCaseProvider = new EnvironmentVariableTestCaseProvider();
-            RunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner);
+            TestCaseProvider = provider;
+            TestRunner = runner;
+            try
+            {
+                TestRunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner);
+                AboutDialog = new AboutDialog();
+            }
+            catch
+            {
+                if (TestRunnerControl != null)
+                    TestRunnerControl.Dispose();
+                if (AboutDialog != null)
+                    AboutDialog.Dispose();
+                throw;
+            }
         }
 
         ~PmlUnitAddin()
@@ -56,7 +83,8 @@ namespace PmlUnit
             if (disposing)
             {
                 TestRunner.Dispose();
-                RunnerControl.Dispose();
+                TestRunnerControl.Dispose();
+                AboutDialog.Dispose();
             }
         }
 
@@ -73,9 +101,30 @@ namespace PmlUnit
         [CLSCompliant(false)]
         public void Start(ServiceManager serviceManager)
         {
+            Start(new ProxyServiceProvider(serviceManager));
+        }
+
+#if E3D_21
+        [CLSCompliant(false)]
+        public void Start(IDependencyResolver resolver)
+        {
+            Start(new DependencyResolverServiceProvider(resolver));
+        }
+#endif
+
+        internal void Start(ServiceProvider provider)
+        {
             try
             {
-                StartInternal(serviceManager);
+                TestRunnerControl.LoadTests();
+
+                var windowManager = provider.GetService<IWindowManager>();
+                var commandManager = provider.GetService<ICommandManager>();
+                if (windowManager != null && commandManager != null)
+                {
+                    commandManager.Commands.Add(new ShowTestRunnerCommand(windowManager, TestRunnerControl));
+                    commandManager.Commands.Add(new ShowAboutDialogCommand(windowManager, AboutDialog));
+                }
             }
             catch
             {
@@ -84,21 +133,11 @@ namespace PmlUnit
             }
         }
 
-        private void StartInternal(ServiceManager serviceManager)
-        {
-            serviceManager.AddService(TestRunner);
-            serviceManager.AddService(TestCaseProvider);
-
-            var windowManager = serviceManager.GetService<WindowManager>();
-            var commandManager = serviceManager.GetService<CommandManager>();
-            if (windowManager != null && commandManager != null)
-                commandManager.Commands.Add(new ShowTestRunnerCommand(windowManager, RunnerControl));
-        }
-
         public void Stop()
         {
             // PDMS crashes if we also dispose the TestRunnerControl here
             TestRunner.Dispose();
+            AboutDialog.Dispose();
         }
     }
 }

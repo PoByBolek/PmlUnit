@@ -3,13 +3,21 @@
 using System;
 using Aveva.ApplicationFramework.Presentation;
 
+#if E3D_21
+using PmlUnit.Properties;
+#endif
+
+#if PDMS || E3D_11
+using IWindowManager = Aveva.ApplicationFramework.Presentation.WindowManager;
+#endif
+
 namespace PmlUnit
 {
     class ShowTestRunnerCommand : Command
     {
         private readonly DockedWindow Window;
 
-        public ShowTestRunnerCommand(WindowManager windowManager, TestRunnerControl control)
+        public ShowTestRunnerCommand(IWindowManager windowManager, TestRunnerControl control)
         {
             if (windowManager == null)
                 throw new ArgumentNullException(nameof(windowManager));
@@ -21,8 +29,10 @@ namespace PmlUnit
             Window = windowManager.CreateDockedWindow(
                 "PmlUnit.TestRunner", "PML Unit", control, DockedPosition.Right
             );
+#if E3D_21
+            Window.Image = Resources.TestRunner;
+#endif
             Window.SaveLayout = true;
-            Window.Shown += OnWindowShown;
             Window.Closed += OnWindowClosed;
 
             windowManager.WindowLayoutLoaded += OnWindowLayoutLoaded;
@@ -31,13 +41,6 @@ namespace PmlUnit
         private void OnWindowLayoutLoaded(object sender, EventArgs e)
         {
             Checked = Window.Visible;
-        }
-
-        private void OnWindowShown(object sender, EventArgs e)
-        {
-            var runnerControl = Window.Control as TestRunnerControl;
-            if (runnerControl != null)
-                runnerControl.LoadTests();
         }
 
         private void OnWindowClosed(object sender, EventArgs e)
