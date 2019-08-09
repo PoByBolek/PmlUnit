@@ -6,11 +6,10 @@ using NUnit.Framework;
 namespace PmlUnit
 {
     [TestFixture]
-    [TestOf(typeof(TestRunnerControl))]
     public class SmokeTest
     {
         [Test]
-        public void TestInstantiation()
+        public void TestRunnerControlInstantiation()
         {
             TestRunnerControl control = null;
             TestRunner runner = null;
@@ -28,6 +27,12 @@ namespace PmlUnit
                 if (control != null)
                     control.Dispose();
             }
+        }
+
+        [Test]
+        public void TestAboutDialogInstantiation()
+        {
+            new AboutDialog();
         }
 
         private class StubTestRunner : TestRunner

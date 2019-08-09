@@ -19,7 +19,8 @@ namespace PmlUnit
     {
         private readonly TestRunner TestRunner;
         private readonly TestCaseProvider TestCaseProvider;
-        private readonly TestRunnerControl RunnerControl;
+        private readonly TestRunnerControl TestRunnerControl;
+        private readonly AboutDialog AboutDialog;
 
         public PmlUnitAddin()
         {
@@ -27,14 +28,17 @@ namespace PmlUnit
             {
                 TestRunner = new PmlTestRunner();
                 TestCaseProvider = new EnvironmentVariableTestCaseProvider();
-                RunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner);
+                TestRunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner);
+                AboutDialog = new AboutDialog();
             }
             catch
             {
                 if (TestRunner != null)
                     TestRunner.Dispose();
-                if (RunnerControl != null)
-                    RunnerControl.Dispose();
+                if (TestRunnerControl != null)
+                    TestRunnerControl.Dispose();
+                if (AboutDialog != null)
+                    AboutDialog.Dispose();
                 throw;
             }
         }
@@ -48,7 +52,19 @@ namespace PmlUnit
 
             TestCaseProvider = provider;
             TestRunner = runner;
-            RunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner);
+            try
+            {
+                TestRunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner);
+                AboutDialog = new AboutDialog();
+            }
+            catch
+            {
+                if (TestRunnerControl != null)
+                    TestRunnerControl.Dispose();
+                if (AboutDialog != null)
+                    AboutDialog.Dispose();
+                throw;
+            }
         }
 
         ~PmlUnitAddin()
@@ -67,7 +83,8 @@ namespace PmlUnit
             if (disposing)
             {
                 TestRunner.Dispose();
-                RunnerControl.Dispose();
+                TestRunnerControl.Dispose();
+                AboutDialog.Dispose();
             }
         }
 
@@ -99,12 +116,15 @@ namespace PmlUnit
         {
             try
             {
-                RunnerControl.LoadTests();
+                TestRunnerControl.LoadTests();
 
                 var windowManager = provider.GetService<IWindowManager>();
                 var commandManager = provider.GetService<ICommandManager>();
                 if (windowManager != null && commandManager != null)
-                    commandManager.Commands.Add(new ShowTestRunnerCommand(windowManager, RunnerControl));
+                {
+                    commandManager.Commands.Add(new ShowTestRunnerCommand(windowManager, TestRunnerControl));
+                    commandManager.Commands.Add(new ShowAboutDialogCommand(windowManager, AboutDialog));
+                }
             }
             catch
             {
@@ -117,6 +137,7 @@ namespace PmlUnit
         {
             // PDMS crashes if we also dispose the TestRunnerControl here
             TestRunner.Dispose();
+            AboutDialog.Dispose();
         }
     }
 }

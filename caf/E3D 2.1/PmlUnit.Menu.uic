@@ -13,12 +13,23 @@
       <Caption>Test Runner...</Caption>
       <DisplayStyle>Default</DisplayStyle>
     </StateButtonTool>
+    <ButtonTool Name="PmlUnit.ShowAboutDialogButton">
+      <Command>
+        <Type>Instance</Type>
+        <Key>PmlUnit.ShowAboutDialogCommand</Key>
+        <Arguments />
+      </Command>
+      <ImageResourceId>AvevaSharedIcons:ID_HELP</ImageResourceId>
+      <Caption>About...</Caption>
+      <DisplayStyle>Default</DisplayStyle>
+    </ButtonTool>
     <MenuTool Name="PmlUnit.MainMenu">
       <Image />
       <Caption>PML Unit</Caption>
       <DisplayStyle>Default</DisplayStyle>
       <Tools>
         <Tool Name="PmlUnit.ShowTestRunnerButton" />
+        <Tool Name="PmlUnit.ShowAboutDialogButton" IsFirstInGroup="True" />
       </Tools>
       <IsContextMenu>false</IsContextMenu>
     </MenuTool>

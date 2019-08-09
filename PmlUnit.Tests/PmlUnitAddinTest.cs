@@ -94,7 +94,7 @@ namespace PmlUnit.Tests
             Addin.Stop();
             // Assert
             var control = Addin.GetType()
-                .GetField("RunnerControl", BindingFlags.Instance | BindingFlags.NonPublic)
+                .GetField("TestRunnerControl", BindingFlags.Instance | BindingFlags.NonPublic)
                 .GetValue(Addin) as Control;
             Assert.IsFalse(control.IsDisposed);
         }
