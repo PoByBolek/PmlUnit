@@ -19,7 +19,7 @@ call :write_info "Building PmlUnit %VERSION%"
 set "BUILD_DIR=PmlUnit-%VERSION%"
 set "RELEASE_FILE=PmlUnit-%VERSION%.zip"
 
-set "nunit.exe=%BASE_DIR%\packages\NUnit.ConsoleRunner.3.9.0\tools\nunit3-console.exe"
+
 
 for %%X in (msbuild.exe) do (
     set "msbuild.exe=%%~$PATH:X"
@@ -40,9 +40,10 @@ if not exist "%msbuild.exe%" (
     call :write_error "'%msbuild.exe%' not found"
     goto end
 )
-
 :msbuild_found
 call :write_info "Using msbuild from '%msbuild.exe%'"
+
+
 
 pushd %~dp0
 nuget restore
@@ -52,6 +53,34 @@ if %_restore_error_level% neq 0 (
     call :write_error "Failed to restore dependencies"
     goto end
 )
+
+
+
+for %%X in (nunit3-console.exe) do (
+    set "nunit.exe=%%~$PATH:X"
+)
+if defined nunit.exe (
+    if exist "%nunit.exe%" (
+        goto nunit_found
+    )
+)
+pushd %~dp0
+for /f "delims=" %%i in ('powershell.exe -ExecutionPolicy bypass "& '%BASE_DIR%\find-nunit.ps1'"') do (
+    set "nunit.exe=%%i"
+)
+popd
+if not defined nunit.exe (
+    call :write_error "Couldn't find the NUnit console runner"
+    goto end
+)
+if not exist "%nunit.exe%" (
+    call :write_error "'%nunit.exe%' not found"
+    goto end
+)
+:nunit_found
+call :write_info "Using NUnit console runner from '%nunit.exe%'"
+
+
 
 call :build "PDMS 12.1" "pdms-12.1"
 if %errorlevel% neq 0 (
@@ -66,8 +95,9 @@ if %errorlevel% neq 0 (
     goto end
 )
 
-call :write_info "Copying PMLLIB files to output directory"
 
+
+call :write_info "Copying PMLLIB files to output directory"
 xcopy /S /E /F /I "%BASE_DIR%\pmllib" "%BUILD_DIR%\pmllib"
 if %errorlevel% neq 0 (
     call :write_error "Failed to copy PMLLIB to output directory"
@@ -91,6 +121,8 @@ if %errorlevel% neq 0 (
     goto end
 )
 
+
+
 call :write_info "Creating zip file"
 "C:\Program Files\7-Zip\7z.exe" a "%RELEASE_FILE%" "%BUILD_DIR%"
 if %errorlevel% neq 0 (
@@ -101,6 +133,7 @@ rmdir /S /Q "%BUILD_DIR%"
 
 call :write_success "%RELEASE_FILE% created sucessfully"
 goto end
+
 
 
 :build
@@ -162,11 +195,13 @@ if %errorlevel% neq 0 (
 goto :eof
 
 
+
 :write_info
 echo.
 echo [97m[INFO] %~1[0m
 echo.
 goto :eof
+
 
 
 :write_error
@@ -175,10 +210,12 @@ echo [91m[ERROR] %~1[0m
 goto :eof
 
 
+
 :write_success
 echo.
 echo [92m[SUCCESS] %~1[0m
 goto :eof
+
 
 
 :end
