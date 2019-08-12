@@ -123,6 +123,7 @@
     <Compile Include="TestListViewMouseTest.cs" />
     <Compile Include="TestListViewTest.cs" />
     <Compile Include="TestRunnerControlTest.cs" />
+    <Compile Include="TestTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PmlUnit\PmlUnit.csproj">

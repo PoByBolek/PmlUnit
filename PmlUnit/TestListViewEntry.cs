@@ -12,11 +12,9 @@ namespace PmlUnit
         public const string NotExecutedImageKey = "Unknown";
 
         public event EventHandler SelectionChanged;
-        public event EventHandler ResultChanged;
 
         public Test Test { get; }
 
-        private TestResult ResultField;
         private bool SelectedField;
 
         public TestListViewEntry(Test test)
@@ -27,17 +25,16 @@ namespace PmlUnit
             Test = test;
         }
 
+        public event EventHandler ResultChanged
+        {
+            add { Test.ResultChanged += value; }
+            remove { Test.ResultChanged -= value; }
+        }
+
         public TestResult Result
         {
-            get { return ResultField; }
-            set
-            {
-                if (value != ResultField)
-                {
-                    ResultField = value;
-                    ResultChanged?.Invoke(this, EventArgs.Empty);
-                }
-            }
+            get { return Test.Result; }
+            set { Test.Result = value; }
         }
 
         public bool Selected
@@ -92,9 +89,9 @@ namespace PmlUnit
 
         private string GetImageKey()
         {
-            if (Result == null)
+            if (Test.Status == TestStatus.NotExecuted)
                 return NotExecutedImageKey;
-            else if (Result.Success)
+            else if (Test.Status == TestStatus.Successful)
                 return SuccessImageKey;
             else
                 return FailureImageKey;
