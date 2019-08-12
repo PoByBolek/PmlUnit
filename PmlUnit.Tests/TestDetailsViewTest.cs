@@ -22,16 +22,11 @@ namespace PmlUnit.Tests
         public void Setup()
         {
             TestDetails = new TestDetailsView();
+            TestDetails.Test = new TestCaseBuilder("foo").AddTest("bar").Build().Tests[0];
             TestNameLabel = TestDetails.FindControl<Label>("TestNameLabel");
             StatusLabel = TestDetails.FindControl<IconLabel>("TestResultIconLabel");
             ElapsedTimeLabel = TestDetails.FindControl<Label>("ElapsedTimeLabel");
             StackTraceLabel = TestDetails.FindControl<Label>("StackTraceLabel");
-        }
-
-        [Test]
-        public void Test_ChecksForNullArgument()
-        {
-            Assert.Throws<ArgumentNullException>(() => TestDetails.Test = null);
         }
 
         [TestCase("Test")]
@@ -53,7 +48,7 @@ namespace PmlUnit.Tests
         public void Result_SetsStatusLabelText(bool? success, string expected)
         {
             // Act
-            TestDetails.Result = CreateTestResult(success, TimeSpan.FromSeconds(0));
+            TestDetails.Test.Result = CreateTestResult(success, TimeSpan.FromSeconds(0));
             // Assert
             Assert.AreEqual(expected, StatusLabel.Text);
         }
@@ -74,26 +69,22 @@ namespace PmlUnit.Tests
         [TestCase(456789, "457 s")]
         public void Result_SetsElapsedTimeLabelText(int milliseconds, string expected)
         {
-            // Arrange
-            var otherDetails = new TestDetailsView();
-            var otherLabel = otherDetails.FindControl<Label>("ElapsedTimeLabel");
-            var success = new TestResult(TimeSpan.FromMilliseconds(milliseconds));
-            var failure = new TestResult(TimeSpan.FromMilliseconds(milliseconds), new Exception());
-            // Act
-            TestDetails.Result = success;
-            otherDetails.Result = failure;
-            // Assert
+            ElapsedTimeLabel.Text = "";
+            TestDetails.Test.Result = new TestResult(TimeSpan.FromMilliseconds(milliseconds));
             Assert.AreEqual("Elapsed time: " + expected, ElapsedTimeLabel.Text);
-            Assert.AreEqual("Elapsed time: " + expected, otherLabel.Text);
+
+            ElapsedTimeLabel.Text = "";
+            TestDetails.Test.Result = new TestResult(TimeSpan.FromMilliseconds(milliseconds), new Exception());
+            Assert.AreEqual("Elapsed time: " + expected, ElapsedTimeLabel.Text);
         }
 
         [Test]
         public void Result_NoResultClearsElapsedTimeLabelText()
         {
             // Arrange
-            TestDetails.Result = new TestResult(TimeSpan.FromSeconds(1));
+            TestDetails.Test.Result = new TestResult(TimeSpan.FromSeconds(1));
             // Act
-            TestDetails.Result = null;
+            TestDetails.Test.Result = null;
             // Assert
             Assert.AreEqual("", ElapsedTimeLabel.Text);
         }
@@ -102,16 +93,16 @@ namespace PmlUnit.Tests
         public void Result_SetsStackTraceLabelText()
         {
             var exception = new Exception("This is a test");
-            TestDetails.Result = new TestResult(TimeSpan.FromSeconds(0), exception);
+            TestDetails.Test.Result = new TestResult(TimeSpan.FromSeconds(0), exception);
             Assert.AreEqual(exception.Message, StackTraceLabel.Text);
 
-            TestDetails.Result = new TestResult(TimeSpan.FromSeconds(0));
+            TestDetails.Test.Result = new TestResult(TimeSpan.FromSeconds(0));
             Assert.AreEqual("", StackTraceLabel.Text);
 
-            TestDetails.Result = new TestResult(TimeSpan.FromSeconds(0), exception);
+            TestDetails.Test.Result = new TestResult(TimeSpan.FromSeconds(0), exception);
             Assert.AreEqual(exception.Message, StackTraceLabel.Text);
 
-            TestDetails.Result = null;
+            TestDetails.Test.Result = null;
             Assert.AreEqual("", StackTraceLabel.Text);
         }
 

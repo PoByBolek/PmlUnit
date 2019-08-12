@@ -270,23 +270,6 @@ namespace PmlUnit.Tests
         }
 
         [Test]
-        public void SelectionChanged_AssignsResultOfSingleSelectedEntryToTestDetails()
-        {
-            // Arrange
-            var entries = TestList.AllTests;
-            entries[0].Result = new TestResult(TimeSpan.FromTicks(0));
-            entries[1].Result = new TestResult(TimeSpan.FromTicks(0), new Exception());
-            entries[2].Result = null;
-            // Act & Assert
-            for (int i = 0; i < entries.Count; i++)
-            {
-                entries[i].Selected = true;
-                Assert.AreSame(TestDetails.Result, entries[i].Result, "Should assign test result {0}.", i);
-                entries[i].Selected = false;
-            }
-        }
-
-        [Test]
         public void SelectionChanged_ShowsTestDetailsIfExactlyOneEntryIsSelected()
         {
             // Arrange
