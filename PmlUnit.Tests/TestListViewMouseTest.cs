@@ -31,12 +31,15 @@ namespace PmlUnit.Tests
             );
             Assert.NotNull(OnMouseClick);
 
-            First = new TestCaseBuilder("First")
-                .AddTest("a1").AddTest("a2").AddTest("a3")
-                .Build();
-            Second = new TestCaseBuilder("Second")
-                .AddTest("b1").AddTest("b2").AddTest("b3")
-                .Build();
+            First = new TestCase("First");
+            First.Tests.Add("a1");
+            First.Tests.Add("a2");
+            First.Tests.Add("a3");
+            Second = new TestCase("Second");
+            Second.Tests.Add("b1");
+            Second.Tests.Add("b2");
+            Second.Tests.Add("b3");
+
             TestList.SetTests(First.Tests.Concat(Second.Tests));
         }
 
@@ -51,7 +54,7 @@ namespace PmlUnit.Tests
         {
             var selected = PerformMouseClick(30, 30);
             Assert.AreEqual(1, selected.Count);
-            Assert.Contains(First.Tests[0], selected);
+            Assert.Contains(First.Tests["a1"], selected);
         }
 
         [Test]
@@ -62,7 +65,7 @@ namespace PmlUnit.Tests
 
             var selected = PerformMouseClick(30, 50);
             Assert.AreEqual(1, selected.Count);
-            Assert.Contains(First.Tests[1], selected);
+            Assert.Contains(First.Tests["a2"], selected);
         }
 
         [Test]
@@ -70,7 +73,7 @@ namespace PmlUnit.Tests
         {
             var selected = PerformMouseClick(30, 70, MouseButtons.Right);
             Assert.AreEqual(1, selected.Count);
-            Assert.Contains(First.Tests[2], selected);
+            Assert.Contains(First.Tests["a3"], selected);
         }
 
         [Test]
@@ -81,13 +84,13 @@ namespace PmlUnit.Tests
 
             var selected = PerformMouseClick(30, 70, MouseButtons.Right);
             Assert.AreEqual(1, selected.Count);
-            Assert.Contains(First.Tests[2], selected);
+            Assert.Contains(First.Tests["a3"], selected);
         }
 
         [Test]
         public void ControlEntryClick_TooglesSelectionOfThatEntry()
         {
-            var clicked = Second.Tests[0];
+            var clicked = Second.Tests["b1"];
             Assert.AreEqual(0, TestList.SelectedTests.Count);
 
             var selected = PerformMouseClick(30, 110, Keys.Control);
@@ -109,7 +112,7 @@ namespace PmlUnit.Tests
         [Test]
         public void RightControlEntryClick_KeepsCurrentSelection()
         {
-            var clicked = Second.Tests[1];
+            var clicked = Second.Tests["b2"];
             Assert.AreEqual(0, TestList.SelectedTests.Count);
 
             var selected = PerformMouseClick(30, 130, MouseButtons.Right, Keys.Control);
@@ -130,26 +133,26 @@ namespace PmlUnit.Tests
 
             var selected = PerformMouseClick(30, 70, Keys.Shift);
             Assert.AreEqual(2, selected.Count);
-            Assert.Contains(First.Tests[1], selected);
-            Assert.Contains(First.Tests[2], selected);
+            Assert.Contains(First.Tests["a2"], selected);
+            Assert.Contains(First.Tests["a3"], selected);
 
             selected = PerformMouseClick(30, 30, Keys.Shift);
             Assert.AreEqual(2, selected.Count);
-            Assert.Contains(First.Tests[0], selected);
-            Assert.Contains(First.Tests[1], selected);
+            Assert.Contains(First.Tests["a1"], selected);
+            Assert.Contains(First.Tests["a2"], selected);
 
             selected = PerformMouseClick(30, 50, Keys.Shift);
             Assert.AreEqual(1, selected.Count);
-            Assert.Contains(First.Tests[1], selected);
+            Assert.Contains(First.Tests["a2"], selected);
 
             PerformMouseClick(30, 130, Keys.Shift);
             PerformMouseClick(30, 90, Keys.Control); // deselect the group entry, because SelectedTests will return all child entries if the group is selected
             selected = TestList.SelectedTests;
             Assert.AreEqual(4, selected.Count);
-            Assert.Contains(First.Tests[1], selected);
-            Assert.Contains(First.Tests[2], selected);
-            Assert.Contains(Second.Tests[0], selected);
-            Assert.Contains(Second.Tests[1], selected);
+            Assert.Contains(First.Tests["a2"], selected);
+            Assert.Contains(First.Tests["a3"], selected);
+            Assert.Contains(Second.Tests["b1"], selected);
+            Assert.Contains(Second.Tests["b2"], selected);
         }
 
         [Test]
@@ -158,7 +161,7 @@ namespace PmlUnit.Tests
             PerformMouseClick(30, 50);
             var selected = PerformMouseClick(30, 70, MouseButtons.Right, Keys.Shift);
             Assert.AreEqual(1, selected.Count);
-            Assert.Contains(First.Tests[1], selected);
+            Assert.Contains(First.Tests["a2"], selected);
         }
 
         private List<Test> PerformMouseClick(int x, int y)

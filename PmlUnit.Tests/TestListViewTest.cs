@@ -14,11 +14,21 @@ namespace PmlUnit.Tests
     public class TestListViewTest
     {
         private TestListView TestList;
+        private TestCase First;
+        private TestCase Second;
 
         [SetUp]
         public void Setup()
         {
+            First = new TestCase("TestCaseOne");
+            First.Tests.Add("one");
+            First.Tests.Add("two");
+            First.Tests.Add("three");
+            Second = new TestCase("TestCaseTwo");
+            Second.Tests.Add("four");
+            Second.Tests.Add("five");
             TestList = new TestListView();
+            TestList.SetTests(First.Tests.Concat(Second.Tests));
         }
 
         [TearDown]
@@ -36,83 +46,65 @@ namespace PmlUnit.Tests
         [Test]
         public void AllTests_ReturnsAllRegisteredTests()
         {
-            // Arrange
-            var first = new TestCaseBuilder("TestCaseOne").AddTest("one").AddTest("two").AddTest("three").Build();
-            var second = new TestCaseBuilder("TestCaseTwo").AddTest("four").AddTest("five").Build();
-            TestList.SetTests(first.Tests.Concat(second.Tests));
             // Act
             var tests = TestList.AllTests;
             // Assert
             Assert.AreEqual(5, tests.Count);
-            Assert.AreSame(first.Tests[0], tests[0]);
-            Assert.AreSame(first.Tests[1], tests[1]);
-            Assert.AreSame(first.Tests[2], tests[2]);
-            Assert.AreSame(second.Tests[0], tests[3]);
-            Assert.AreSame(second.Tests[1], tests[4]);
+            Assert.AreSame(First.Tests["one"], tests[0]);
+            Assert.AreSame(First.Tests["two"], tests[1]);
+            Assert.AreSame(First.Tests["three"], tests[2]);
+            Assert.AreSame(Second.Tests["four"], tests[3]);
+            Assert.AreSame(Second.Tests["five"], tests[4]);
         }
 
         [Test]
         public void SucceededTests_ReturnsSucceededTests()
         {
             // Arrange
-            var first = new TestCaseBuilder("TestCaseOne").AddTest("one").AddTest("two").AddTest("three").Build();
-            var second = new TestCaseBuilder("TestCaseTwo").AddTest("four").AddTest("five").Build();
-            TestList.SetTests(first.Tests.Concat(second.Tests));
-            TestList.AllTests[2].Result = new TestResult(TimeSpan.FromSeconds(1));
-            TestList.AllTests[4].Result = new TestResult(TimeSpan.FromSeconds(1));
+            First.Tests["three"].Result = new TestResult(TimeSpan.FromSeconds(1));
+            Second.Tests["five"].Result = new TestResult(TimeSpan.FromSeconds(1));
             // Act
             var tests = TestList.SucceededTests;
             // Assert
             Assert.AreEqual(2, tests.Count);
-            Assert.AreSame(first.Tests[2], tests[0]);
-            Assert.AreSame(second.Tests[1], tests[1]);
+            Assert.AreSame(First.Tests["three"], tests[0]);
+            Assert.AreSame(Second.Tests["five"], tests[1]);
         }
 
         [Test]
         public void FailedTests_ReturnsFailedTests()
         {
             // Arrange
-            var first = new TestCaseBuilder("TestCaseOne").AddTest("one").AddTest("two").AddTest("three").Build();
-            var second = new TestCaseBuilder("TestCaseTwo").AddTest("four").AddTest("five").Build();
-            TestList.SetTests(first.Tests.Concat(second.Tests));
-            TestList.AllTests[0].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("foo"));
-            TestList.AllTests[2].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("bar"));
-            TestList.AllTests[3].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("baz"));
+            First.Tests["one"].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("foo"));
+            First.Tests["three"].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("bar"));
+            Second.Tests["four"].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("baz"));
             // Act
             var tests = TestList.FailedTests;
             // Assert
             Assert.AreEqual(3, tests.Count);
-            Assert.AreSame(first.Tests[0], tests[0]);
-            Assert.AreSame(first.Tests[2], tests[1]);
-            Assert.AreSame(second.Tests[0], tests[2]);
+            Assert.AreSame(First.Tests["one"], tests[0]);
+            Assert.AreSame(First.Tests["three"], tests[1]);
+            Assert.AreSame(Second.Tests["four"], tests[2]);
         }
 
         [Test]
         public void NotExecutedTests_ReturnsNotExecutedTests()
         {
             // Arrange
-            var first = new TestCaseBuilder("TestCaseOne").AddTest("one").AddTest("two").AddTest("three").Build();
-            var second = new TestCaseBuilder("TestCaseTwo").AddTest("four").AddTest("five").Build();
-            TestList.SetTests(first.Tests.Concat(second.Tests));
-            TestList.AllTests[1].Result = new TestResult(TimeSpan.FromSeconds(1));
-            TestList.AllTests[3].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("error"));
+            First.Tests["two"].Result = new TestResult(TimeSpan.FromSeconds(1));
+            Second.Tests["four"].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("error"));
             // Act
             var tests = TestList.NotExecutedTests;
             // Assert
             Assert.AreEqual(3, tests.Count);
-            Assert.AreSame(first.Tests[0], tests[0]);
-            Assert.AreSame(first.Tests[2], tests[1]);
-            Assert.AreSame(second.Tests[1], tests[2]);
+            Assert.AreSame(First.Tests["one"], tests[0]);
+            Assert.AreSame(First.Tests["three"], tests[1]);
+            Assert.AreSame(Second.Tests["five"], tests[2]);
         }
 
         [Test]
         public void SetTests_ClearsResultOfNewTests()
         {
-            // Arrange
-            var testCase = new TestCaseBuilder("TestCase").AddTest("one").Build();
-            // Act
-            TestList.SetTests(testCase.Tests);
-            // Assert
             foreach (var test in TestList.AllTests)
                 Assert.IsNull(test.Result);
         }

@@ -131,7 +131,6 @@
     <Compile Include="ShowTestRunnerCommand.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="TestCase.cs" />
-    <Compile Include="TestCaseBuilder.cs" />
     <Compile Include="TestCaseParser.cs" />
     <Compile Include="TestCaseProvider.cs" />
     <Compile Include="TestDetailsView.cs">

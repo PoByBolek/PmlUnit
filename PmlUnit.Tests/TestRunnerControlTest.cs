@@ -47,8 +47,15 @@ namespace PmlUnit.Tests
         public void Setup()
         {
             TestCases = new List<TestCase>();
-            TestCases.Add(new TestCaseBuilder("Foo").AddTest("testOne").AddTest("testTwo").Build());
-            TestCases.Add(new TestCaseBuilder("Bar").AddTest("testThree").AddTest("testFour").AddTest("testFive").Build());
+            var first = new TestCase("Foo");
+            first.Tests.Add("one");
+            first.Tests.Add("two");
+            TestCases.Add(first);
+            var second = new TestCase("Bar");
+            second.Tests.Add("three");
+            second.Tests.Add("four");
+            second.Tests.Add("five");
+            TestCases.Add(second);
 
             ProviderMock = new Mock<TestCaseProvider>();
             ProviderMock.Setup(provider => provider.GetTestCases()).Returns(TestCases);
@@ -80,11 +87,11 @@ namespace PmlUnit.Tests
             // Assert
             var allTests = TestList.AllTests;
             Assert.AreEqual(5, allTests.Count);
-            Assert.AreEqual("testOne", allTests[0].Name);
-            Assert.AreEqual("testTwo", allTests[1].Name);
-            Assert.AreEqual("testThree", allTests[2].Name);
-            Assert.AreEqual("testFour", allTests[3].Name);
-            Assert.AreEqual("testFive", allTests[4].Name);
+            Assert.AreSame(TestCases[0].Tests["one"], allTests[0]);
+            Assert.AreSame(TestCases[0].Tests["two"], allTests[1]);
+            Assert.AreSame(TestCases[1].Tests["three"], allTests[2]);
+            Assert.AreSame(TestCases[1].Tests["four"], allTests[3]);
+            Assert.AreSame(TestCases[1].Tests["five"], allTests[4]);
         }
     }
 
@@ -102,10 +109,11 @@ namespace PmlUnit.Tests
         [SetUp]
         public void Setup()
         {
-            TestCase = new TestCaseBuilder("TestCase").AddTest("one").AddTest("two").AddTest("three").AddTest("four").Build();
-            TestCase.Tests[0].Result = new TestResult(TimeSpan.FromSeconds(1));
-            TestCase.Tests[1].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("error"));
-            TestCase.Tests[2].Result = new TestResult(TimeSpan.FromSeconds(1));
+            TestCase = new TestCase("TestCase");
+            TestCase.Tests.Add("one").Result = new TestResult(TimeSpan.FromSeconds(1));
+            TestCase.Tests.Add("two").Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("error"));
+            TestCase.Tests.Add("three").Result = new TestResult(TimeSpan.FromSeconds(1));
+            TestCase.Tests.Add("four");
 
             RunnerMock = new Mock<TestRunner>();
             RunnerMock.Setup(runner => runner.Run(It.IsAny<Test>())).Returns(new TestResult(TimeSpan.FromSeconds(1)));
@@ -132,10 +140,10 @@ namespace PmlUnit.Tests
             // Act
             RunEventHandler("OnRunAllLinkClick");
             // Assert
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[0]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[1]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[2]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[3]), Times.Once());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["one"]), Times.Once());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["two"]), Times.Once());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["three"]), Times.Once());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["four"]), Times.Once());
         }
 
         [Test]
@@ -144,10 +152,10 @@ namespace PmlUnit.Tests
             // Act
             RunEventHandler("OnRunSucceededTestsMenuItemClick");
             // Assert
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[0]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[1]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[2]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[3]), Times.Never());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["one"]), Times.Once());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["two"]), Times.Never());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["three"]), Times.Once());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["four"]), Times.Never());
         }
 
         [Test]
@@ -156,10 +164,10 @@ namespace PmlUnit.Tests
             // Act
             RunEventHandler("OnRunFailedTestsMenuItemClick");
             // Assert
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[0]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[1]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[2]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[3]), Times.Never());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["one"]), Times.Never());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["two"]), Times.Once());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["three"]), Times.Never());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["four"]), Times.Never());
         }
 
         [Test]
@@ -168,10 +176,10 @@ namespace PmlUnit.Tests
             // Act
             RunEventHandler("OnRunNotExecutedTestsMenuItemClick");
             // Assert
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[0]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[1]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[2]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[3]), Times.Once());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["one"]), Times.Never());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["two"]), Times.Never());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["three"]), Times.Never());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["four"]), Times.Once());
         }
 
         [Test]
@@ -180,10 +188,10 @@ namespace PmlUnit.Tests
             // Act
             RunEventHandler("OnRunSelectedTestsMenuItemClick");
             // Assert
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[0]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[1]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[2]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[3]), Times.Once());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["one"]), Times.Never());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["two"]), Times.Once());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["three"]), Times.Never());
+            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["four"]), Times.Once());
         }
 
         private void RunEventHandler(string handler)
@@ -216,7 +224,10 @@ namespace PmlUnit.Tests
         [SetUp]
         public void Setup()
         {
-            TestCase = new TestCaseBuilder("Test").AddTest("one").AddTest("two").AddTest("three").Build();
+            TestCase = new TestCase("Test");
+            TestCase.Tests.Add("one");
+            TestCase.Tests.Add("two");
+            TestCase.Tests.Add("three");
             RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), Mock.Of<TestRunner>());
             TestSummary = RunnerControl.FindControl<TestSummaryView>("TestSummary");
             TestDetails = RunnerControl.FindControl<TestDetailsView>("TestDetails");

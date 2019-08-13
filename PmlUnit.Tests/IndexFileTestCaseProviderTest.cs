@@ -55,7 +55,7 @@ namespace PmlUnit.Tests
         [Test]
         public void GetTestCases_ShouldCallTestCaseParserWithObjectName()
         {
-            var dummy = new TestCaseBuilder("dummy").Build();
+            var dummy = new TestCase("dummy");
             var parser = new Mock<TestCaseParser>();
             parser.Setup(mock => mock.Parse(It.IsAny<string>())).Returns(dummy);
 
@@ -75,7 +75,7 @@ pmlrandomtest.pmlobj";
         [Test]
         public void GetTestCases_ShouldIgnoreTestFilesThatCannotBeParsed()
         {
-            var dummy = new TestCaseBuilder("dummy").Build();
+            var dummy = new TestCase("dummy");
             var parser = new Mock<TestCaseParser>();
             parser.Setup(mock => mock.Parse(@"C:\testing\path\to\tests\pmlfirsttest.pmlobj")).Throws<ParserException>();
             parser.Setup(mock => mock.Parse(@"C:\testing\path\to\tests\pmlsecondtest.pmlobj")).Returns(dummy);
@@ -98,7 +98,7 @@ pmlthirdtest.pmlobj";
         [Test]
         public void GetTestCases_ShouldOnlyAttemptToParseObjectFiles()
         {
-            var dummy = new TestCaseBuilder("dummy").Build();
+            var dummy = new TestCase("dummy");
             var parser = new Mock<TestCaseParser>(MockBehavior.Strict);
             parser.Setup(mock => mock.Parse(@"C:\some\other\testing\path\pmltest.pmlobj")).Returns(dummy);
             parser.Setup(mock => mock.Parse(@"C:\some\other\testing\path\PmlDuplicateTest.PmlObj")).Returns(dummy);
@@ -126,7 +126,7 @@ somethingelse.txt";
         [Test]
         public void GetTestCases_ShouldOnlyAttemptToParseObjectFilesThatEndInTest()
         {
-            var dummy = new TestCaseBuilder("dummy").Build();
+            var dummy = new TestCase("dummy");
             var parser = new Mock<TestCaseParser>(MockBehavior.Strict);
             parser.Setup(mock => mock.Parse(@"C:\some\other\testing\path\OTHERTEST.PMLOBJ")).Returns(dummy);
             parser.Setup(mock => mock.Parse(@"C:\some\other\testing\path\randomtest.pmlobj")).Returns(dummy);
@@ -149,7 +149,7 @@ FoOtEsT.PmLoBj";
         [Test]
         public void GetTestCases_ShouldTryToParseFilesFromDifferentDirectories()
         {
-            var dummy = new TestCaseBuilder("dummy").Build();
+            var dummy = new TestCase("dummy");
             var parser = new Mock<TestCaseParser>();
             parser.Setup(mock => mock.Parse(@"C:\full\path\to\the\tests\firsttest.pmlobj")).Returns(dummy);
             parser.Setup(mock => mock.Parse(@"C:\full\path\to\some\other\tests\secondtest.pmlobj")).Returns(dummy);

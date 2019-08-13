@@ -118,7 +118,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShowTestRunnerCommandTest.cs" />
     <Compile Include="SimpleTestCaseParserTest.cs" />
-    <Compile Include="TestCaseBuilderTest.cs" />
+    <Compile Include="TestCaseTest.cs" />
     <Compile Include="TestDetailsViewTest.cs" />
     <Compile Include="TestListViewMouseTest.cs" />
     <Compile Include="TestListViewTest.cs" />

@@ -19,6 +19,8 @@ namespace PmlUnit
                 throw new ArgumentNullException(nameof(testCase));
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
+            if (!TestCase.NameRegex.IsMatch(name))
+                throw new ArgumentException("Test names must start with a letter and only contain letters and digits", nameof(name));
 
             TestCase = testCase;
             Name = name;
@@ -48,6 +50,11 @@ namespace PmlUnit
                 else
                     return TestStatus.Failed;
             }
+        }
+
+        public override string ToString()
+        {
+            return TestCase.Name + "." + Name;
         }
     }
 
