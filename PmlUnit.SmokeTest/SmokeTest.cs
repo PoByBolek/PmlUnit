@@ -32,7 +32,16 @@ namespace PmlUnit
         [Test]
         public void TestAboutDialogInstantiation()
         {
-            new AboutDialog();
+            AboutDialog dialog = null;
+            try
+            {
+                dialog = new AboutDialog();
+            }
+            finally
+            {
+                if (dialog != null)
+                    dialog.Dispose();
+            }
         }
 
         private class StubTestRunner : TestRunner
