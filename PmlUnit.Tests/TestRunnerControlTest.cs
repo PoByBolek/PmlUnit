@@ -80,11 +80,11 @@ namespace PmlUnit.Tests
             // Assert
             var allTests = TestList.AllTests;
             Assert.AreEqual(5, allTests.Count);
-            Assert.AreEqual("testOne", allTests[0].Test.Name);
-            Assert.AreEqual("testTwo", allTests[1].Test.Name);
-            Assert.AreEqual("testThree", allTests[2].Test.Name);
-            Assert.AreEqual("testFour", allTests[3].Test.Name);
-            Assert.AreEqual("testFive", allTests[4].Test.Name);
+            Assert.AreEqual("testOne", allTests[0].Name);
+            Assert.AreEqual("testTwo", allTests[1].Name);
+            Assert.AreEqual("testThree", allTests[2].Name);
+            Assert.AreEqual("testFour", allTests[3].Name);
+            Assert.AreEqual("testFive", allTests[4].Name);
         }
     }
 
@@ -103,6 +103,9 @@ namespace PmlUnit.Tests
         public void Setup()
         {
             TestCase = new TestCaseBuilder("TestCase").AddTest("one").AddTest("two").AddTest("three").AddTest("four").Build();
+            TestCase.Tests[0].Result = new TestResult(TimeSpan.FromSeconds(1));
+            TestCase.Tests[1].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("error"));
+            TestCase.Tests[2].Result = new TestResult(TimeSpan.FromSeconds(1));
 
             RunnerMock = new Mock<TestRunner>();
             RunnerMock.Setup(runner => runner.Run(It.IsAny<Test>())).Returns(new TestResult(TimeSpan.FromSeconds(1)));
@@ -112,13 +115,9 @@ namespace PmlUnit.Tests
             TestList = RunnerControl.FindControl<TestListView>("TestList");
             TestList.SetTests(TestCase.Tests);
 
-            var tests = TestList.AllTests;
-            tests[0].Result = new TestResult(TimeSpan.FromSeconds(1));
-            tests[1].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("error"));
-            tests[2].Result = new TestResult(TimeSpan.FromSeconds(1));
-
-            tests[1].Selected = true;
-            tests[3].Selected = true;
+            var entries = TestList.AllTestEntries;
+            entries[1].Selected = true;
+            entries[3].Selected = true;
         }
 
         [TearDown]
@@ -235,7 +234,7 @@ namespace PmlUnit.Tests
         public void SelectionChanged_AssignsTestOfSingleSelectedEntryToTestDetails()
         {
             // Arrange
-            var entries = TestList.AllTests;
+            var entries = TestList.AllTestEntries;
             // Act & Assert
             for (int i = 0; i < entries.Count; i++)
             {
@@ -249,7 +248,7 @@ namespace PmlUnit.Tests
         public void SelectionChanged_ShowsTestDetailsIfExactlyOneEntryIsSelected()
         {
             // Arrange
-            var entries = TestList.AllTests;
+            var entries = TestList.AllTestEntries;
             // Act & Assert
             for (int i = 0; i < entries.Count; i++)
             {
@@ -264,7 +263,7 @@ namespace PmlUnit.Tests
         public void SelectionChanged_ShowsTestSummaryUnlessExactlyOneEntryIsSelected()
         {
             // Arrange
-            var entries = TestList.AllTests;
+            var entries = TestList.AllTestEntries;
             // Act & Assert
             Assert.IsFalse(TestDetails.Visible);
             Assert.IsTrue(TestSummary.Visible);

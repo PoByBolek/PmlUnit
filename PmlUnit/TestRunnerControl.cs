@@ -35,7 +35,7 @@ namespace PmlUnit
         {
             TestList.SetTests(testCases.SelectMany(testCase => testCase.Tests));
             TestSummary.UpdateSummary(TestList.AllTests);
-            TestDetails.Test = TestList.SelectedTests.Select(entry => entry.Test).FirstOrDefault();
+            TestDetails.Test = TestList.SelectedTests.FirstOrDefault();
         }
 
         protected override void Dispose(bool disposing)
@@ -78,31 +78,31 @@ namespace PmlUnit
             Run(TestList.SelectedTests);
         }
 
-        private void Run(ICollection<TestListEntry> entries)
+        private void Run(ICollection<Test> tests)
         {
             Enabled = false;
             try
             {
-                RunInternal(entries);
+                RunInternal(tests);
             }
             finally
             {
                 Enabled = true;
-                TestSummary.UpdateSummary(entries);
+                TestSummary.UpdateSummary(tests);
             }
         }
 
-        private void RunInternal(ICollection<TestListEntry> entries)
+        private void RunInternal(ICollection<Test> tests)
         {
             ExecutionProgressBar.Value = 0;
-            ExecutionProgressBar.Maximum = entries.Count;
+            ExecutionProgressBar.Maximum = tests.Count;
             ExecutionProgressBar.Color = Color.Green;
 
-            foreach (var entry in entries)
+            foreach (var test in tests)
             {
-                Runner.Run(entry.Test);
+                Runner.Run(test);
                 ExecutionProgressBar.Increment(1);
-                if (entry.Result != null && !entry.Result.Success)
+                if (test.Status == TestStatus.Failed)
                     ExecutionProgressBar.Color = Color.Red;
 
                 Application.DoEvents();
@@ -133,7 +133,7 @@ namespace PmlUnit
         private void OnTestListSelectionChanged(object sender, EventArgs e)
         {
             var selected = TestList.SelectedTests;
-            TestDetails.Test = selected.Select(entry => entry.Test).FirstOrDefault();
+            TestDetails.Test = selected.FirstOrDefault();
             TestSummary.Visible = selected.Count != 1;
             TestDetails.Visible = selected.Count == 1;
         }

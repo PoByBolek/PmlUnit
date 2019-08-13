@@ -70,40 +70,40 @@ namespace PmlUnit
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> AllTests => AllTestEntries.ToList();
+        public List<Test> AllTests => AllTestsInternal.ToList();
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> SucceededTests => AllTestEntries.Where(entry => entry.Result != null && entry.Result.Error == null).ToList();
+        public List<Test> SucceededTests => AllTestsInternal.Where(test => test.Status == TestStatus.Successful).ToList();
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> FailedTests => AllTestEntries.Where(entry => entry.Result?.Error != null).ToList();
+        public List<Test> FailedTests => AllTestsInternal.Where(test => test.Status == TestStatus.Failed).ToList();
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> NotExecutedTests => AllTestEntries.Where(entry => entry.Result == null).ToList();
+        public List<Test> NotExecutedTests => AllTestsInternal.Where(test => test.Status == TestStatus.NotExecuted).ToList();
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> SelectedTests
+        public List<Test> SelectedTests
         {
             get
             {
-                var result = new HashSet<TestListEntry>();
+                var result = new HashSet<Test>();
                 foreach (var group in Groups)
                 {
                     if (group.Selected)
                     {
                         foreach (var entry in group.Entries)
-                            result.Add(entry);
+                            result.Add(entry.Test);
                     }
                     else
                     {
                         foreach (var entry in group.Entries)
                         {
                             if (entry.Selected)
-                                result.Add(entry);
+                                result.Add(entry.Test);
                         }
                     }
                 }
@@ -111,7 +111,13 @@ namespace PmlUnit
             }
         }
 
-        private IEnumerable<TestListEntry> AllTestEntries => Groups.SelectMany(group => group.Entries).OfType<TestListEntry>();
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public List<TestListEntry> AllTestEntries => AllTestEntriesInternal.ToList();
+
+        private IEnumerable<Test> AllTestsInternal => AllTestEntriesInternal.Select(entry => entry.Test);
+
+        private IEnumerable<TestListEntry> AllTestEntriesInternal => Groups.SelectMany(group => group.Entries).OfType<TestListEntry>();
 
         private IEnumerable<TestListBaseEntry> AllEntries
         {

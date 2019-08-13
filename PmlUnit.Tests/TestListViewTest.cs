@@ -44,11 +44,11 @@ namespace PmlUnit.Tests
             var tests = TestList.AllTests;
             // Assert
             Assert.AreEqual(5, tests.Count);
-            Assert.AreSame(first.Tests[0], tests[0].Test);
-            Assert.AreSame(first.Tests[1], tests[1].Test);
-            Assert.AreSame(first.Tests[2], tests[2].Test);
-            Assert.AreSame(second.Tests[0], tests[3].Test);
-            Assert.AreSame(second.Tests[1], tests[4].Test);
+            Assert.AreSame(first.Tests[0], tests[0]);
+            Assert.AreSame(first.Tests[1], tests[1]);
+            Assert.AreSame(first.Tests[2], tests[2]);
+            Assert.AreSame(second.Tests[0], tests[3]);
+            Assert.AreSame(second.Tests[1], tests[4]);
         }
 
         [Test]
@@ -64,8 +64,8 @@ namespace PmlUnit.Tests
             var tests = TestList.SucceededTests;
             // Assert
             Assert.AreEqual(2, tests.Count);
-            Assert.AreSame(first.Tests[2], tests[0].Test);
-            Assert.AreSame(second.Tests[1], tests[1].Test);
+            Assert.AreSame(first.Tests[2], tests[0]);
+            Assert.AreSame(second.Tests[1], tests[1]);
         }
 
         [Test]
@@ -82,9 +82,9 @@ namespace PmlUnit.Tests
             var tests = TestList.FailedTests;
             // Assert
             Assert.AreEqual(3, tests.Count);
-            Assert.AreSame(first.Tests[0], tests[0].Test);
-            Assert.AreSame(first.Tests[2], tests[1].Test);
-            Assert.AreSame(second.Tests[0], tests[2].Test);
+            Assert.AreSame(first.Tests[0], tests[0]);
+            Assert.AreSame(first.Tests[2], tests[1]);
+            Assert.AreSame(second.Tests[0], tests[2]);
         }
 
         [Test]
@@ -100,9 +100,9 @@ namespace PmlUnit.Tests
             var tests = TestList.NotExecutedTests;
             // Assert
             Assert.AreEqual(3, tests.Count);
-            Assert.AreSame(first.Tests[0], tests[0].Test);
-            Assert.AreSame(first.Tests[2], tests[1].Test);
-            Assert.AreSame(second.Tests[1], tests[2].Test);
+            Assert.AreSame(first.Tests[0], tests[0]);
+            Assert.AreSame(first.Tests[2], tests[1]);
+            Assert.AreSame(second.Tests[1], tests[2]);
         }
 
         [Test]
@@ -113,8 +113,8 @@ namespace PmlUnit.Tests
             // Act
             TestList.SetTests(testCase.Tests);
             // Assert
-            foreach (var entry in TestList.AllTests)
-                Assert.IsNull(entry.Result);
+            foreach (var test in TestList.AllTests)
+                Assert.IsNull(test.Result);
         }
     }
 }

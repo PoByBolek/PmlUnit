@@ -57,7 +57,7 @@ namespace PmlUnit.Tests
         [Test]
         public void EntryClick_SelectsOnlyThatEntry()
         {
-            foreach (var entry in TestList.AllTests)
+            foreach (var entry in TestList.AllTestEntries)
                 entry.Selected = true;
 
             var selected = PerformMouseClick(30, 50);
@@ -76,7 +76,7 @@ namespace PmlUnit.Tests
         [Test]
         public void RightEntryClick_SelectsOnlyThatEntry()
         {
-            foreach (var entry in TestList.AllTests)
+            foreach (var entry in TestList.AllTestEntries)
                 entry.Selected = true;
 
             var selected = PerformMouseClick(30, 70, MouseButtons.Right);
@@ -97,7 +97,7 @@ namespace PmlUnit.Tests
             selected = PerformMouseClick(30, 110, Keys.Control);
             Assert.AreEqual(0, selected.Count);
 
-            foreach (var entry in TestList.AllTests)
+            foreach (var entry in TestList.AllTestEntries)
                 entry.Selected = true;
 
             selected = PerformMouseClick(30, 110, Keys.Control);
@@ -115,7 +115,7 @@ namespace PmlUnit.Tests
             var selected = PerformMouseClick(30, 130, MouseButtons.Right, Keys.Control);
             Assert.AreEqual(0, selected.Count);
 
-            foreach (var entry in TestList.AllTests)
+            foreach (var entry in TestList.AllTestEntries)
                 entry.Selected = true;
             Assert.AreEqual(6, TestList.SelectedTests.Count);
 
@@ -144,7 +144,7 @@ namespace PmlUnit.Tests
 
             PerformMouseClick(30, 130, Keys.Shift);
             PerformMouseClick(30, 90, Keys.Control); // deselect the group entry, because SelectedTests will return all child entries if the group is selected
-            selected = TestList.SelectedTests.Select(entry => entry.Test).ToList();
+            selected = TestList.SelectedTests;
             Assert.AreEqual(4, selected.Count);
             Assert.Contains(First.Tests[1], selected);
             Assert.Contains(First.Tests[2], selected);
@@ -180,7 +180,7 @@ namespace PmlUnit.Tests
         {
             var args = new MouseEventArgs(button, 1, x, y, 0);
             OnMouseClick.Invoke(TestList, new object[] { args, modifierKeys });
-            return TestList.SelectedTests.Select(entry => entry.Test).ToList();
+            return TestList.SelectedTests;
         }
     }
 }
