@@ -90,11 +90,15 @@ namespace PmlUnit
             public TestResult Run(Test test)
             {
                 var duration = TimeSpan.FromMilliseconds(RNG.Next(2000));
+                TestResult result;
 
                 if (RNG.NextDouble() <= 0.8)
-                    return new TestResult(duration);
+                    result = new TestResult(duration);
                 else
-                    return new TestResult(duration, new Exception());
+                    result = new TestResult(duration, new PmlException());
+
+                test.Result = result;
+                return result;
             }
 
             public void Run(TestCase testCase)

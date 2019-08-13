@@ -100,7 +100,7 @@ namespace PmlUnit
 
             foreach (var entry in entries)
             {
-                entry.Result = Runner.Run(entry.Test);
+                Runner.Run(entry.Test);
                 ExecutionProgressBar.Increment(1);
                 if (entry.Result != null && !entry.Result.Success)
                     ExecutionProgressBar.Color = Color.Red;

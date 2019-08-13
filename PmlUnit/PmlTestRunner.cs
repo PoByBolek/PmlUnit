@@ -105,12 +105,14 @@ namespace PmlUnit
                     "run", testCase.Name, test.Name, testCase.HasSetUp, testCase.HasTearDown
                 );
                 var elapsed = Clock.CurrentInstant - start;
-                return new TestResult(elapsed, UnmarshalException(result));
+                test.Result = new TestResult(elapsed, UnmarshalException(result));
+                return test.Result;
             }
             catch (PmlException error)
             {
                 var elapsed = Clock.CurrentInstant - start;
-                return new TestResult(elapsed, error);
+                test.Result = new TestResult(elapsed, error);
+                return test.Result;
             }
         }
 

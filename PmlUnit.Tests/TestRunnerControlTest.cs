@@ -187,30 +187,6 @@ namespace PmlUnit.Tests
             RunnerMock.Verify(runner => runner.Run(TestCase.Tests[3]), Times.Once());
         }
 
-        [Test]
-        public void Run_AssignsTestResultsToListEntries()
-        {
-            // Arrange
-            var results = new List<TestResult> {
-                new TestResult(TimeSpan.FromSeconds(1), new PmlException("error")), null,
-                new TestResult(TimeSpan.FromSeconds(3)), new TestResult(TimeSpan.FromSeconds(4))
-            };
-            RunnerMock.Reset();
-            for (int i = 0; i < results.Count; i++)
-                SetupTestResult(TestCase.Tests[i], results[i]);
-            // Act
-            RunEventHandler("OnRunAllLinkClick");
-            // Assert
-            var tests = TestList.AllTests;
-            for (int i = 0; i < results.Count; i++)
-                Assert.AreSame(results[i], tests[i].Result);
-        }
-
-        private void SetupTestResult(Test test, TestResult result)
-        {
-            RunnerMock.Setup(runner => runner.Run(test)).Returns(result);
-        }
-
         private void RunEventHandler(string handler)
         {
             var method = RunnerControl.GetType().GetMethod(
