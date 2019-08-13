@@ -31,12 +31,6 @@ namespace PmlUnit
             remove { Test.ResultChanged -= value; }
         }
 
-        public TestResult Result
-        {
-            get { return Test.Result; }
-            set { Test.Result = value; }
-        }
-
         public bool Selected
         {
             get { return SelectedField; }
@@ -71,9 +65,9 @@ namespace PmlUnit
             g.DrawImage(options.StatusImageList.Images[GetImageKey()], left, y);
             left += 16 + padding;
 
-            if (left < right && Result != null)
+            if (left < right && Test.Result != null)
             {
-                string duration = Result.Duration.Format();
+                string duration = Test.Result.Duration.Format();
                 int durationWidth = (int)Math.Ceiling(g.MeasureString(duration, options.EntryFont).Width);
                 int durationX = Math.Max(left, right - durationWidth);
                 g.DrawString(duration, options.EntryFont, textBrush, durationX, y);
