@@ -17,6 +17,10 @@ namespace PmlUnit
         [Category("Behavior")]
         public event EventHandler SelectionChanged;
 
+        public TestListTestCaseCollection TestCases { get; }
+        public TestListEntryCollection Entries { get; }
+        public TestListEntryCollection SelectedEntries { get; }
+
         private readonly List<TestListGroupEntry> Groups;
         private bool IgnoreSelectionChanged;
         private int IgnoredSelectionChanges;
@@ -25,6 +29,9 @@ namespace PmlUnit
 
         public TestListView()
         {
+            TestCases = new TestListTestCaseCollection(this);
+            TestCases.Changed += OnTestCasesChanged;
+
             InitializeComponent();
 
             DoubleBuffered = true;
@@ -40,6 +47,11 @@ namespace PmlUnit
             StatusImageList.Images.Add(TestListViewEntry.NotExecutedImageKey, Resources.Unknown);
             StatusImageList.Images.Add(TestListViewEntry.FailureImageKey, Resources.Failure);
             StatusImageList.Images.Add(TestListViewEntry.SuccessImageKey, Resources.Success);
+        }
+
+        private void OnTestCasesChanged(object sender, TestCaseCollectionChangedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         public void SetTests(IEnumerable<Test> tests)

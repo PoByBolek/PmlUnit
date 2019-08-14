@@ -140,8 +140,10 @@
       <DependentUpon>TestDetailsView.cs</DependentUpon>
     </Compile>
     <Compile Include="TestListEntry.cs" />
+    <Compile Include="TestListEntryCollection.cs" />
     <Compile Include="TestListGroupEntry.cs" />
     <Compile Include="TestListPaintOptions.cs" />
+    <Compile Include="TestListTestCaseCollection.cs" />
     <Compile Include="TestListView.cs">
       <SubType>Component</SubType>
     </Compile>
