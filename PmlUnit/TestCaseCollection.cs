@@ -5,25 +5,18 @@ using System.Linq;
 
 namespace PmlUnit
 {
-    class TestListTestCaseCollection : ICollection<TestCase>
+    class TestCaseCollection : ICollection<TestCase>
     {
-        public event EventHandler<TestCaseCollectionChangedEventArgs> Changed;
+        public event EventHandler<TestCasesChangedEventArgs> Changed;
 
-        private readonly TestListView View;
         private readonly Dictionary<string, TestCase> TestCases;
 
-        public TestListTestCaseCollection(TestListView view)
+        public TestCaseCollection()
         {
-            if (view == null)
-                throw new ArgumentNullException(nameof(view));
-
-            View = view;
             TestCases = new Dictionary<string, TestCase>(StringComparer.OrdinalIgnoreCase);
         }
 
         public int Count => TestCases.Count;
-
-        public bool IsReadOnly => false;
 
         public TestCase this[string name]
         {
@@ -62,6 +55,9 @@ namespace PmlUnit
                 throw new ArgumentNullException(nameof(collection));
 
             var copy = collection.ToList();
+            if (copy.Count == 0)
+                return;
+
             var names = new HashSet<string>(TestCases.Comparer);
             foreach (var testCase in copy)
             {
@@ -81,9 +77,12 @@ namespace PmlUnit
 
         public void Clear()
         {
-            var copy = TestCases.Values.ToList();
-            TestCases.Clear();
-            OnChanged(null, copy);
+            if (Count > 0)
+            {
+                var copy = TestCases.Values.ToList();
+                TestCases.Clear();
+                OnChanged(null, copy);
+            }
         }
 
         public bool Contains(TestCase item)
@@ -118,29 +117,31 @@ namespace PmlUnit
             return GetEnumerator();
         }
 
+        bool ICollection<TestCase>.IsReadOnly => false;
+
         private void OnChanged(TestCase added, TestCase removed)
         {
-            Changed?.Invoke(this, new TestCaseCollectionChangedEventArgs(added, removed));
+            Changed?.Invoke(this, new TestCasesChangedEventArgs(added, removed));
         }
 
         private void OnChanged(IEnumerable<TestCase> added, IEnumerable<TestCase> removed)
         {
-            Changed?.Invoke(this, new TestCaseCollectionChangedEventArgs(added, removed));
+            Changed?.Invoke(this, new TestCasesChangedEventArgs(added, removed));
         }
     }
 
-    class TestCaseCollectionChangedEventArgs : EventArgs
+    class TestCasesChangedEventArgs : EventArgs
     {
         public IEnumerable<TestCase> AddedTestCases { get; }
         public IEnumerable<TestCase> RemovedTestCases { get; }
 
-        public TestCaseCollectionChangedEventArgs(TestCase added, TestCase removed)
+        public TestCasesChangedEventArgs(TestCase added, TestCase removed)
         {
             AddedTestCases = added == null ? Enumerable.Empty<TestCase>() : Enumerable.Repeat(added, 1);
             RemovedTestCases = removed == null ? Enumerable.Empty<TestCase>() : Enumerable.Repeat(removed, 1);
         }
 
-        public TestCaseCollectionChangedEventArgs(IEnumerable<TestCase> added, IEnumerable<TestCase> removed)
+        public TestCasesChangedEventArgs(IEnumerable<TestCase> added, IEnumerable<TestCase> removed)
         {
             AddedTestCases = added == null ? Enumerable.Empty<TestCase>() : added.ToList();
             RemovedTestCases = removed == null ? Enumerable.Empty<TestCase>() : removed.ToList();

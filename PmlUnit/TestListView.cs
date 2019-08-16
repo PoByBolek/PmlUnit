@@ -17,7 +17,7 @@ namespace PmlUnit
         [Category("Behavior")]
         public event EventHandler SelectionChanged;
 
-        public TestListTestCaseCollection TestCases { get; }
+        public TestCaseCollection TestCases { get; }
         public TestListEntryCollection Entries { get; }
         public TestListEntryCollection SelectedEntries { get; }
 
@@ -29,7 +29,7 @@ namespace PmlUnit
 
         public TestListView()
         {
-            TestCases = new TestListTestCaseCollection(this);
+            TestCases = new TestCaseCollection();
             TestCases.Changed += OnTestCasesChanged;
 
             InitializeComponent();
@@ -49,7 +49,7 @@ namespace PmlUnit
             StatusImageList.Images.Add(TestListViewEntry.SuccessImageKey, Resources.Success);
         }
 
-        private void OnTestCasesChanged(object sender, TestCaseCollectionChangedEventArgs e)
+        private void OnTestCasesChanged(object sender, TestCasesChangedEventArgs e)
         {
             throw new NotImplementedException();
         }
