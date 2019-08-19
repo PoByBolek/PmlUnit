@@ -86,12 +86,12 @@ namespace PmlUnit.Tests
             RunnerControl.LoadTests();
             // Assert
             var allTests = TestList.AllTests;
-            Assert.AreEqual(5, allTests.Count);
-            Assert.AreSame(TestCases[0].Tests["one"], allTests[0]);
-            Assert.AreSame(TestCases[0].Tests["two"], allTests[1]);
-            Assert.AreSame(TestCases[1].Tests["three"], allTests[2]);
-            Assert.AreSame(TestCases[1].Tests["four"], allTests[3]);
-            Assert.AreSame(TestCases[1].Tests["five"], allTests[4]);
+            Assert.That(allTests.Count, Is.EqualTo(5));
+            Assert.That(allTests, Contains.Item(TestCases[0].Tests["one"]));
+            Assert.That(allTests, Contains.Item(TestCases[0].Tests["two"]));
+            Assert.That(allTests, Contains.Item(TestCases[1].Tests["three"]));
+            Assert.That(allTests, Contains.Item(TestCases[1].Tests["four"]));
+            Assert.That(allTests, Contains.Item(TestCases[1].Tests["five"]));
         }
     }
 
@@ -121,7 +121,7 @@ namespace PmlUnit.Tests
             RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), RunnerMock.Object);
             TestSummary = RunnerControl.FindControl<TestSummaryView>("TestSummary");
             TestList = RunnerControl.FindControl<TestListView>("TestList");
-            TestList.SetTests(TestCase.Tests);
+            TestList.TestCases.Add(TestCase);
 
             var entries = TestList.AllTestEntries;
             entries[1].Selected = true;
@@ -232,7 +232,7 @@ namespace PmlUnit.Tests
             TestSummary = RunnerControl.FindControl<TestSummaryView>("TestSummary");
             TestDetails = RunnerControl.FindControl<TestDetailsView>("TestDetails");
             TestList = RunnerControl.FindControl<TestListView>("TestList");
-            TestList.SetTests(TestCase.Tests);
+            TestList.TestCases.Add(TestCase);
         }
 
         [TearDown]

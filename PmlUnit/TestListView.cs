@@ -18,10 +18,8 @@ namespace PmlUnit
         public event EventHandler SelectionChanged;
 
         public TestCaseCollection TestCases { get; }
-        public TestListEntryCollection Entries { get; }
-        public TestListEntryCollection SelectedEntries { get; }
 
-        private readonly List<TestListGroupEntry> Groups;
+        private readonly SortedList<string, TestListGroupEntry> Groups;
         private bool IgnoreSelectionChanged;
         private int IgnoredSelectionChanges;
         private TestListBaseEntry SelectionStartEntry;
@@ -31,11 +29,11 @@ namespace PmlUnit
         {
             TestCases = new TestCaseCollection();
             TestCases.Changed += OnTestCasesChanged;
+            Groups = new SortedList<string, TestListGroupEntry>(StringComparer.OrdinalIgnoreCase);
 
             InitializeComponent();
 
             DoubleBuffered = true;
-            Groups = new List<TestListGroupEntry>();
             IgnoreSelectionChanged = false;
             IgnoredSelectionChanges = 0;
 
@@ -51,31 +49,28 @@ namespace PmlUnit
 
         private void OnTestCasesChanged(object sender, TestCasesChangedEventArgs e)
         {
-            throw new NotImplementedException();
-        }
-
-        public void SetTests(IEnumerable<Test> tests)
-        {
-            Groups.Clear();
-
-            foreach (var grouping in tests.GroupBy(test => test.TestCase.Name))
+            foreach (var testCase in e.RemovedTestCases)
             {
-                var group = new TestListGroupEntry(grouping.Key);
+                Groups.Remove(testCase.Name);
+            }
+            foreach (var testCase in e.AddedTestCases)
+            {
+                var group = new TestListGroupEntry(testCase.Name);
                 group.SelectionChanged += OnSelectionChanged;
                 group.ExpandedChanged += OnGroupExpandedChanged;
-                foreach (var test in grouping)
+                foreach (var test in testCase.Tests)
                 {
                     var entry = new TestListViewEntry(test);
                     entry.SelectionChanged += OnSelectionChanged;
                     entry.ResultChanged += OnTestResultChanged;
                     group.Add(entry);
                 }
-                Groups.Add(group);
+                Groups.Add(testCase.Name, group);
             }
 
             FocusedEntry = null;
-            SelectionStartEntry = Groups.FirstOrDefault();
-            AutoScrollMinSize = new Size(0, Groups.Sum(group => group.Height));
+            SelectionStartEntry = Groups.Values.FirstOrDefault();
+            AutoScrollMinSize = new Size(0, Groups.Values.Sum(group => group.Height));
 
             Invalidate();
         }
@@ -103,7 +98,7 @@ namespace PmlUnit
             get
             {
                 var result = new HashSet<Test>();
-                foreach (var group in Groups)
+                foreach (var group in Groups.Values)
                 {
                     if (group.Selected)
                     {
@@ -129,13 +124,13 @@ namespace PmlUnit
 
         private IEnumerable<Test> AllTestsInternal => AllTestEntriesInternal.Select(entry => entry.Test);
 
-        private IEnumerable<TestListEntry> AllTestEntriesInternal => Groups.SelectMany(group => group.Entries).OfType<TestListEntry>();
+        private IEnumerable<TestListEntry> AllTestEntriesInternal => Groups.Values.SelectMany(group => group.Entries).OfType<TestListEntry>();
 
         private IEnumerable<TestListBaseEntry> AllEntries
         {
             get
             {
-                foreach (var group in Groups)
+                foreach (var group in Groups.Values)
                 {
                     yield return group;
                     foreach (var entry in group.Entries)
@@ -148,7 +143,7 @@ namespace PmlUnit
         {
             get
             {
-                foreach (var group in Groups)
+                foreach (var group in Groups.Values)
                 {
                     yield return group;
                     if (group.IsExpanded)
@@ -191,7 +186,7 @@ namespace PmlUnit
                 int maxY = e.ClipRectangle.Bottom;
                 int y = -VerticalScroll.Value;
 
-                foreach (var group in Groups)
+                foreach (var group in Groups.Values)
                 {
                     if (y > maxY)
                         break;
@@ -267,7 +262,7 @@ namespace PmlUnit
             }
             else if (e.KeyCode == Keys.Up)
             {
-                target = Groups.FirstOrDefault();
+                target = Groups.Values.FirstOrDefault();
                 foreach (var entry in VisibleEntries)
                 {
                     if (entry == FocusedEntry)
@@ -296,7 +291,7 @@ namespace PmlUnit
                 }
                 else
                 {
-                    foreach (var group in Groups)
+                    foreach (var group in Groups.Values)
                     {
                         foreach (var entry in group.Entries)
                         {
@@ -400,7 +395,7 @@ namespace PmlUnit
             int y = -VerticalScroll.Value;
             int target = location.Y;
 
-            foreach (var group in Groups)
+            foreach (var group in Groups.Values)
             {
                 if (target < y)
                     return null;
@@ -482,7 +477,7 @@ namespace PmlUnit
 
         private void OnGroupExpandedChanged(object sender, EventArgs e)
         {
-            AutoScrollMinSize = new Size(0, Groups.Sum(group => group.Height));
+            AutoScrollMinSize = new Size(0, Groups.Values.Sum(group => group.Height));
             Invalidate();
         }
 

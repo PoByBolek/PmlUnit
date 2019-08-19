@@ -3,7 +3,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -35,12 +34,12 @@ namespace PmlUnit.Tests
             First.Tests.Add("a1");
             First.Tests.Add("a2");
             First.Tests.Add("a3");
+            TestList.TestCases.Add(First);
             Second = new TestCase("Second");
             Second.Tests.Add("b1");
             Second.Tests.Add("b2");
             Second.Tests.Add("b3");
-
-            TestList.SetTests(First.Tests.Concat(Second.Tests));
+            TestList.TestCases.Add(Second);
         }
 
         [TearDown]

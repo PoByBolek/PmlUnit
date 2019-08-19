@@ -28,19 +28,14 @@ namespace PmlUnit.Tests
             Second.Tests.Add("four");
             Second.Tests.Add("five");
             TestList = new TestListView();
-            TestList.SetTests(First.Tests.Concat(Second.Tests));
+            TestList.TestCases.Add(First);
+            TestList.TestCases.Add(Second);
         }
 
         [TearDown]
         public void TearDown()
         {
             TestList.Dispose();
-        }
-
-        [Test]
-        public void SetTests_ChecksForNullArgument()
-        {
-            Assert.Throws<ArgumentNullException>(() => TestList.SetTests(null));
         }
 
         [Test]
