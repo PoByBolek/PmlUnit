@@ -17,9 +17,17 @@ namespace PmlUnit
         [Category("Behavior")]
         public event EventHandler SelectionChanged;
 
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public TestCaseCollection TestCases { get; }
 
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public TestListEntryCollection Entries { get; }
+
         private readonly SortedList<string, TestListGroupEntry> Groups;
+        private readonly WritableTestListEntryCollection EntriesField;
+
         private bool IgnoreSelectionChanged;
         private int IgnoredSelectionChanges;
         private TestListBaseEntry SelectionStartEntry;
@@ -30,6 +38,8 @@ namespace PmlUnit
             TestCases = new TestCaseCollection();
             TestCases.Changed += OnTestCasesChanged;
             Groups = new SortedList<string, TestListGroupEntry>(StringComparer.OrdinalIgnoreCase);
+            EntriesField = new WritableTestListEntryCollection();
+            Entries = EntriesField.AsReadOnly();
 
             InitializeComponent();
 
@@ -52,6 +62,8 @@ namespace PmlUnit
             foreach (var testCase in e.RemovedTestCases)
             {
                 Groups.Remove(testCase.Name);
+                foreach (var test in testCase.Tests)
+                    EntriesField.Remove(test);
             }
             foreach (var testCase in e.AddedTestCases)
             {
@@ -60,7 +72,7 @@ namespace PmlUnit
                 group.ExpandedChanged += OnGroupExpandedChanged;
                 foreach (var test in testCase.Tests)
                 {
-                    var entry = new TestListViewEntry(test);
+                    var entry = EntriesField.Add(test) as TestListViewEntry;
                     entry.SelectionChanged += OnSelectionChanged;
                     entry.ResultChanged += OnTestResultChanged;
                     group.Add(entry);
@@ -118,13 +130,7 @@ namespace PmlUnit
             }
         }
 
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> AllTestEntries => AllTestEntriesInternal.ToList();
-
-        private IEnumerable<Test> AllTestsInternal => AllTestEntriesInternal.Select(entry => entry.Test);
-
-        private IEnumerable<TestListEntry> AllTestEntriesInternal => Groups.Values.SelectMany(group => group.Entries).OfType<TestListEntry>();
+        private IEnumerable<Test> AllTestsInternal => Entries.Select(entry => entry.Test);
 
         private IEnumerable<TestListBaseEntry> AllEntries
         {

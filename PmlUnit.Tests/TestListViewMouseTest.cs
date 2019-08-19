@@ -59,7 +59,7 @@ namespace PmlUnit.Tests
         [Test]
         public void EntryClick_SelectsOnlyThatEntry()
         {
-            foreach (var entry in TestList.AllTestEntries)
+            foreach (var entry in TestList.Entries)
                 entry.Selected = true;
 
             var selected = PerformMouseClick(30, 50);
@@ -78,7 +78,7 @@ namespace PmlUnit.Tests
         [Test]
         public void RightEntryClick_SelectsOnlyThatEntry()
         {
-            foreach (var entry in TestList.AllTestEntries)
+            foreach (var entry in TestList.Entries)
                 entry.Selected = true;
 
             var selected = PerformMouseClick(30, 70, MouseButtons.Right);
@@ -99,7 +99,7 @@ namespace PmlUnit.Tests
             selected = PerformMouseClick(30, 110, Keys.Control);
             Assert.AreEqual(0, selected.Count);
 
-            foreach (var entry in TestList.AllTestEntries)
+            foreach (var entry in TestList.Entries)
                 entry.Selected = true;
 
             selected = PerformMouseClick(30, 110, Keys.Control);
@@ -117,7 +117,7 @@ namespace PmlUnit.Tests
             var selected = PerformMouseClick(30, 130, MouseButtons.Right, Keys.Control);
             Assert.AreEqual(0, selected.Count);
 
-            foreach (var entry in TestList.AllTestEntries)
+            foreach (var entry in TestList.Entries)
                 entry.Selected = true;
             Assert.AreEqual(6, TestList.SelectedTests.Count);
 

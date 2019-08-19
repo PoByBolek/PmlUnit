@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Copyright (c) 2019 Florian Zimmermann.
+// Licensed under the MIT License: https://opensource.org/licenses/MIT
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -54,7 +56,7 @@ namespace PmlUnit.Tests
         [Test]
         public void Add_IncreasesTheCollectionsCount()
         {
-            
+
             Assert.That(Collection.Count, Is.EqualTo(0));
 
             Collection.Add(First);
@@ -186,7 +188,7 @@ namespace PmlUnit.Tests
         [Test]
         public void AddRange_OnlyEvaluatesCollectionOnce()
         {
-            
+
             Collection.AddRange(new OneTimeEnumerable());
         }
 

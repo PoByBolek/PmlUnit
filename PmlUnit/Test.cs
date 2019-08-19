@@ -52,9 +52,14 @@ namespace PmlUnit
             }
         }
 
+        public string FullName
+        {
+            get { return TestCase.Name + "." + Name; }
+        }
+
         public override string ToString()
         {
-            return TestCase.Name + "." + Name;
+            return FullName;
         }
     }
 

@@ -2,7 +2,6 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 
 using NUnit.Framework;
 
@@ -44,12 +43,12 @@ namespace PmlUnit.Tests
             // Act
             var tests = TestList.AllTests;
             // Assert
-            Assert.AreEqual(5, tests.Count);
-            Assert.AreSame(First.Tests["one"], tests[0]);
-            Assert.AreSame(First.Tests["two"], tests[1]);
-            Assert.AreSame(First.Tests["three"], tests[2]);
-            Assert.AreSame(Second.Tests["four"], tests[3]);
-            Assert.AreSame(Second.Tests["five"], tests[4]);
+            Assert.That(tests.Count, Is.EqualTo(5));
+            Assert.That(tests, Contains.Item(First.Tests["one"]));
+            Assert.That(tests, Contains.Item(First.Tests["two"]));
+            Assert.That(tests, Contains.Item(First.Tests["three"]));
+            Assert.That(tests, Contains.Item(Second.Tests["four"]));
+            Assert.That(tests, Contains.Item(Second.Tests["five"]));
         }
 
         [Test]
@@ -61,9 +60,9 @@ namespace PmlUnit.Tests
             // Act
             var tests = TestList.SucceededTests;
             // Assert
-            Assert.AreEqual(2, tests.Count);
-            Assert.AreSame(First.Tests["three"], tests[0]);
-            Assert.AreSame(Second.Tests["five"], tests[1]);
+            Assert.That(tests.Count, Is.EqualTo(2));
+            Assert.That(tests, Contains.Item(First.Tests["three"]));
+            Assert.That(tests, Contains.Item(Second.Tests["five"]));
         }
 
         [Test]
@@ -76,10 +75,10 @@ namespace PmlUnit.Tests
             // Act
             var tests = TestList.FailedTests;
             // Assert
-            Assert.AreEqual(3, tests.Count);
-            Assert.AreSame(First.Tests["one"], tests[0]);
-            Assert.AreSame(First.Tests["three"], tests[1]);
-            Assert.AreSame(Second.Tests["four"], tests[2]);
+            Assert.That(tests.Count, Is.EqualTo(3));
+            Assert.That(tests, Contains.Item(First.Tests["one"]));
+            Assert.That(tests, Contains.Item(First.Tests["three"]));
+            Assert.That(tests, Contains.Item(Second.Tests["four"]));
         }
 
         [Test]
@@ -91,17 +90,17 @@ namespace PmlUnit.Tests
             // Act
             var tests = TestList.NotExecutedTests;
             // Assert
-            Assert.AreEqual(3, tests.Count);
-            Assert.AreSame(First.Tests["one"], tests[0]);
-            Assert.AreSame(First.Tests["three"], tests[1]);
-            Assert.AreSame(Second.Tests["five"], tests[2]);
+            Assert.That(tests.Count, Is.EqualTo(3));
+            Assert.That(tests, Contains.Item(First.Tests["one"]));
+            Assert.That(tests, Contains.Item(First.Tests["three"]));
+            Assert.That(tests, Contains.Item(Second.Tests["five"]));
         }
 
         [Test]
         public void SetTests_ClearsResultOfNewTests()
         {
             foreach (var test in TestList.AllTests)
-                Assert.IsNull(test.Result);
+                Assert.That(test.Result, Is.Null);
         }
     }
 }
