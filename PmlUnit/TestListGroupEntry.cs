@@ -95,33 +95,6 @@ namespace PmlUnit
 
         public void Paint(Graphics g, Rectangle bounds, TestListPaintOptions options)
         {
-            int minY = options.ClipRectangle.Top;
-            int maxY = options.ClipRectangle.Bottom;
-            int y = bounds.Y;
-
-            if (y > maxY)
-                return;
-
-            if (y + TestListView.EntryHeight >= minY)
-            {
-                var headerBounds = new Rectangle(bounds.X, bounds.Y, bounds.Width, TestListView.EntryHeight);
-                PaintHeader(g, headerBounds, options);
-            }
-            y += TestListView.EntryHeight;
-
-            if (IsExpanded)
-            {
-                int totalHeight = EntriesField.Count * TestListView.EntryHeight;
-                if (y + totalHeight >= minY)
-                {
-                    var entryBounds = new Rectangle(bounds.X + 20, y, bounds.Width - 20, totalHeight);
-                    PaintEntries(g, entryBounds, options);
-                }
-            }
-        }
-
-        private void PaintHeader(Graphics g, Rectangle bounds, TestListPaintOptions options)
-        {
             int padding = 2;
             int x = bounds.Left + padding;
             int y = bounds.Top + padding;
@@ -130,11 +103,14 @@ namespace PmlUnit
             if (Selected)
             {
                 textBrush = options.SelectedTextBrush;
-                g.FillRectangle(options.SelectedBackBrush, 0, bounds.Top, bounds.Right, bounds.Height);
+                g.FillRectangle(options.SelectedBackBrush, bounds);
             }
             else if (options.FocusedEntry == this)
             {
-                g.DrawRectangle(options.FocusRectanglePen, 0, bounds.Top, bounds.Right - 1, bounds.Height - 1);
+                var copy = bounds;
+                copy.Width -= 1;
+                copy.Height -= 1;
+                g.DrawRectangle(options.FocusRectanglePen, copy);
             }
 
             g.DrawImage(options.ExpanderImageList.Images[IsExpanded ? ExpandedImageKey : CollapsedImageKey], x, y);
@@ -146,26 +122,6 @@ namespace PmlUnit
 
             var count = " (" + Entries.Count + ")";
             g.DrawString(count, options.EntryFont, textBrush, x, y);
-        }
-
-        private void PaintEntries(Graphics g, Rectangle bounds, TestListPaintOptions options)
-        {
-            int minY = options.ClipRectangle.Top;
-            int maxY = options.ClipRectangle.Bottom;
-            int y = bounds.Top;
-
-            foreach (var entry in EntriesField)
-            {
-                if (y > maxY)
-                    return;
-
-                if (y + TestListView.EntryHeight >= minY)
-                {
-                    var entryBounds = new Rectangle(bounds.X, y, bounds.Width, TestListView.EntryHeight);
-                    entry.Paint(g, entryBounds, options);
-                }
-                y += TestListView.EntryHeight;
-            }
         }
     }
 

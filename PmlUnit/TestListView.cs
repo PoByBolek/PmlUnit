@@ -27,6 +27,7 @@ namespace PmlUnit
 
         private readonly SortedList<string, TestListGroupEntry> Groups;
         private readonly WritableTestListEntryCollection EntriesField;
+        private readonly SortedList<string, TestListBaseEntry> VisibleEntries;
 
         private bool IgnoreSelectionChanged;
         private int IgnoredSelectionChanges;
@@ -40,6 +41,7 @@ namespace PmlUnit
             Groups = new SortedList<string, TestListGroupEntry>(StringComparer.OrdinalIgnoreCase);
             EntriesField = new WritableTestListEntryCollection();
             Entries = EntriesField.AsReadOnly();
+            VisibleEntries = new SortedList<string, TestListBaseEntry>(StringComparer.OrdinalIgnoreCase);
 
             InitializeComponent();
 
@@ -62,8 +64,12 @@ namespace PmlUnit
             foreach (var testCase in e.RemovedTestCases)
             {
                 Groups.Remove(testCase.Name);
+                VisibleEntries.Remove(testCase.Name);
                 foreach (var test in testCase.Tests)
+                {
                     EntriesField.Remove(test);
+                    VisibleEntries.Remove(test.FullName);
+                }
             }
             foreach (var testCase in e.AddedTestCases)
             {
@@ -76,13 +82,15 @@ namespace PmlUnit
                     entry.SelectionChanged += OnSelectionChanged;
                     entry.ResultChanged += OnTestResultChanged;
                     group.Add(entry);
+                    VisibleEntries.Add(test.FullName, entry);
                 }
                 Groups.Add(testCase.Name, group);
+                VisibleEntries.Add(testCase.Name, group);
             }
 
             FocusedEntry = null;
             SelectionStartEntry = Groups.Values.FirstOrDefault();
-            AutoScrollMinSize = new Size(0, Groups.Values.Sum(group => group.Height));
+            AutoScrollMinSize = new Size(0, VisibleEntries.Count * EntryHeight);
 
             Invalidate();
         }
@@ -145,22 +153,6 @@ namespace PmlUnit
             }
         }
 
-        private IEnumerable<TestListBaseEntry> VisibleEntries
-        {
-            get
-            {
-                foreach (var group in Groups.Values)
-                {
-                    yield return group;
-                    if (group.IsExpanded)
-                    {
-                        foreach (var entry in group.Entries)
-                            yield return entry;
-                    }
-                }
-            }
-        }
-
         private TestListBaseEntry FocusedEntry
         {
             get { return FocusedEntryField; }
@@ -188,22 +180,17 @@ namespace PmlUnit
             using (var options = new TestListPaintOptions(this, e.ClipRectangle, FocusedEntry, StatusImageList, ExpanderImageList))
             {
                 int width = ClientSize.Width;
-                int minY = e.ClipRectangle.Top;
-                int maxY = e.ClipRectangle.Bottom;
-                int y = -VerticalScroll.Value;
+                int offset = VerticalScroll.Value;
+                int startIndex = (e.ClipRectangle.Top + offset) / EntryHeight;
+                startIndex = Math.Max(0, startIndex);
+                int endIndex = (e.ClipRectangle.Bottom + offset) / EntryHeight;
+                endIndex = Math.Min(endIndex, VisibleEntries.Count - 1);
 
-                foreach (var group in Groups.Values)
+                for (int i = startIndex; i <= endIndex; i++)
                 {
-                    if (y > maxY)
-                        break;
-
-                    int height = group.Height;
-                    if (y + height >= minY)
-                    {
-                        var bounds = new Rectangle(0, y, width, height);
-                        group.Paint(g, bounds, options);
-                    }
-                    y += height;
+                    var entry = VisibleEntries.Values[i];
+                    var bounds = new Rectangle(0, i * EntryHeight - offset, width, EntryHeight);
+                    entry.Paint(g, bounds, options);
                 }
             }
         }
@@ -268,25 +255,19 @@ namespace PmlUnit
             }
             else if (e.KeyCode == Keys.Up)
             {
-                target = Groups.Values.FirstOrDefault();
-                foreach (var entry in VisibleEntries)
-                {
-                    if (entry == FocusedEntry)
-                        break;
-                    target = entry;
-                }
+                int index = VisibleEntries.IndexOfValue(FocusedEntry);
+                if (index > 0)
+                    target = VisibleEntries.Values[index - 1];
+                else
+                    target = VisibleEntries.Values.FirstOrDefault();
             }
             else if (e.KeyCode == Keys.Down)
             {
-                bool stop = false;
-                foreach (var entry in VisibleEntries)
-                {
-                    target = entry;
-                    if (stop)
-                        break;
-                    else if (entry == FocusedEntry)
-                        stop = true;
-                }
+                int index = VisibleEntries.IndexOfValue(FocusedEntry);
+                if (index < VisibleEntries.Count - 1)
+                    target = VisibleEntries.Values[index + 1];
+                else
+                    target = VisibleEntries.Values.LastOrDefault();
             }
             else if (e.KeyCode == Keys.Left)
             {
@@ -398,54 +379,33 @@ namespace PmlUnit
 
         private TestListBaseEntry FindEntry(Point location)
         {
-            int y = -VerticalScroll.Value;
-            int target = location.Y;
-
-            foreach (var group in Groups.Values)
-            {
-                if (target < y)
-                    return null;
-                else if (target < y + EntryHeight)
-                    return group;
-                y += EntryHeight;
-
-                if (group.IsExpanded)
-                {
-                    int height = group.Entries.Count * EntryHeight;
-                    if (target < y + height)
-                    {
-                        int index = (target - y) / EntryHeight;
-                        return group.Entries[index];
-                    }
-                    y += height;
-                }
-            }
-            return null;
+            int clientY = location.Y + VerticalScroll.Value;
+            int index = clientY / EntryHeight;
+            if (index < 0 || index >= VisibleEntries.Count)
+                return null;
+            else
+                return VisibleEntries.Values[index];
         }
 
         private void ScrollEntryIntoView(TestListBaseEntry entry)
         {
-            int offset = 0;
-            foreach (var e in VisibleEntries)
+            int index = VisibleEntries.IndexOfValue(entry);
+            if (index >= 0)
             {
-                if (e == entry)
+                int offset = index * EntryHeight;
+                int top = VerticalScroll.Value;
+                int bottom = VerticalScroll.Value + ClientSize.Height;
+                int min = VerticalScroll.Minimum;
+                int max = VerticalScroll.Maximum;
+                if (offset < top)
                 {
-                    int top = VerticalScroll.Value;
-                    int bottom = VerticalScroll.Value + ClientSize.Height;
-                    int min = VerticalScroll.Minimum;
-                    int max = VerticalScroll.Maximum;
-                    if (offset < top)
-                    {
-                        AutoScrollPosition = new Point(0, Math.Max(min, Math.Min(offset, max)));
-                    }
-                    else if (offset + EntryHeight > bottom)
-                    {
-                        offset -= ClientSize.Height - EntryHeight;
-                        AutoScrollPosition = new Point(0, Math.Max(min, Math.Min(offset, max)));
-                    }
-                    return;
+                    AutoScrollPosition = new Point(0, Math.Max(min, Math.Min(offset, max)));
                 }
-                offset += EntryHeight;
+                else if (offset + EntryHeight > bottom)
+                {
+                    offset -= ClientSize.Height - EntryHeight;
+                    AutoScrollPosition = new Point(0, Math.Max(min, Math.Min(offset, max)));
+                }
             }
         }
 
@@ -483,7 +443,19 @@ namespace PmlUnit
 
         private void OnGroupExpandedChanged(object sender, EventArgs e)
         {
-            AutoScrollMinSize = new Size(0, Groups.Values.Sum(group => group.Height));
+            var group = sender as TestListGroupEntry;
+            if (group.IsExpanded)
+            {
+                foreach (var entry in group.Entries)
+                    VisibleEntries.Add(entry.Test.FullName, entry);
+            }
+            else
+            {
+                foreach (var entry in group.Entries)
+                    VisibleEntries.Remove(entry.Test.FullName);
+            }
+
+            AutoScrollMinSize = new Size(0, VisibleEntries.Count * EntryHeight);
             Invalidate();
         }
 

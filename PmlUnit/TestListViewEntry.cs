@@ -47,7 +47,7 @@ namespace PmlUnit
         public void Paint(Graphics g, Rectangle bounds, TestListPaintOptions options)
         {
             int padding = 2;
-            int left = bounds.Left + padding;
+            int left = bounds.Left + padding + 20;
             int right = bounds.Right - padding;
             int y = bounds.Top + padding;
 
@@ -55,11 +55,14 @@ namespace PmlUnit
             if (Selected)
             {
                 textBrush = options.SelectedTextBrush;
-                g.FillRectangle(options.SelectedBackBrush, 0, bounds.Top, bounds.Right, bounds.Height);
+                g.FillRectangle(options.SelectedBackBrush, bounds);
             }
             else if (options.FocusedEntry == this)
             {
-                g.DrawRectangle(options.FocusRectanglePen, 0, bounds.Top, bounds.Right - 1, bounds.Height - 1);
+                var copy = bounds;
+                copy.Width -= 1;
+                copy.Height -= 1;
+                g.DrawRectangle(options.FocusRectanglePen, copy);
             }
 
             g.DrawImage(options.StatusImageList.Images[GetImageKey()], left, y);
