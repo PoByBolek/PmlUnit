@@ -27,6 +27,7 @@ namespace PmlUnit
 
         private readonly SortedList<string, TestListGroupEntry> Groups;
         private readonly WritableTestListEntryCollection EntriesField;
+        private readonly SortedList<string, TestListBaseEntry> AllEntries;
         private readonly SortedList<string, TestListBaseEntry> VisibleEntries;
 
         private bool IgnoreSelectionChanged;
@@ -41,6 +42,7 @@ namespace PmlUnit
             Groups = new SortedList<string, TestListGroupEntry>(StringComparer.OrdinalIgnoreCase);
             EntriesField = new WritableTestListEntryCollection();
             Entries = EntriesField.AsReadOnly();
+            AllEntries = new SortedList<string, TestListBaseEntry>(StringComparer.OrdinalIgnoreCase);
             VisibleEntries = new SortedList<string, TestListBaseEntry>(StringComparer.OrdinalIgnoreCase);
 
             InitializeComponent();
@@ -64,10 +66,12 @@ namespace PmlUnit
             foreach (var testCase in e.RemovedTestCases)
             {
                 Groups.Remove(testCase.Name);
+                AllEntries.Remove(testCase.Name);
                 VisibleEntries.Remove(testCase.Name);
                 foreach (var test in testCase.Tests)
                 {
                     EntriesField.Remove(test);
+                    AllEntries.Remove(test.FullName);
                     VisibleEntries.Remove(test.FullName);
                 }
             }
@@ -82,9 +86,11 @@ namespace PmlUnit
                     entry.SelectionChanged += OnSelectionChanged;
                     entry.ResultChanged += OnTestResultChanged;
                     group.Add(entry);
+                    AllEntries.Add(test.FullName, entry);
                     VisibleEntries.Add(test.FullName, entry);
                 }
                 Groups.Add(testCase.Name, group);
+                AllEntries.Add(testCase.Name, group);
                 VisibleEntries.Add(testCase.Name, group);
             }
 
@@ -139,19 +145,6 @@ namespace PmlUnit
         }
 
         private IEnumerable<Test> AllTestsInternal => Entries.Select(entry => entry.Test);
-
-        private IEnumerable<TestListBaseEntry> AllEntries
-        {
-            get
-            {
-                foreach (var group in Groups.Values)
-                {
-                    yield return group;
-                    foreach (var entry in group.Entries)
-                        yield return entry;
-                }
-            }
-        }
 
         private TestListBaseEntry FocusedEntry
         {
@@ -411,7 +404,7 @@ namespace PmlUnit
 
         private void SelectOnly(TestListBaseEntry target)
         {
-            foreach (var entry in AllEntries)
+            foreach (var entry in AllEntries.Values)
                 entry.Selected = false;
 
             if (target != null)
@@ -425,7 +418,7 @@ namespace PmlUnit
         private void SelectRange(TestListBaseEntry target)
         {
             bool selected = false;
-            foreach (var entry in AllEntries)
+            foreach (var entry in AllEntries.Values)
             {
                 if (entry == target || entry == SelectionStartEntry)
                 {
