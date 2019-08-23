@@ -39,6 +39,10 @@ namespace PmlUnit
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public ReadOnlyTestListGroupEntryCollection Groups { get; }
 
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public TestListSelectedEntryCollection SelectedEntries { get; }
+
         private readonly TestListTestEntryCollection EntriesField;
         private readonly TestListGroupEntryCollection GroupsField;
         private readonly SortedList<string, TestListEntry> AllEntries;
@@ -57,8 +61,10 @@ namespace PmlUnit
             Entries = EntriesField.AsReadOnly();
             GroupsField = new TestListGroupEntryCollection();
             Groups = GroupsField.AsReadOnly();
+
             AllEntries = new SortedList<string, TestListEntry>(StringComparer.OrdinalIgnoreCase);
             VisibleEntries = new SortedList<string, TestListEntry>(StringComparer.OrdinalIgnoreCase);
+            SelectedEntries = new TestListSelectedEntryCollection(AllEntries.Values);
 
             InitializeComponent();
 

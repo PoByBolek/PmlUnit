@@ -144,6 +144,7 @@
     <Compile Include="TestListGroupEntry.cs" />
     <Compile Include="TestListGroupEntryCollection.cs" />
     <Compile Include="TestListPaintOptions.cs" />
+    <Compile Include="TestListSelectedEntryCollection.cs" />
     <Compile Include="TestListTestEntry.cs" />
     <Compile Include="TestListTestEntryCollection.cs" />
     <Compile Include="TestListView.cs">
