@@ -21,6 +21,7 @@ namespace PmlUnit
         public int Count => Entries.Count;
 
         public TestListTestEntry this[Test test] => Entries[test];
+        public TestListTestEntry this[int index] => Entries[index];
 
         public bool Contains(TestListTestEntry item)
         {
@@ -73,10 +74,8 @@ namespace PmlUnit
 
         public int Count => Entries.Count;
 
-        public TestListTestEntry this[Test test]
-        {
-            get { return Entries[test]; }
-        }
+        public TestListTestEntry this[Test test] => Entries[test];
+        public TestListTestEntry this[int index] => Entries.Values[index];
 
         public ReadOnlyTestListTestEntryCollection AsReadOnly()
         {

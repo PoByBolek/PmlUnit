@@ -35,8 +35,12 @@ namespace PmlUnit
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public ReadOnlyTestListTestEntryCollection Entries { get; }
 
-        private readonly SortedList<string, TestListGroupEntry> Groups;
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public ReadOnlyTestListGroupEntryCollection Groups { get; }
+
         private readonly TestListTestEntryCollection EntriesField;
+        private readonly TestListGroupEntryCollection GroupsField;
         private readonly SortedList<string, TestListEntry> AllEntries;
         private readonly SortedList<string, TestListEntry> VisibleEntries;
 
@@ -49,9 +53,10 @@ namespace PmlUnit
         {
             TestCases = new TestCaseCollection();
             TestCases.Changed += OnTestCasesChanged;
-            Groups = new SortedList<string, TestListGroupEntry>(StringComparer.OrdinalIgnoreCase);
             EntriesField = new TestListTestEntryCollection();
             Entries = EntriesField.AsReadOnly();
+            GroupsField = new TestListGroupEntryCollection();
+            Groups = GroupsField.AsReadOnly();
             AllEntries = new SortedList<string, TestListEntry>(StringComparer.OrdinalIgnoreCase);
             VisibleEntries = new SortedList<string, TestListEntry>(StringComparer.OrdinalIgnoreCase);
 
@@ -75,7 +80,7 @@ namespace PmlUnit
         {
             foreach (var testCase in e.RemovedTestCases)
             {
-                Groups.Remove(testCase.Name);
+                GroupsField.Remove(testCase.Name);
                 AllEntries.Remove(testCase.Name);
                 VisibleEntries.Remove(testCase.Name);
                 foreach (var test in testCase.Tests)
@@ -99,13 +104,13 @@ namespace PmlUnit
                     AllEntries.Add(test.FullName, entry);
                     VisibleEntries.Add(test.FullName, entry);
                 }
-                Groups.Add(testCase.Name, group);
+                GroupsField.Add(group);
                 AllEntries.Add(testCase.Name, group);
                 VisibleEntries.Add(testCase.Name, group);
             }
 
             FocusedEntry = null;
-            SelectionStartEntry = Groups.Values.FirstOrDefault();
+            SelectionStartEntry = GroupsField.FirstOrDefault();
             AutoScrollMinSize = new Size(0, VisibleEntries.Count * EntryHeight);
 
             Invalidate();
@@ -134,7 +139,7 @@ namespace PmlUnit
             get
             {
                 var result = new HashSet<Test>();
-                foreach (var group in Groups.Values)
+                foreach (var group in GroupsField)
                 {
                     if (group.Selected)
                     {
@@ -370,7 +375,7 @@ namespace PmlUnit
                 }
                 else
                 {
-                    foreach (var group in Groups.Values)
+                    foreach (var group in GroupsField)
                     {
                         foreach (var entry in group.Entries)
                         {
@@ -391,14 +396,9 @@ namespace PmlUnit
                 if (focusedGroup != null)
                 {
                     if (focusedGroup.IsExpanded)
-                    {
-                        if (focusedGroup.Entries.Count > 0)
-                            target = focusedGroup.Entries.FirstOrDefault();
-                    }
+                        target = focusedGroup.Entries.FirstOrDefault();
                     else
-                    {
                         focusedGroup.IsExpanded = true;
-                    }
                 }
             }
 
