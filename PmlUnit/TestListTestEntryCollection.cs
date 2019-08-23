@@ -3,14 +3,15 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PmlUnit
 {
-    class TestListTestEntryCollection : ICollection<TestListTestEntry>
+    class ReadOnlyTestListTestEntryCollection : ICollection<TestListTestEntry>
     {
-        WritableTestListTestEntryCollection Entries;
+        TestListTestEntryCollection Entries;
 
-        public TestListTestEntryCollection(WritableTestListTestEntryCollection entries)
+        public ReadOnlyTestListTestEntryCollection(TestListTestEntryCollection entries)
         {
             if (entries == null)
                 throw new ArgumentNullException(nameof(entries));
@@ -59,11 +60,13 @@ namespace PmlUnit
         }
     }
 
-    class WritableTestListTestEntryCollection : ICollection<TestListTestEntry>
+    class TestListTestEntryCollection : ICollection<TestListTestEntry>
     {
+        public event EventHandler<TestListEntriesChangedEventArgs> Changed;
+
         private readonly SortedList<Test, TestListTestEntry> Entries;
 
-        public WritableTestListTestEntryCollection()
+        public TestListTestEntryCollection()
         {
             Entries = new SortedList<Test, TestListTestEntry>(new TestComparer());
         }
@@ -75,9 +78,9 @@ namespace PmlUnit
             get { return Entries[test]; }
         }
 
-        public TestListTestEntryCollection AsReadOnly()
+        public ReadOnlyTestListTestEntryCollection AsReadOnly()
         {
-            return new TestListTestEntryCollection(this);
+            return new ReadOnlyTestListTestEntryCollection(this);
         }
 
         public TestListTestEntry Add(Test test)
@@ -87,6 +90,8 @@ namespace PmlUnit
 
             var result = new TestListTestEntry(test);
             Entries.Add(test, result);
+            OnChanged(result, null);
+
             return result;
         }
 
@@ -94,12 +99,19 @@ namespace PmlUnit
         {
             if (item == null)
                 throw new ArgumentNullException(nameof(item));
+
             Entries.Add(item.Test, item);
+            OnChanged(item, null);
         }
 
         public void Clear()
         {
-            Entries.Clear();
+            if (Entries.Count > 0)
+            {
+                var copy = Entries.Values.ToList();
+                Entries.Clear();
+                OnChanged(null, copy);
+            }
         }
 
         public bool Contains(TestListTestEntry item)
@@ -115,12 +127,23 @@ namespace PmlUnit
         {
             if (test == null)
                 throw new ArgumentNullException(nameof(test));
-            return Entries.Remove(test);
+
+            TestListTestEntry entry;
+            bool result = Entries.TryGetValue(test, out entry);
+            if (result)
+            {
+                Entries.Remove(test);
+                OnChanged(null, entry);
+            }
+            return result;
         }
 
         public bool Remove(TestListTestEntry item)
         {
-            return Contains(item) && Entries.Remove(item.Test);
+            bool result = Contains(item) && Entries.Remove(item.Test);
+            if (result)
+                OnChanged(null, item);
+            return result;
         }
 
         public void CopyTo(TestListTestEntry[] array, int arrayIndex)
@@ -140,6 +163,16 @@ namespace PmlUnit
 
         bool ICollection<TestListTestEntry>.IsReadOnly => false;
 
+        private void OnChanged(TestListTestEntry added, TestListTestEntry removed)
+        {
+            Changed?.Invoke(this, new TestListEntriesChangedEventArgs(added, removed));
+        }
+
+        private void OnChanged(IEnumerable<TestListTestEntry> added, IEnumerable<TestListTestEntry> removed)
+        {
+            Changed?.Invoke(this, new TestListEntriesChangedEventArgs(added, removed));
+        }
+
         private class TestComparer : IComparer<Test>
         {
             public int Compare(Test left, Test right)
@@ -154,6 +187,24 @@ namespace PmlUnit
                     result = string.Compare(left.TestCase.Name, right.TestCase.Name, StringComparison.OrdinalIgnoreCase);
                 return result;
             }
+        }
+    }
+
+    class TestListEntriesChangedEventArgs : EventArgs
+    {
+        public IEnumerable<TestListTestEntry> AddedEntries { get; }
+        public IEnumerable<TestListTestEntry> RemovedEntries { get; }
+
+        public TestListEntriesChangedEventArgs(TestListTestEntry added, TestListTestEntry removed)
+        {
+            AddedEntries = added == null ? Enumerable.Empty<TestListTestEntry>() : Enumerable.Repeat(added, 1);
+            RemovedEntries = removed == null ? Enumerable.Empty<TestListTestEntry>() : Enumerable.Repeat(removed, 1);
+        }
+
+        public TestListEntriesChangedEventArgs(IEnumerable<TestListTestEntry> added, IEnumerable<TestListTestEntry> removed)
+        {
+            AddedEntries = added == null ? Enumerable.Empty<TestListTestEntry>() : added.ToList();
+            RemovedEntries = removed == null ? Enumerable.Empty<TestListTestEntry>() : removed.ToList();
         }
     }
 }

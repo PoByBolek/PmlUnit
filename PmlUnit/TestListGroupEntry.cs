@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
-using System.Collections.Generic;
 
 namespace PmlUnit
 {
@@ -10,8 +9,8 @@ namespace PmlUnit
         public event EventHandler ExpandedChanged;
 
         public string Name { get; }
+        public TestListTestEntryCollection Entries { get; }
 
-        private readonly List<TestListTestEntry> EntriesField;
         private bool ExpandedField;
 
         public TestListGroupEntry(string name)
@@ -20,29 +19,9 @@ namespace PmlUnit
                 throw new ArgumentNullException(nameof(name));
 
             Name = name;
-            EntriesField = new List<TestListTestEntry>();
+            Entries = new TestListTestEntryCollection();
+            Entries.Changed += OnEntriesChanged;
             ExpandedField = true;
-        }
-
-        public IList<TestListTestEntry> Entries
-        {
-            get { return EntriesField.AsReadOnly(); }
-        }
-
-        public void Add(TestListTestEntry entry)
-        {
-            if (entry == null)
-                throw new ArgumentNullException(nameof(entry));
-
-            EntriesField.Add(entry);
-        }
-
-        public void Remove(TestListTestEntry entry)
-        {
-            if (entry == null)
-                throw new ArgumentNullException(nameof(entry));
-
-            EntriesField.Remove(entry);
         }
 
         public bool IsExpanded
@@ -56,6 +35,14 @@ namespace PmlUnit
                     ExpandedChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
+        }
+
+        private void OnEntriesChanged(object sender, TestListEntriesChangedEventArgs e)
+        {
+            foreach (var entry in e.RemovedEntries)
+                entry.Group = null;
+            foreach (var entry in e.AddedEntries)
+                entry.Group = this;
         }
     }
 }

@@ -33,10 +33,10 @@ namespace PmlUnit
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public TestListTestEntryCollection Entries { get; }
+        public ReadOnlyTestListTestEntryCollection Entries { get; }
 
         private readonly SortedList<string, TestListGroupEntry> Groups;
-        private readonly WritableTestListTestEntryCollection EntriesField;
+        private readonly TestListTestEntryCollection EntriesField;
         private readonly SortedList<string, TestListEntry> AllEntries;
         private readonly SortedList<string, TestListEntry> VisibleEntries;
 
@@ -50,7 +50,7 @@ namespace PmlUnit
             TestCases = new TestCaseCollection();
             TestCases.Changed += OnTestCasesChanged;
             Groups = new SortedList<string, TestListGroupEntry>(StringComparer.OrdinalIgnoreCase);
-            EntriesField = new WritableTestListTestEntryCollection();
+            EntriesField = new TestListTestEntryCollection();
             Entries = EntriesField.AsReadOnly();
             AllEntries = new SortedList<string, TestListEntry>(StringComparer.OrdinalIgnoreCase);
             VisibleEntries = new SortedList<string, TestListEntry>(StringComparer.OrdinalIgnoreCase);
@@ -95,7 +95,7 @@ namespace PmlUnit
                     var entry = EntriesField.Add(test);
                     entry.SelectionChanged += OnSelectionChanged;
                     entry.ResultChanged += OnTestResultChanged;
-                    group.Add(entry);
+                    group.Entries.Add(entry);
                     AllEntries.Add(test.FullName, entry);
                     VisibleEntries.Add(test.FullName, entry);
                 }
@@ -393,7 +393,7 @@ namespace PmlUnit
                     if (focusedGroup.IsExpanded)
                     {
                         if (focusedGroup.Entries.Count > 0)
-                            target = focusedGroup.Entries[0];
+                            target = focusedGroup.Entries.FirstOrDefault();
                     }
                     else
                     {
