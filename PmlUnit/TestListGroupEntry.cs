@@ -2,17 +2,11 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 
 namespace PmlUnit
 {
     class TestListGroupEntry : TestListEntry
     {
-        public const string ExpandedImageKey = "Expanded";
-        public const string ExpandedHighlightImageKey = "ExpandedHighlight";
-        public const string CollapsedImageKey = "Collapsed";
-        public const string CollapsedHighlightImageKey = "CollapsedHighlight";
-
         public event EventHandler ExpandedChanged;
 
         public string Name { get; }
@@ -34,8 +28,6 @@ namespace PmlUnit
         {
             get { return EntriesField.AsReadOnly(); }
         }
-
-        public Rectangle IconBounds => new Rectangle(0, 0, 20, TestListView.EntryHeight);
 
         public void Add(TestListTestEntry entry)
         {
@@ -64,37 +56,6 @@ namespace PmlUnit
                     ExpandedChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
-        }
-
-        public override void Paint(Graphics g, Rectangle bounds, TestListPaintOptions options)
-        {
-            int padding = 2;
-            int x = bounds.Left + padding;
-            int y = bounds.Top + padding;
-
-            var textBrush = options.NormalTextBrush;
-            if (Selected)
-            {
-                textBrush = options.SelectedTextBrush;
-                g.FillRectangle(options.SelectedBackBrush, bounds);
-            }
-            else if (options.FocusedEntry == this)
-            {
-                var copy = bounds;
-                copy.Width -= 1;
-                copy.Height -= 1;
-                g.DrawRectangle(options.FocusRectanglePen, copy);
-            }
-
-            g.DrawImage(options.ExpanderImageList.Images[IsExpanded ? ExpandedImageKey : CollapsedImageKey], x, y);
-            x += 16 + padding;
-
-            int nameWidth = (int)Math.Ceiling(g.MeasureString(Name, options.HeaderFont).Width);
-            g.DrawString(Name, options.HeaderFont, textBrush, x, y);
-            x += nameWidth;
-
-            var count = " (" + Entries.Count + ")";
-            g.DrawString(count, options.EntryFont, textBrush, x, y);
         }
     }
 }

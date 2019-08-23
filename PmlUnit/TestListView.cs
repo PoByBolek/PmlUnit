@@ -12,7 +12,17 @@ namespace PmlUnit
 {
     partial class TestListView : ScrollableControl
     {
-        public const int EntryHeight = 20;
+        private const int EntryHeight = 20;
+        private const int EntryPadding = 2;
+
+        private const string ExpandedImageKey = "Expanded";
+        private const string ExpandedHighlightImageKey = "ExpandedHighlight";
+        private const string CollapsedImageKey = "Collapsed";
+        private const string CollapsedHighlightImageKey = "CollapsedHighlight";
+
+        private const string SuccessImageKey = "Success";
+        private const string FailureImageKey = "Failure";
+        private const string NotExecutedImageKey = "Unknown";
 
         [Category("Behavior")]
         public event EventHandler SelectionChanged;
@@ -51,14 +61,14 @@ namespace PmlUnit
             IgnoreSelectionChanged = false;
             IgnoredSelectionChanges = 0;
 
-            ExpanderImageList.Images.Add(TestListGroupEntry.ExpandedImageKey, Resources.Expanded);
-            ExpanderImageList.Images.Add(TestListGroupEntry.ExpandedHighlightImageKey, Resources.ExpandedHighlight);
-            ExpanderImageList.Images.Add(TestListGroupEntry.CollapsedImageKey, Resources.Collapsed);
-            ExpanderImageList.Images.Add(TestListGroupEntry.CollapsedHighlightImageKey, Resources.CollapsedHighlight);
+            EntryImages.Images.Add(ExpandedImageKey, Resources.Expanded);
+            EntryImages.Images.Add(ExpandedHighlightImageKey, Resources.ExpandedHighlight);
+            EntryImages.Images.Add(CollapsedImageKey, Resources.Collapsed);
+            EntryImages.Images.Add(CollapsedHighlightImageKey, Resources.CollapsedHighlight);
 
-            StatusImageList.Images.Add(TestListTestEntry.NotExecutedImageKey, Resources.Unknown);
-            StatusImageList.Images.Add(TestListTestEntry.FailureImageKey, Resources.Failure);
-            StatusImageList.Images.Add(TestListTestEntry.SuccessImageKey, Resources.Success);
+            EntryImages.Images.Add(NotExecutedImageKey, Resources.Unknown);
+            EntryImages.Images.Add(FailureImageKey, Resources.Failure);
+            EntryImages.Images.Add(SuccessImageKey, Resources.Success);
         }
 
         private void OnTestCasesChanged(object sender, TestCasesChangedEventArgs e)
@@ -170,7 +180,7 @@ namespace PmlUnit
                 g.FillRectangle(brush, e.ClipRectangle);
             }
 
-            using (var options = new TestListPaintOptions(this, e.ClipRectangle, FocusedEntry, StatusImageList, ExpanderImageList))
+            using (var options = new TestListPaintOptions(this, e.ClipRectangle, FocusedEntryField))
             {
                 int width = ClientSize.Width;
                 int offset = VerticalScroll.Value;
@@ -181,11 +191,100 @@ namespace PmlUnit
 
                 for (int i = startIndex; i <= endIndex; i++)
                 {
-                    var entry = VisibleEntries.Values[i];
                     var bounds = new Rectangle(0, i * EntryHeight - offset, width, EntryHeight);
-                    entry.Paint(g, bounds, options);
+                    var entry = VisibleEntries.Values[i];
+                    PaintEntryBackground(g, entry, bounds, options);
+
+                    var testEntry = entry as TestListTestEntry;
+                    if (testEntry != null)
+                    {
+                        PaintTestEntry(g, testEntry, bounds, options);
+                        continue;
+                    }
+
+                    var groupEntry = entry as TestListGroupEntry;
+                    if (groupEntry != null)
+                    {
+                        PaintGroupEntry(g, groupEntry, bounds, options);
+                        continue;
+                    }
                 }
             }
+        }
+
+        private void PaintTestEntry(Graphics g, TestListTestEntry entry, Rectangle bounds, TestListPaintOptions options)
+        {
+            int left = bounds.Left + EntryPadding + 20;
+            int right = bounds.Right - EntryPadding;
+            int y = bounds.Top + EntryPadding;
+
+            g.DrawImage(GetTestEntryImage(entry.Test.Status), left, y);
+            left += 16 + EntryPadding;
+
+            var textBrush = options.GetTextBrush(entry);
+            if (left < right && entry.Test.Result != null)
+            {
+                string duration = entry.Test.Result.Duration.Format();
+                int durationWidth = (int)Math.Ceiling(g.MeasureString(duration, options.EntryFont).Width);
+                int durationX = Math.Max(left, right - durationWidth);
+                g.DrawString(duration, options.EntryFont, textBrush, durationX, y);
+                right = durationX - EntryPadding;
+            }
+
+            if (left < right)
+            {
+                var nameBounds = new RectangleF(left, y, right - left, 16);
+                g.DrawString(entry.Test.Name, options.EntryFont, textBrush, nameBounds, options.EntryFormat);
+            }
+        }
+
+        private void PaintGroupEntry(Graphics g, TestListGroupEntry group, Rectangle bounds, TestListPaintOptions options)
+        {
+            int x = bounds.Left + EntryPadding;
+            int y = bounds.Top + EntryPadding;
+
+            g.DrawImage(GetGroupEntryImage(group.IsExpanded), x, y);
+            x += 16 + EntryPadding;
+
+            var textBrush = options.GetTextBrush(group);
+            int nameWidth = (int)Math.Ceiling(g.MeasureString(group.Name, options.HeaderFont).Width);
+            g.DrawString(group.Name, options.HeaderFont, textBrush, x, y);
+            x += nameWidth;
+
+            var count = " (" + group.Entries.Count + ")";
+            g.DrawString(count, options.EntryFont, textBrush, x, y);
+        }
+
+        private void PaintEntryBackground(Graphics g, TestListEntry entry, Rectangle bounds, TestListPaintOptions options)
+        {
+            if (entry.Selected)
+            {
+                g.FillRectangle(options.SelectedBackBrush, bounds);
+            }
+            else if (entry == FocusedEntryField)
+            {
+                bounds.Width -= 1;
+                bounds.Height -= 1;
+                g.DrawRectangle(options.FocusRectanglePen, bounds);
+            }
+        }
+
+        private Image GetTestEntryImage(TestStatus status)
+        {
+            if (status == TestStatus.NotExecuted)
+                return EntryImages.Images[NotExecutedImageKey];
+            else if (status == TestStatus.Successful)
+                return EntryImages.Images[SuccessImageKey];
+            else
+                return EntryImages.Images[FailureImageKey];
+        }
+
+        private Image GetGroupEntryImage(bool expanded)
+        {
+            if (expanded)
+                return EntryImages.Images[ExpandedImageKey];
+            else
+                return EntryImages.Images[CollapsedImageKey];
         }
 
         protected override void OnClientSizeChanged(EventArgs e)
@@ -336,7 +435,9 @@ namespace PmlUnit
                 {
                     var group = clicked as TestListGroupEntry;
                     var relativeClickLocation = new Point(e.X, (e.Y + VerticalScroll.Value) % EntryHeight);
-                    if (left && group != null && group.IconBounds.Contains(relativeClickLocation))
+                    var iconBounds = new Rectangle(Point.Empty, EntryImages.ImageSize);
+                    iconBounds.Inflate(2 * EntryPadding, 2 * EntryPadding);
+                    if (left && group != null && iconBounds.Contains(relativeClickLocation))
                         group.IsExpanded = !group.IsExpanded;
                     else if (left || right)
                         SelectOnly(clicked);

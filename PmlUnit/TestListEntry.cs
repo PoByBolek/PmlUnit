@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
-using System.Drawing;
 
 namespace PmlUnit
 {
@@ -23,7 +22,5 @@ namespace PmlUnit
                 }
             }
         }
-
-        public abstract void Paint(Graphics g, Rectangle bounds, TestListPaintOptions options);
     }
 }

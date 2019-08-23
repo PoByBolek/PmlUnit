@@ -2,7 +2,6 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Drawing;
-using System.Windows.Forms;
 
 namespace PmlUnit
 {
@@ -14,28 +13,20 @@ namespace PmlUnit
         public Brush NormalTextBrush { get; }
         public Brush SelectedTextBrush { get; }
         public Brush SelectedBackBrush { get; }
-        public ImageList StatusImageList { get; }
-        public ImageList ExpanderImageList { get; }
         public Font EntryFont { get; }
         public Font HeaderFont { get; }
         public StringFormat EntryFormat { get; }
 
-        public TestListPaintOptions(TestListView view, Rectangle clipRectangle, TestListEntry focusedEntry, ImageList statusImageList, ImageList expanderImageList)
+        public TestListPaintOptions(TestListView view, Rectangle clipRectangle, TestListEntry focusedEntry)
         {
             if (view == null)
                 throw new ArgumentNullException(nameof(view));
-            if (statusImageList == null)
-                throw new ArgumentNullException(nameof(statusImageList));
-            if (expanderImageList == null)
-                throw new ArgumentNullException(nameof(expanderImageList));
 
             try
             {
                 ClipRectangle = clipRectangle;
                 FocusedEntry = view.Focused ? focusedEntry : null;
                 FocusRectanglePen = view.Focused ? SystemPens.Highlight.Clone() as Pen : SystemPens.Control.Clone() as Pen;
-                StatusImageList = statusImageList;
-                ExpanderImageList = expanderImageList;
                 EntryFont = view.Font;
                 NormalTextBrush = new SolidBrush(view.ForeColor);
                 SelectedTextBrush = view.Focused ? SystemBrushes.HighlightText.Clone() as Brush : new SolidBrush(view.ForeColor);
@@ -65,6 +56,13 @@ namespace PmlUnit
         ~TestListPaintOptions()
         {
             Dispose(false);
+        }
+
+        public Brush GetTextBrush(TestListEntry entry)
+        {
+            if (entry == null)
+                throw new ArgumentNullException(nameof(entry));
+            return entry.Selected ? SelectedTextBrush : NormalTextBrush;
         }
 
         public void Dispose()

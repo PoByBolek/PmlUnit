@@ -28,21 +28,14 @@ namespace PmlUnit
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.ExpanderImageList = new System.Windows.Forms.ImageList(this.components);
-            this.StatusImageList = new System.Windows.Forms.ImageList(this.components);
+            this.EntryImages = new System.Windows.Forms.ImageList(this.components);
             this.SuspendLayout();
             // 
-            // ExpanderImageList
+            // EntryImages
             // 
-            this.ExpanderImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
-            this.ExpanderImageList.ImageSize = new System.Drawing.Size(16, 16);
-            this.ExpanderImageList.TransparentColor = System.Drawing.Color.Transparent;
-            // 
-            // StatusImageList
-            // 
-            this.StatusImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
-            this.StatusImageList.ImageSize = new System.Drawing.Size(16, 16);
-            this.StatusImageList.TransparentColor = System.Drawing.Color.Transparent;
+            this.EntryImages.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+            this.EntryImages.ImageSize = new System.Drawing.Size(16, 16);
+            this.EntryImages.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // TestListView
             // 
@@ -53,7 +46,6 @@ namespace PmlUnit
         }
 
         #endregion
-        private System.Windows.Forms.ImageList ExpanderImageList;
-        private System.Windows.Forms.ImageList StatusImageList;
+        private System.Windows.Forms.ImageList EntryImages;
     }
 }
