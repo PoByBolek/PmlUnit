@@ -5,25 +5,11 @@ using System.Drawing;
 
 namespace PmlUnit
 {
-    class TestListViewEntry : TestListBaseEntry, TestListEntry
+    class TestListTestEntry : TestListEntry
     {
         public const string SuccessImageKey = "Success";
         public const string FailureImageKey = "Failure";
         public const string NotExecutedImageKey = "Unknown";
-
-        public event EventHandler SelectionChanged;
-
-        public Test Test { get; }
-
-        private bool SelectedField;
-
-        public TestListViewEntry(Test test)
-        {
-            if (test == null)
-                throw new ArgumentNullException(nameof(test));
-
-            Test = test;
-        }
 
         public event EventHandler ResultChanged
         {
@@ -31,20 +17,16 @@ namespace PmlUnit
             remove { Test.ResultChanged -= value; }
         }
 
-        public bool Selected
+        public Test Test { get; }
+
+        public TestListTestEntry(Test test)
         {
-            get { return SelectedField; }
-            set
-            {
-                if (value != SelectedField)
-                {
-                    SelectedField = value;
-                    SelectionChanged?.Invoke(this, EventArgs.Empty);
-                }
-            }
+            if (test == null)
+                throw new ArgumentNullException(nameof(test));
+            Test = test;
         }
 
-        public void Paint(Graphics g, Rectangle bounds, TestListPaintOptions options)
+        public override void Paint(Graphics g, Rectangle bounds, TestListPaintOptions options)
         {
             int padding = 2;
             int left = bounds.Left + padding + 20;

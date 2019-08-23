@@ -23,27 +23,27 @@ namespace PmlUnit
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public TestListEntryCollection Entries { get; }
+        public TestListTestEntryCollection Entries { get; }
 
         private readonly SortedList<string, TestListGroupEntry> Groups;
-        private readonly WritableTestListEntryCollection EntriesField;
-        private readonly SortedList<string, TestListBaseEntry> AllEntries;
-        private readonly SortedList<string, TestListBaseEntry> VisibleEntries;
+        private readonly WritableTestListTestEntryCollection EntriesField;
+        private readonly SortedList<string, TestListEntry> AllEntries;
+        private readonly SortedList<string, TestListEntry> VisibleEntries;
 
         private bool IgnoreSelectionChanged;
         private int IgnoredSelectionChanges;
-        private TestListBaseEntry SelectionStartEntry;
-        private TestListBaseEntry FocusedEntryField;
+        private TestListEntry SelectionStartEntry;
+        private TestListEntry FocusedEntryField;
 
         public TestListView()
         {
             TestCases = new TestCaseCollection();
             TestCases.Changed += OnTestCasesChanged;
             Groups = new SortedList<string, TestListGroupEntry>(StringComparer.OrdinalIgnoreCase);
-            EntriesField = new WritableTestListEntryCollection();
+            EntriesField = new WritableTestListTestEntryCollection();
             Entries = EntriesField.AsReadOnly();
-            AllEntries = new SortedList<string, TestListBaseEntry>(StringComparer.OrdinalIgnoreCase);
-            VisibleEntries = new SortedList<string, TestListBaseEntry>(StringComparer.OrdinalIgnoreCase);
+            AllEntries = new SortedList<string, TestListEntry>(StringComparer.OrdinalIgnoreCase);
+            VisibleEntries = new SortedList<string, TestListEntry>(StringComparer.OrdinalIgnoreCase);
 
             InitializeComponent();
 
@@ -56,9 +56,9 @@ namespace PmlUnit
             ExpanderImageList.Images.Add(TestListGroupEntry.CollapsedImageKey, Resources.Collapsed);
             ExpanderImageList.Images.Add(TestListGroupEntry.CollapsedHighlightImageKey, Resources.CollapsedHighlight);
 
-            StatusImageList.Images.Add(TestListViewEntry.NotExecutedImageKey, Resources.Unknown);
-            StatusImageList.Images.Add(TestListViewEntry.FailureImageKey, Resources.Failure);
-            StatusImageList.Images.Add(TestListViewEntry.SuccessImageKey, Resources.Success);
+            StatusImageList.Images.Add(TestListTestEntry.NotExecutedImageKey, Resources.Unknown);
+            StatusImageList.Images.Add(TestListTestEntry.FailureImageKey, Resources.Failure);
+            StatusImageList.Images.Add(TestListTestEntry.SuccessImageKey, Resources.Success);
         }
 
         private void OnTestCasesChanged(object sender, TestCasesChangedEventArgs e)
@@ -82,7 +82,7 @@ namespace PmlUnit
                 group.ExpandedChanged += OnGroupExpandedChanged;
                 foreach (var test in testCase.Tests)
                 {
-                    var entry = EntriesField.Add(test) as TestListViewEntry;
+                    var entry = EntriesField.Add(test);
                     entry.SelectionChanged += OnSelectionChanged;
                     entry.ResultChanged += OnTestResultChanged;
                     group.Add(entry);
@@ -146,7 +146,7 @@ namespace PmlUnit
 
         private IEnumerable<Test> AllTestsInternal => Entries.Select(entry => entry.Test);
 
-        private TestListBaseEntry FocusedEntry
+        private TestListEntry FocusedEntry
         {
             get { return FocusedEntryField; }
             set
@@ -234,7 +234,7 @@ namespace PmlUnit
             if (FocusedEntry == null)
                 return;
 
-            TestListBaseEntry target = null;
+            TestListEntry target = null;
 
             if (e.KeyCode == Keys.Space)
             {
@@ -370,7 +370,7 @@ namespace PmlUnit
             }
         }
 
-        private TestListBaseEntry FindEntry(Point location)
+        private TestListEntry FindEntry(Point location)
         {
             int clientY = location.Y + VerticalScroll.Value;
             int index = clientY / EntryHeight;
@@ -380,7 +380,7 @@ namespace PmlUnit
                 return VisibleEntries.Values[index];
         }
 
-        private void ScrollEntryIntoView(TestListBaseEntry entry)
+        private void ScrollEntryIntoView(TestListEntry entry)
         {
             int index = VisibleEntries.IndexOfValue(entry);
             if (index >= 0)
@@ -402,7 +402,7 @@ namespace PmlUnit
             }
         }
 
-        private void SelectOnly(TestListBaseEntry target)
+        private void SelectOnly(TestListEntry target)
         {
             foreach (var entry in AllEntries.Values)
                 entry.Selected = false;
@@ -415,7 +415,7 @@ namespace PmlUnit
             }
         }
 
-        private void SelectRange(TestListBaseEntry target)
+        private void SelectRange(TestListEntry target)
         {
             bool selected = false;
             foreach (var entry in AllEntries.Values)

@@ -6,11 +6,11 @@ using System.Collections.Generic;
 
 namespace PmlUnit
 {
-    class TestListEntryCollection : ICollection<TestListEntry>
+    class TestListTestEntryCollection : ICollection<TestListTestEntry>
     {
-        WritableTestListEntryCollection Entries;
+        WritableTestListTestEntryCollection Entries;
 
-        public TestListEntryCollection(WritableTestListEntryCollection entries)
+        public TestListTestEntryCollection(WritableTestListTestEntryCollection entries)
         {
             if (entries == null)
                 throw new ArgumentNullException(nameof(entries));
@@ -19,19 +19,19 @@ namespace PmlUnit
 
         public int Count => Entries.Count;
 
-        public TestListEntry this[Test test] => Entries[test];
+        public TestListTestEntry this[Test test] => Entries[test];
 
-        public bool Contains(TestListEntry item)
+        public bool Contains(TestListTestEntry item)
         {
             return Entries.Contains(item);
         }
 
-        public void CopyTo(TestListEntry[] array, int arrayIndex)
+        public void CopyTo(TestListTestEntry[] array, int arrayIndex)
         {
             Entries.CopyTo(array, arrayIndex);
         }
 
-        public IEnumerator<TestListEntry> GetEnumerator()
+        public IEnumerator<TestListTestEntry> GetEnumerator()
         {
             return Entries.GetEnumerator();
         }
@@ -41,56 +41,56 @@ namespace PmlUnit
             return GetEnumerator();
         }
 
-        bool ICollection<TestListEntry>.IsReadOnly => true;
+        bool ICollection<TestListTestEntry>.IsReadOnly => true;
 
-        void ICollection<TestListEntry>.Add(TestListEntry item)
+        void ICollection<TestListTestEntry>.Add(TestListTestEntry item)
         {
             throw new NotSupportedException();
         }
 
-        void ICollection<TestListEntry>.Clear()
+        void ICollection<TestListTestEntry>.Clear()
         {
             throw new NotSupportedException();
         }
 
-        bool ICollection<TestListEntry>.Remove(TestListEntry item)
+        bool ICollection<TestListTestEntry>.Remove(TestListTestEntry item)
         {
             throw new NotSupportedException();
         }
     }
 
-    class WritableTestListEntryCollection : ICollection<TestListEntry>
+    class WritableTestListTestEntryCollection : ICollection<TestListTestEntry>
     {
-        private readonly SortedList<Test, TestListEntry> Entries;
+        private readonly SortedList<Test, TestListTestEntry> Entries;
 
-        public WritableTestListEntryCollection()
+        public WritableTestListTestEntryCollection()
         {
-            Entries = new SortedList<Test, TestListEntry>(new TestComparer());
+            Entries = new SortedList<Test, TestListTestEntry>(new TestComparer());
         }
 
         public int Count => Entries.Count;
 
-        public TestListEntry this[Test test]
+        public TestListTestEntry this[Test test]
         {
             get { return Entries[test]; }
         }
 
-        public TestListEntryCollection AsReadOnly()
+        public TestListTestEntryCollection AsReadOnly()
         {
-            return new TestListEntryCollection(this);
+            return new TestListTestEntryCollection(this);
         }
 
-        public TestListEntry Add(Test test)
+        public TestListTestEntry Add(Test test)
         {
             if (test == null)
                 throw new ArgumentNullException(nameof(test));
 
-            var result = new TestListViewEntry(test);
+            var result = new TestListTestEntry(test);
             Entries.Add(test, result);
             return result;
         }
 
-        public void Add(TestListEntry item)
+        public void Add(TestListTestEntry item)
         {
             if (item == null)
                 throw new ArgumentNullException(nameof(item));
@@ -102,12 +102,12 @@ namespace PmlUnit
             Entries.Clear();
         }
 
-        public bool Contains(TestListEntry item)
+        public bool Contains(TestListTestEntry item)
         {
             if (item == null)
                 throw new ArgumentNullException(nameof(item));
 
-            TestListEntry entry;
+            TestListTestEntry entry;
             return Entries.TryGetValue(item.Test, out entry) && entry == item;
         }
 
@@ -118,17 +118,17 @@ namespace PmlUnit
             return Entries.Remove(test);
         }
 
-        public bool Remove(TestListEntry item)
+        public bool Remove(TestListTestEntry item)
         {
             return Contains(item) && Entries.Remove(item.Test);
         }
 
-        public void CopyTo(TestListEntry[] array, int arrayIndex)
+        public void CopyTo(TestListTestEntry[] array, int arrayIndex)
         {
             Entries.Values.CopyTo(array, arrayIndex);
         }
 
-        public IEnumerator<TestListEntry> GetEnumerator()
+        public IEnumerator<TestListTestEntry> GetEnumerator()
         {
             return Entries.Values.GetEnumerator();
         }
@@ -138,7 +138,7 @@ namespace PmlUnit
             return GetEnumerator();
         }
 
-        bool ICollection<TestListEntry>.IsReadOnly => false;
+        bool ICollection<TestListTestEntry>.IsReadOnly => false;
 
         private class TestComparer : IComparer<Test>
         {

@@ -5,17 +5,25 @@ using System.Drawing;
 
 namespace PmlUnit
 {
-    interface TestListEntry
+    abstract class TestListEntry
     {
-        Test Test { get; }
-        bool Selected { get; set; }
-    }
+        public event EventHandler SelectionChanged;
 
-    interface TestListBaseEntry
-    {
-        event EventHandler SelectionChanged;
+        private bool SelectedField;
 
-        bool Selected { get; set; }
-        void Paint(Graphics g, Rectangle bounds, TestListPaintOptions options);
+        public bool Selected
+        {
+            get { return SelectedField; }
+            set
+            {
+                if (value != SelectedField)
+                {
+                    SelectedField = value;
+                    SelectionChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
+
+        public abstract void Paint(Graphics g, Rectangle bounds, TestListPaintOptions options);
     }
 }

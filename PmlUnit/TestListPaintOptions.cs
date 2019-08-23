@@ -9,7 +9,7 @@ namespace PmlUnit
     class TestListPaintOptions : IDisposable
     {
         public Rectangle ClipRectangle { get; }
-        public TestListBaseEntry FocusedEntry { get; }
+        public TestListEntry FocusedEntry { get; }
         public Pen FocusRectanglePen { get; }
         public Brush NormalTextBrush { get; }
         public Brush SelectedTextBrush { get; }
@@ -20,7 +20,7 @@ namespace PmlUnit
         public Font HeaderFont { get; }
         public StringFormat EntryFormat { get; }
 
-        public TestListPaintOptions(TestListView view, Rectangle clipRectangle, TestListBaseEntry focusedEntry, ImageList statusImageList, ImageList expanderImageList)
+        public TestListPaintOptions(TestListView view, Rectangle clipRectangle, TestListEntry focusedEntry, ImageList statusImageList, ImageList expanderImageList)
         {
             if (view == null)
                 throw new ArgumentNullException(nameof(view));

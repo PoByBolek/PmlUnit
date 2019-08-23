@@ -6,20 +6,18 @@ using System.Drawing;
 
 namespace PmlUnit
 {
-    class TestListGroupEntry : TestListBaseEntry
+    class TestListGroupEntry : TestListEntry
     {
         public const string ExpandedImageKey = "Expanded";
         public const string ExpandedHighlightImageKey = "ExpandedHighlight";
         public const string CollapsedImageKey = "Collapsed";
         public const string CollapsedHighlightImageKey = "CollapsedHighlight";
 
-        public event EventHandler SelectionChanged;
         public event EventHandler ExpandedChanged;
 
         public string Name { get; }
 
-        private readonly List<TestListViewEntry> EntriesField;
-        private bool SelectedField;
+        private readonly List<TestListTestEntry> EntriesField;
         private bool ExpandedField;
 
         public TestListGroupEntry(string name)
@@ -28,43 +26,18 @@ namespace PmlUnit
                 throw new ArgumentNullException(nameof(name));
 
             Name = name;
-            EntriesField = new List<TestListViewEntry>();
-            SelectedField = false;
+            EntriesField = new List<TestListTestEntry>();
             ExpandedField = true;
         }
 
-        public IList<TestListViewEntry> Entries
+        public IList<TestListTestEntry> Entries
         {
             get { return EntriesField.AsReadOnly(); }
         }
 
         public Rectangle IconBounds => new Rectangle(0, 0, 20, TestListView.EntryHeight);
 
-        public bool Selected
-        {
-            get { return SelectedField; }
-            set
-            {
-                if (value != SelectedField)
-                {
-                    SelectedField = value;
-                    SelectionChanged?.Invoke(this, EventArgs.Empty);
-                }
-            }
-        }
-
-        public int Height
-        {
-            get
-            {
-                int result = TestListView.EntryHeight;
-                if (IsExpanded)
-                    result += TestListView.EntryHeight * EntriesField.Count;
-                return result;
-            }
-        }
-
-        public void Add(TestListViewEntry entry)
+        public void Add(TestListTestEntry entry)
         {
             if (entry == null)
                 throw new ArgumentNullException(nameof(entry));
@@ -72,7 +45,7 @@ namespace PmlUnit
             EntriesField.Add(entry);
         }
 
-        public void Remove(TestListViewEntry entry)
+        public void Remove(TestListTestEntry entry)
         {
             if (entry == null)
                 throw new ArgumentNullException(nameof(entry));
@@ -93,7 +66,7 @@ namespace PmlUnit
             }
         }
 
-        public void Paint(Graphics g, Rectangle bounds, TestListPaintOptions options)
+        public override void Paint(Graphics g, Rectangle bounds, TestListPaintOptions options)
         {
             int padding = 2;
             int x = bounds.Left + padding;
@@ -122,18 +95,6 @@ namespace PmlUnit
 
             var count = " (" + Entries.Count + ")";
             g.DrawString(count, options.EntryFont, textBrush, x, y);
-        }
-    }
-
-    class EntryClickEventArgs : EventArgs
-    {
-        public TestListViewEntry Entry { get; }
-
-        public EntryClickEventArgs(TestListViewEntry entry)
-        {
-            if (entry == null)
-                throw new ArgumentNullException(nameof(entry));
-            Entry = entry;
         }
     }
 }
