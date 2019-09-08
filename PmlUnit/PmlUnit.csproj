@@ -153,6 +153,7 @@
     <Compile Include="TestListView.Designer.cs">
       <DependentUpon>TestListView.cs</DependentUpon>
     </Compile>
+    <Compile Include="TestListViewController.cs" />
     <Compile Include="TestResult.cs" />
     <Compile Include="TestRunner.cs" />
     <Compile Include="TestRunnerControl.cs">

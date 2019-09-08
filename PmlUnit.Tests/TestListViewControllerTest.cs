@@ -1,6 +1,5 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
@@ -13,10 +12,10 @@ namespace PmlUnit.Tests
     [TestFixture]
     [TestOf(typeof(TestListView))]
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
-    public class TestListViewMouseTest
+    public class TestListViewControllerTest
     {
         private TestListView TestList;
-        private MethodInfo OnMouseClick;
+        private TestListViewController Controller;
         private TestCase First;
         private TestCase Second;
 
@@ -24,11 +23,10 @@ namespace PmlUnit.Tests
         public void Setup()
         {
             TestList = new TestListView();
-            OnMouseClick = TestList.GetType().GetMethod(
-                "OnMouseClick", BindingFlags.Instance | BindingFlags.NonPublic,
-                null, new Type[] { typeof(MouseEventArgs), typeof(Keys) }, null
-            );
-            Assert.NotNull(OnMouseClick);
+            Controller = TestList.GetType()
+                .GetField("Controller", BindingFlags.Instance | BindingFlags.NonPublic)
+                .GetValue(TestList) as TestListViewController;
+            Assert.NotNull(Controller);
 
             First = new TestCase("First");
             First.Tests.Add("a1");
@@ -180,8 +178,7 @@ namespace PmlUnit.Tests
 
         private List<Test> PerformMouseClick(int x, int y, MouseButtons button, Keys modifierKeys)
         {
-            var args = new MouseEventArgs(button, 1, x, y, 0);
-            OnMouseClick.Invoke(TestList, new object[] { args, modifierKeys });
+            Controller.HandleMouseClick(new MouseEventArgs(button, 1, x, y, 0), modifierKeys);
             return TestList.SelectedTests;
         }
     }
