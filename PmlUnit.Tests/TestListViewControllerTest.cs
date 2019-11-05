@@ -45,43 +45,87 @@ namespace PmlUnit.Tests
         {
             TestList.Dispose();
         }
-
-        [Test]
-        public void EntryClick_SelectsThatEntry()
+        
+        [TestCase(0, 30, 30)]
+        [TestCase(1, 30, 50)]
+        [TestCase(2, 30, 70)]
+        [TestCase(3, 30, 110)]
+        [TestCase(4, 30, 130)]
+        [TestCase(5, 30, 150)]
+        public void EntryClick_SelectsThatEntry(int index, int x, int y)
         {
-            var selected = PerformMouseClick(30, 30);
-            Assert.AreEqual(1, selected.Count);
-            Assert.Contains(First.Tests["a1"], selected);
+            PerformMouseClick(x, y);
+            Assert.AreEqual(1, TestList.SelectedEntries.Count);
+            Assert.Contains(TestList.Entries[index], TestList.SelectedEntries);
         }
 
-        [Test]
-        public void EntryClick_SelectsOnlyThatEntry()
+        [TestCase(0, 30, 30)]
+        [TestCase(1, 30, 50)]
+        [TestCase(2, 30, 70)]
+        [TestCase(3, 30, 110)]
+        [TestCase(4, 30, 130)]
+        [TestCase(5, 30, 150)]
+        public void EntryClick_SelectsOnlyThatEntry(int index, int x, int y)
         {
             foreach (var entry in TestList.Entries)
                 entry.Selected = true;
 
-            var selected = PerformMouseClick(30, 50);
-            Assert.AreEqual(1, selected.Count);
-            Assert.Contains(First.Tests["a2"], selected);
+            PerformMouseClick(x, y);
+            Assert.AreEqual(1, TestList.SelectedEntries.Count);
+            Assert.Contains(TestList.Entries[index], TestList.SelectedEntries);
         }
 
-        [Test]
-        public void RightEntryClick_SelectsThatEntry()
+        [TestCase(0, 30, 30)]
+        [TestCase(1, 30, 50)]
+        [TestCase(2, 30, 70)]
+        [TestCase(3, 30, 110)]
+        [TestCase(4, 30, 130)]
+        [TestCase(5, 30, 150)]
+        public void EntryClick_FocusesThatEntry(int index, int x, int y)
         {
-            var selected = PerformMouseClick(30, 70, MouseButtons.Right);
-            Assert.AreEqual(1, selected.Count);
-            Assert.Contains(First.Tests["a3"], selected);
+            PerformMouseClick(x, y);
+            Assert.AreSame(TestList.Entries[index], Controller.FocusedEntry);
         }
 
-        [Test]
-        public void RightEntryClick_SelectsOnlyThatEntry()
+        [TestCase(0, 30, 30)]
+        [TestCase(1, 30, 50)]
+        [TestCase(2, 30, 70)]
+        [TestCase(3, 30, 110)]
+        [TestCase(4, 30, 130)]
+        [TestCase(5, 30, 150)]
+        public void RightEntryClick_SelectsThatEntry(int index, int x, int y)
+        {
+            PerformMouseClick(x ,y, MouseButtons.Right);
+            Assert.AreEqual(1, TestList.SelectedEntries.Count);
+            Assert.Contains(TestList.Entries[index], TestList.SelectedEntries);
+        }
+
+        [TestCase(0, 30, 30)]
+        [TestCase(1, 30, 50)]
+        [TestCase(2, 30, 70)]
+        [TestCase(3, 30, 110)]
+        [TestCase(4, 30, 130)]
+        [TestCase(5, 30, 150)]
+        public void RightEntryClick_SelectsOnlyThatEntry(int index, int x, int y)
         {
             foreach (var entry in TestList.Entries)
                 entry.Selected = true;
 
-            var selected = PerformMouseClick(30, 70, MouseButtons.Right);
-            Assert.AreEqual(1, selected.Count);
-            Assert.Contains(First.Tests["a3"], selected);
+            PerformMouseClick(x, y, MouseButtons.Right);
+            Assert.AreEqual(1, TestList.SelectedEntries.Count);
+            Assert.Contains(TestList.Entries[index], TestList.SelectedEntries);
+        }
+
+        [TestCase(0, 30, 30)]
+        [TestCase(1, 30, 50)]
+        [TestCase(2, 30, 70)]
+        [TestCase(3, 30, 110)]
+        [TestCase(4, 30, 130)]
+        [TestCase(5, 30, 150)]
+        public void RightEntryClick_FocusesThatEntry(int index, int x, int y)
+        {
+            PerformMouseClick(x, y, MouseButtons.Right);
+            Assert.AreSame(TestList.Entries[index], Controller.FocusedEntry);
         }
 
         [Test]
