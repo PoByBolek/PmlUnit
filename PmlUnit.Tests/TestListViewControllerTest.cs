@@ -1,6 +1,5 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Windows.Forms;
@@ -45,185 +44,184 @@ namespace PmlUnit.Tests
         {
             TestList.Dispose();
         }
-        
-        [TestCase(0, 30, 30)]
-        [TestCase(1, 30, 50)]
-        [TestCase(2, 30, 70)]
-        [TestCase(3, 30, 110)]
-        [TestCase(4, 30, 130)]
-        [TestCase(5, 30, 150)]
-        public void EntryClick_SelectsThatEntry(int index, int x, int y)
+
+        [TestCase(0, 30, 30, MouseButtons.Left)]
+        [TestCase(1, 30, 50, MouseButtons.Left)]
+        [TestCase(2, 30, 70, MouseButtons.Left)]
+        [TestCase(3, 30, 110, MouseButtons.Left)]
+        [TestCase(4, 30, 130, MouseButtons.Left)]
+        [TestCase(5, 30, 150, MouseButtons.Left)]
+        [TestCase(0, 30, 30, MouseButtons.Right)]
+        [TestCase(1, 30, 50, MouseButtons.Right)]
+        [TestCase(2, 30, 70, MouseButtons.Right)]
+        [TestCase(3, 30, 110, MouseButtons.Right)]
+        [TestCase(4, 30, 130, MouseButtons.Right)]
+        [TestCase(5, 30, 150, MouseButtons.Right)]
+        public void EntryClick_SelectsThatEntry(int index, int x, int y, MouseButtons button)
         {
-            PerformMouseClick(x, y);
-            Assert.AreEqual(1, TestList.SelectedEntries.Count);
-            Assert.Contains(TestList.Entries[index], TestList.SelectedEntries);
+            PerformMouseClick(x, y, button);
+            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[index]));
         }
 
-        [TestCase(0, 30, 30)]
-        [TestCase(1, 30, 50)]
-        [TestCase(2, 30, 70)]
-        [TestCase(3, 30, 110)]
-        [TestCase(4, 30, 130)]
-        [TestCase(5, 30, 150)]
-        public void EntryClick_SelectsOnlyThatEntry(int index, int x, int y)
+        [TestCase(0, 30, 30, MouseButtons.Left)]
+        [TestCase(1, 30, 50, MouseButtons.Left)]
+        [TestCase(2, 30, 70, MouseButtons.Left)]
+        [TestCase(3, 30, 110, MouseButtons.Left)]
+        [TestCase(4, 30, 130, MouseButtons.Left)]
+        [TestCase(5, 30, 150, MouseButtons.Left)]
+        [TestCase(0, 30, 30, MouseButtons.Right)]
+        [TestCase(1, 30, 50, MouseButtons.Right)]
+        [TestCase(2, 30, 70, MouseButtons.Right)]
+        [TestCase(3, 30, 110, MouseButtons.Right)]
+        [TestCase(4, 30, 130, MouseButtons.Right)]
+        [TestCase(5, 30, 150, MouseButtons.Right)]
+        public void EntryClick_SelectsOnlyThatEntry(int index, int x, int y, MouseButtons button)
         {
             foreach (var entry in TestList.Entries)
                 entry.Selected = true;
 
-            PerformMouseClick(x, y);
-            Assert.AreEqual(1, TestList.SelectedEntries.Count);
-            Assert.Contains(TestList.Entries[index], TestList.SelectedEntries);
+            PerformMouseClick(x, y, button);
+            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[index]));
         }
 
-        [TestCase(0, 30, 30)]
-        [TestCase(1, 30, 50)]
-        [TestCase(2, 30, 70)]
-        [TestCase(3, 30, 110)]
-        [TestCase(4, 30, 130)]
-        [TestCase(5, 30, 150)]
-        public void EntryClick_FocusesThatEntry(int index, int x, int y)
+        [TestCase(0, 30, 30, MouseButtons.Left)]
+        [TestCase(1, 30, 50, MouseButtons.Left)]
+        [TestCase(2, 30, 70, MouseButtons.Left)]
+        [TestCase(3, 30, 110, MouseButtons.Left)]
+        [TestCase(4, 30, 130, MouseButtons.Left)]
+        [TestCase(5, 30, 150, MouseButtons.Left)]
+        [TestCase(0, 30, 30, MouseButtons.Right)]
+        [TestCase(1, 30, 50, MouseButtons.Right)]
+        [TestCase(2, 30, 70, MouseButtons.Right)]
+        [TestCase(3, 30, 110, MouseButtons.Right)]
+        [TestCase(4, 30, 130, MouseButtons.Right)]
+        [TestCase(5, 30, 150, MouseButtons.Right)]
+        public void EntryClick_FocusesThatEntry(int index, int x, int y, MouseButtons button)
         {
-            PerformMouseClick(x, y);
-            Assert.AreSame(TestList.Entries[index], Controller.FocusedEntry);
+            PerformMouseClick(x, y, button);
+            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Entries[index]));
         }
 
-        [TestCase(0, 30, 30)]
-        [TestCase(1, 30, 50)]
-        [TestCase(2, 30, 70)]
-        [TestCase(3, 30, 110)]
-        [TestCase(4, 30, 130)]
-        [TestCase(5, 30, 150)]
-        public void RightEntryClick_SelectsThatEntry(int index, int x, int y)
-        {
-            PerformMouseClick(x ,y, MouseButtons.Right);
-            Assert.AreEqual(1, TestList.SelectedEntries.Count);
-            Assert.Contains(TestList.Entries[index], TestList.SelectedEntries);
-        }
-
-        [TestCase(0, 30, 30)]
-        [TestCase(1, 30, 50)]
-        [TestCase(2, 30, 70)]
-        [TestCase(3, 30, 110)]
-        [TestCase(4, 30, 130)]
-        [TestCase(5, 30, 150)]
-        public void RightEntryClick_SelectsOnlyThatEntry(int index, int x, int y)
+        [TestCase(MouseButtons.Left)]
+        [TestCase(MouseButtons.Right)]
+        public void OutsideClick_SelectsNothing(MouseButtons button)
         {
             foreach (var entry in TestList.Entries)
                 entry.Selected = true;
 
-            PerformMouseClick(x, y, MouseButtons.Right);
-            Assert.AreEqual(1, TestList.SelectedEntries.Count);
-            Assert.Contains(TestList.Entries[index], TestList.SelectedEntries);
-        }
-
-        [TestCase(0, 30, 30)]
-        [TestCase(1, 30, 50)]
-        [TestCase(2, 30, 70)]
-        [TestCase(3, 30, 110)]
-        [TestCase(4, 30, 130)]
-        [TestCase(5, 30, 150)]
-        public void RightEntryClick_FocusesThatEntry(int index, int x, int y)
-        {
-            PerformMouseClick(x, y, MouseButtons.Right);
-            Assert.AreSame(TestList.Entries[index], Controller.FocusedEntry);
+            PerformMouseClick(30, 170, button);
+            Assert.That(TestList.SelectedEntries, Is.Empty);
         }
 
         [Test]
-        public void ControlEntryClick_TooglesSelectionOfThatEntry()
+        public void LeftControlEntryClick_TooglesSelectionOfThatEntry()
         {
-            var clicked = Second.Tests["b1"];
-            Assert.AreEqual(0, TestList.SelectedTests.Count);
+            Assert.That(TestList.SelectedEntries, Is.Empty);
 
-            var selected = PerformMouseClick(30, 110, Keys.Control);
-            Assert.AreEqual(1, selected.Count);
-            Assert.Contains(clicked, selected);
+            PerformMouseClick(30, 110, Keys.Control);
+            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[3]));
 
-            selected = PerformMouseClick(30, 110, Keys.Control);
-            Assert.AreEqual(0, selected.Count);
+            PerformMouseClick(30, 110, Keys.Control);
+            Assert.That(TestList.SelectedEntries, Is.Empty);
 
             foreach (var entry in TestList.Entries)
                 entry.Selected = true;
 
-            selected = PerformMouseClick(30, 110, Keys.Control);
-            Assert.AreEqual(5, selected.Count);
-            foreach (var test in selected)
-                Assert.AreNotSame(clicked, test);
+            PerformMouseClick(30, 110, Keys.Control);
+            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(5));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[0]));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[2]));
+            Assert.That(TestList.SelectedEntries, Does.Not.Contain(TestList.Entries[3]));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[4]));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[5]));
         }
 
         [Test]
         public void RightControlEntryClick_KeepsCurrentSelection()
         {
-            var clicked = Second.Tests["b2"];
-            Assert.AreEqual(0, TestList.SelectedTests.Count);
+            Assert.That(TestList.SelectedEntries, Is.Empty);
 
-            var selected = PerformMouseClick(30, 130, MouseButtons.Right, Keys.Control);
-            Assert.AreEqual(0, selected.Count);
+            PerformMouseClick(30, 130, MouseButtons.Right, Keys.Control);
+            Assert.That(TestList.SelectedEntries, Is.Empty);
 
             foreach (var entry in TestList.Entries)
                 entry.Selected = true;
-            Assert.AreEqual(6, TestList.SelectedTests.Count);
+            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(6));
 
-            selected = PerformMouseClick(30, 130, MouseButtons.Right, Keys.Control);
-            Assert.AreEqual(6, selected.Count);
+            PerformMouseClick(30, 130, MouseButtons.Right, Keys.Control);
+            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(6));
         }
 
         [Test]
-        public void ShiftEntryClick_SelectsAllEntriesBetweenLastAndCurrentClick()
+        public void LeftShiftEntryClick_SelectsAllEntriesBetweenLastAndCurrentClick()
         {
             PerformMouseClick(30, 50);
 
-            var selected = PerformMouseClick(30, 70, Keys.Shift);
-            Assert.AreEqual(2, selected.Count);
-            Assert.Contains(First.Tests["a2"], selected);
-            Assert.Contains(First.Tests["a3"], selected);
+            PerformMouseClick(30, 70, Keys.Shift);
+            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(2));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[2]));
 
-            selected = PerformMouseClick(30, 30, Keys.Shift);
-            Assert.AreEqual(2, selected.Count);
-            Assert.Contains(First.Tests["a1"], selected);
-            Assert.Contains(First.Tests["a2"], selected);
+            PerformMouseClick(30, 30, Keys.Shift);
+            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(2));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[0]));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
 
-            selected = PerformMouseClick(30, 50, Keys.Shift);
-            Assert.AreEqual(1, selected.Count);
-            Assert.Contains(First.Tests["a2"], selected);
+            PerformMouseClick(30, 50, Keys.Shift);
+            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
 
             PerformMouseClick(30, 130, Keys.Shift);
-            PerformMouseClick(30, 90, Keys.Control); // deselect the group entry, because SelectedTests will return all child entries if the group is selected
-            selected = TestList.SelectedTests;
-            Assert.AreEqual(4, selected.Count);
-            Assert.Contains(First.Tests["a2"], selected);
-            Assert.Contains(First.Tests["a3"], selected);
-            Assert.Contains(Second.Tests["b1"], selected);
-            Assert.Contains(Second.Tests["b2"], selected);
+            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(5));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[2]));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[1]));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[3]));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[4]));
         }
+
+        [Test]
+        public void LeftShiftEntryClick_StartsAtFirstEntry()
+        {
+            PerformMouseClick(30, 50, Keys.Shift);
+            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(3));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[0]));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[0]));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
+        }
+    
 
         [Test]
         public void RightShiftEntryClick_KeepsCurrentSelection()
         {
             PerformMouseClick(30, 50);
-            var selected = PerformMouseClick(30, 70, MouseButtons.Right, Keys.Shift);
-            Assert.AreEqual(1, selected.Count);
-            Assert.Contains(First.Tests["a2"], selected);
+            PerformMouseClick(30, 70, MouseButtons.Right, Keys.Shift);
+            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
         }
 
-        private List<Test> PerformMouseClick(int x, int y)
+        private void PerformMouseClick(int x, int y)
         {
-            return PerformMouseClick(x, y, MouseButtons.Left, Keys.None);
+            PerformMouseClick(x, y, MouseButtons.Left, Keys.None);
         }
 
-        private List<Test> PerformMouseClick(int x, int y, Keys modifierKeys)
+        private void PerformMouseClick(int x, int y, Keys modifierKeys)
         {
-            return PerformMouseClick(x, y, MouseButtons.Left, modifierKeys);
+            PerformMouseClick(x, y, MouseButtons.Left, modifierKeys);
         }
 
-        private List<Test> PerformMouseClick(int x, int y, MouseButtons button)
+        private void PerformMouseClick(int x, int y, MouseButtons button)
         {
-            return PerformMouseClick(x, y, button, Keys.None);
+            PerformMouseClick(x, y, button, Keys.None);
         }
 
-        private List<Test> PerformMouseClick(int x, int y, MouseButtons button, Keys modifierKeys)
+        private void PerformMouseClick(int x, int y, MouseButtons button, Keys modifierKeys)
         {
             Controller.HandleMouseClick(new MouseEventArgs(button, 1, x, y, 0), modifierKeys);
-            return TestList.SelectedTests;
         }
     }
 }

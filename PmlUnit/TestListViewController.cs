@@ -226,6 +226,9 @@ namespace PmlUnit
         private void SelectRange(TestListEntry target)
         {
             bool selected = false;
+            if (SelectionStartEntry == null)
+                SelectionStartEntry = AllEntries.FirstOrDefault();
+
             foreach (var entry in AllEntries)
             {
                 if (entry == target || entry == SelectionStartEntry)

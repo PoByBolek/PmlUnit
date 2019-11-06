@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace PmlUnit
 {
-    class TestListSelectedEntryCollection : ICollection<TestListEntry>, ICollection
+    class TestListSelectedEntryCollection : ICollection<TestListEntry>
     {
         private readonly ICollection<TestListEntry> Entries;
         private readonly Func<TestListEntry, bool> Predicate;
@@ -62,11 +62,6 @@ namespace PmlUnit
 
         public void CopyTo(TestListEntry[] array, int index)
         {
-            ((ICollection)this).CopyTo(array, index);
-        }
-
-        void ICollection.CopyTo(Array array, int index)
-        {
             if (array == null)
                 throw new ArgumentNullException(nameof(array));
             if (index < 0)
@@ -76,15 +71,11 @@ namespace PmlUnit
             {
                 if (index >= array.Length)
                     throw new ArgumentException();
-                array.SetValue(entry, index++);
+                array[index++] = entry;
             }
         }
 
         bool ICollection<TestListEntry>.IsReadOnly => false;
-
-        object ICollection.SyncRoot => this;
-
-        bool ICollection.IsSynchronized => false;
 
         public IEnumerator<TestListEntry> GetEnumerator()
         {

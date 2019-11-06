@@ -116,8 +116,6 @@ namespace PmlUnit
                 VisibleEntries.Add(testCase.Name, group);
             }
 
-            //FocusedEntry = null;
-            //SelectionStartEntry = GroupsField.FirstOrDefault();
             AutoScrollMinSize = new Size(0, VisibleEntries.Count * EntryHeight);
 
             Invalidate();
