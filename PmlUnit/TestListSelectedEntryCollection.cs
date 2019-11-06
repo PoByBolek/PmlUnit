@@ -65,12 +65,12 @@ namespace PmlUnit
             if (array == null)
                 throw new ArgumentNullException(nameof(array));
             if (index < 0)
-                throw new IndexOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(index), "index must be greater than or equal to zero");
 
             foreach (var entry in this)
             {
                 if (index >= array.Length)
-                    throw new ArgumentException();
+                    throw new ArgumentException("array is too small to hold all entries", nameof(array));
                 array[index++] = entry;
             }
         }
