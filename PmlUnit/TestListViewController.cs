@@ -59,77 +59,111 @@ namespace PmlUnit
 
         public void HandleKeyDown(KeyEventArgs e)
         {
-            if (FocusedEntry == null)
+            if (VisibleEntries.Count == 0)
                 return;
-
-            TestListEntry target = null;
-
+            
             if (e.KeyCode == Keys.Space)
-            {
-                if (e.Modifiers == Keys.None)
-                    FocusedEntry.Selected = true;
-                else if (e.Modifiers == Keys.Control)
-                    FocusedEntry.Selected = !FocusedEntry.Selected;
-                else if (e.Modifiers == Keys.Shift)
-                    SelectRange(FocusedEntry);
-                return;
-            }
+                ToggleSelectionOfFocusedEntry(e.Modifiers);
             else if (e.KeyCode == Keys.Up)
-            {
-                int index = VisibleEntries.IndexOf(FocusedEntry);
-                if (index > 0)
-                    target = VisibleEntries[index - 1];
-                else
-                    target = VisibleEntries.FirstOrDefault();
-            }
+                MoveFocus(-1, e.Modifiers);
             else if (e.KeyCode == Keys.Down)
-            {
-
-                int index = VisibleEntries.IndexOf(FocusedEntry);
-                if (index < VisibleEntries.Count - 1)
-                    target = VisibleEntries[index + 1];
-                else
-                    target = VisibleEntries.LastOrDefault();
-            }
+                MoveFocus(+1, e.Modifiers);
             else if (e.KeyCode == Keys.Left)
-            {
-                var entry = FocusedEntry as TestListTestEntry;
-                if (entry != null)
-                {
-                    target = entry.Group;
-                }
-                else
-                {
-                    var group = FocusedEntry as TestListGroupEntry;
-                    if (group != null)
-                    {
-                        group.IsExpanded = false;
-                    }
-                }
-            }
+                CollapseFocusedGroup(e.Modifiers);
             else if (e.KeyCode == Keys.Right)
+                ExpandFocusedGroup(e.Modifiers);
+        }
+
+        private void ToggleSelectionOfFocusedEntry(Keys modifierKeys)
+        {
+            if (modifierKeys == Keys.None)
             {
-                var focusedGroup = FocusedEntry as TestListGroupEntry;
-                if (focusedGroup != null)
-                {
-                    if (focusedGroup.IsExpanded)
-                        target = focusedGroup.Entries.FirstOrDefault();
-                    else
-                        focusedGroup.IsExpanded = true;
-                }
+                GetEntryRelativeToFocus(0);
+                FocusedEntry.Selected = true;
             }
-
-            if (target != null)
+            else if (modifierKeys == Keys.Control)
             {
-                if (e.Modifiers == Keys.None)
-                    SelectOnly(target);
-                else if (e.Modifiers == Keys.Shift)
-                    SelectRange(target);
-                else if (e.Modifiers == Keys.Control)
-                    FocusedEntry = target;
+                GetEntryRelativeToFocus(0);
+                FocusedEntry.Selected = !FocusedEntry.Selected;
+            }
+            else if (modifierKeys == Keys.Shift)
+            {
+                GetEntryRelativeToFocus(0);
+                SelectRange(FocusedEntry);
+            }
+        }
 
+        private void MoveFocus(int offset, Keys modifierKeys)
+        {
+            MoveFocus(GetEntryRelativeToFocus(offset), modifierKeys);
+        }
+
+        private void CollapseFocusedGroup(Keys modifierKeys)
+        {
+            var focus = GetEntryRelativeToFocus(0);
+            var group = focus as TestListGroupEntry;
+            var entry = focus as TestListTestEntry;
+            if (entry != null)
+                group = entry.Group;
+
+            if (MoveFocus(group, modifierKeys) && entry == null)
+                group.IsExpanded = false;
+        }
+
+        private void ExpandFocusedGroup(Keys modifierKeys)
+        {
+            var focus = GetEntryRelativeToFocus(0);
+            var entry = focus as TestListTestEntry;
+            var group = focus as TestListGroupEntry;
+            if (group != null)
+                entry = group.Entries.FirstOrDefault();
+
+            if (group == null || group.IsExpanded)
+                MoveFocus(entry, modifierKeys);
+            else if (MoveFocus(group, modifierKeys))
+                group.IsExpanded = true;
+        }
+
+        private bool MoveFocus(TestListEntry target, Keys modifierKeys)
+        {
+            if (modifierKeys == Keys.None)
+            {
+                FocusedEntry = target;
+                SelectOnly(target);
                 ScrollEntryIntoView(target);
+                return true;
             }
+            else if (modifierKeys == Keys.Control)
+            {
+                FocusedEntry = target;
+                ScrollEntryIntoView(target);
+                return true;
+            }
+            else if (modifierKeys == Keys.Shift)
+            {
+                FocusedEntry = target;
+                SelectRange(target);
+                ScrollEntryIntoView(target);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private TestListEntry GetEntryRelativeToFocus(int offset)
+        {
+            int index = 0;
+            if (FocusedEntry != null)
+                index = VisibleEntries.IndexOf(FocusedEntry);
+            index = Math.Max(0, Math.Min(index + offset, VisibleEntries.Count - 1));
+
+            if (index < VisibleEntries.Count)
+                return VisibleEntries[index];
+            else
+                return null;
+
         }
 
         public void HandleMouseClick(MouseEventArgs e, Keys modifierKeys)

@@ -204,6 +204,26 @@ namespace PmlUnit.Tests
             Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
         }
 
+        [Test]
+        public void DownArrow_MovesSelectionOneEntryDown()
+        {
+            PerformKeyPress(Keys.Down);
+            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[0]));
+
+            PerformKeyPress(Keys.Down);
+            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
+
+            PerformKeyPress(Keys.Down);
+            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[2]));
+
+            PerformKeyPress(Keys.Down);
+            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
+            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[1]));
+        }
+
         private void PerformMouseClick(int x, int y)
         {
             PerformMouseClick(x, y, MouseButtons.Left, Keys.None);
@@ -222,6 +242,11 @@ namespace PmlUnit.Tests
         private void PerformMouseClick(int x, int y, MouseButtons button, Keys modifierKeys)
         {
             Controller.HandleMouseClick(new MouseEventArgs(button, 1, x, y, 0), modifierKeys);
+        }
+
+        private void PerformKeyPress(Keys keys)
+        {
+            Controller.HandleKeyDown(new KeyEventArgs(keys));
         }
     }
 }
