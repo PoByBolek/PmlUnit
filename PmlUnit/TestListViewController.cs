@@ -18,6 +18,7 @@ namespace PmlUnit
         private int IgnoredSelectionChanges;
         private TestListEntry SelectionStartEntry;
         private TestListEntry FocusedEntryField;
+        private TestListGroupEntry HighlightedIconEntryField;
 
         public TestListViewController(TestListView view, IList<TestListEntry> allEntries, IList<TestListEntry> visibleEntries)
         {
@@ -45,6 +46,19 @@ namespace PmlUnit
                 {
                     FocusedEntryField = value;
                     ScrollEntryIntoView(value);
+                    View.Invalidate();
+                }
+            }
+        }
+
+        public TestListGroupEntry HighlightedIconEntry
+        {
+            get { return HighlightedIconEntryField; }
+            private set
+            {
+                if (value != HighlightedIconEntryField)
+                {
+                    HighlightedIconEntryField = value;
                     View.Invalidate();
                 }
             }
@@ -164,6 +178,20 @@ namespace PmlUnit
 
         }
 
+        public void HandleMouseMove(MouseEventArgs e)
+        {
+            var group = FindEntry(e.Location) as TestListGroupEntry;
+            if (group != null && IsWithinIconBounds(e.Location))
+                HighlightedIconEntry = group;
+            else
+                HighlightedIconEntry = null;
+        }
+
+        public void HandleMouseLeave(EventArgs e)
+        {
+            HighlightedIconEntry = null;
+        }
+
         public void HandleMouseClick(MouseEventArgs e, Keys modifierKeys)
         {
             var clicked = FindEntry(e.Location);
@@ -176,10 +204,7 @@ namespace PmlUnit
                 if (modifierKeys == Keys.None)
                 {
                     var group = clicked as TestListGroupEntry;
-                    var relativeClickLocation = new Point(e.X, (e.Y + View.VerticalScroll.Value) % View.EntryHeight);
-                    var iconBounds = new Rectangle(Point.Empty, View.ImageSize);
-                    iconBounds.Inflate(2 * View.EntryPadding, 2 * View.EntryPadding);
-                    if (left && group != null && iconBounds.Contains(relativeClickLocation))
+                    if (left && group != null && IsWithinIconBounds(e.Location))
                         group.IsExpanded = !group.IsExpanded;
                     else if (left || right)
                         SelectOnly(clicked);
@@ -199,6 +224,15 @@ namespace PmlUnit
             {
                 EndUpdate();
             }
+        }
+
+        private bool IsWithinIconBounds(Point location)
+        {
+            int x = location.X;
+            int y = (location.Y + View.VerticalScroll.Value) % View.EntryHeight;
+            int width = View.ImageSize.Width + 2 * View.EntryPadding;
+            int height = View.ImageSize.Height + 2 * View.EntryPadding;
+            return x >= 0 && x < width && y >= 0 && y < height;
         }
 
         public void HandleMouseDoubleClick(MouseEventArgs e, Keys modifierKeys)

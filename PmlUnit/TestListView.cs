@@ -240,7 +240,8 @@ namespace PmlUnit
             int x = bounds.Left + EntryPadding;
             int y = bounds.Top + EntryPadding;
 
-            g.DrawImage(GetGroupEntryImage(group.IsExpanded), x, y);
+            var image = GetGroupEntryImage(group.IsExpanded, group == Controller.HighlightedIconEntry);
+            g.DrawImage(image, x, y);
             x += 16 + EntryPadding;
 
             var textBrush = options.GetTextBrush(group);
@@ -276,12 +277,14 @@ namespace PmlUnit
                 return EntryImages.Images[FailureImageKey];
         }
 
-        private Image GetGroupEntryImage(bool expanded)
+        private Image GetGroupEntryImage(bool expanded, bool highlighted)
         {
+            string key;
             if (expanded)
-                return EntryImages.Images[ExpandedImageKey];
+                key = highlighted ? ExpandedHighlightImageKey : ExpandedImageKey;
             else
-                return EntryImages.Images[CollapsedImageKey];
+                key = highlighted ? CollapsedHighlightImageKey : CollapsedImageKey;
+            return EntryImages.Images[key];
         }
 
         protected override void OnClientSizeChanged(EventArgs e)
@@ -328,6 +331,18 @@ namespace PmlUnit
         {
             base.OnKeyDown(e);
             Controller.HandleKeyDown(e);
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+            Controller.HandleMouseMove(e);
+        }
+
+        protected override void OnMouseLeave(EventArgs e)
+        {
+            base.OnMouseLeave(e);
+            Controller.HandleMouseLeave(e);
         }
 
         protected override void OnMouseClick(MouseEventArgs e)
