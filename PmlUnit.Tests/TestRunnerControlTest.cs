@@ -123,8 +123,8 @@ namespace PmlUnit.Tests
             TestList = RunnerControl.FindControl<TestListView>("TestList");
             TestList.TestCases.Add(TestCase);
 
-            TestList.Entries[TestCase.Tests["two"]].Selected = true;
-            TestList.Entries[TestCase.Tests["four"]].Selected = true;
+            TestList.Entries[TestCase.Tests["two"]].IsSelected = true;
+            TestList.Entries[TestCase.Tests["four"]].IsSelected = true;
         }
 
         [TearDown]
@@ -245,9 +245,9 @@ namespace PmlUnit.Tests
         {
             foreach (var entry in TestList.Entries)
             {
-                entry.Selected = true;
+                entry.IsSelected = true;
                 Assert.AreSame(entry.Test, TestDetails.Test, "Should assign test {0}.", entry.Test);
-                entry.Selected = false;
+                entry.IsSelected = false;
             }
         }
 
@@ -257,10 +257,10 @@ namespace PmlUnit.Tests
             // Act & Assert
             foreach (var entry in TestList.Entries)
             {
-                entry.Selected = true;
+                entry.IsSelected = true;
                 Assert.IsTrue(TestDetails.Visible, "Should show test details for test {0}", entry.Test);
                 Assert.IsFalse(TestSummary.Visible, "Should not show test summary for test {0}", entry.Test);
-                entry.Selected = false;
+                entry.IsSelected = false;
             }
         }
 
@@ -272,17 +272,17 @@ namespace PmlUnit.Tests
             Assert.IsTrue(TestSummary.Visible);
 
             foreach (var entry in TestList.Entries)
-                entry.Selected = true;
+                entry.IsSelected = true;
 
             Assert.IsFalse(TestDetails.Visible);
             Assert.IsTrue(TestSummary.Visible);
 
             foreach (var entry in TestList.Entries)
             {
-                entry.Selected = false;
+                entry.IsSelected = false;
                 Assert.IsFalse(TestDetails.Visible, "Should not show test details for test {0}", entry.Test);
                 Assert.True(TestSummary.Visible, "Should show test summary for test {0}", entry.Test);
-                entry.Selected = true;
+                entry.IsSelected = true;
             }
         }
     }

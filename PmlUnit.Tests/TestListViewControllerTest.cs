@@ -79,7 +79,7 @@ namespace PmlUnit.Tests
         public void EntryClick_SelectsOnlyThatEntry(int index, int x, int y, MouseButtons button)
         {
             foreach (var entry in TestList.Entries)
-                entry.Selected = true;
+                entry.IsSelected = true;
 
             PerformMouseClick(x, y, button);
             Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
@@ -109,7 +109,7 @@ namespace PmlUnit.Tests
         public void OutsideClick_SelectsNothing(MouseButtons button)
         {
             foreach (var entry in TestList.Entries)
-                entry.Selected = true;
+                entry.IsSelected = true;
 
             PerformMouseClick(30, 170, button);
             Assert.That(TestList.SelectedEntries, Is.Empty);
@@ -158,7 +158,7 @@ namespace PmlUnit.Tests
             Assert.That(TestList.SelectedEntries, Is.Empty);
 
             foreach (var entry in TestList.Entries)
-                entry.Selected = true;
+                entry.IsSelected = true;
 
             PerformMouseClick(30, 110, Keys.Control);
             Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(5));
@@ -179,7 +179,7 @@ namespace PmlUnit.Tests
             Assert.That(TestList.SelectedEntries, Is.Empty);
 
             foreach (var entry in TestList.Entries)
-                entry.Selected = true;
+                entry.IsSelected = true;
             Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(6));
 
             PerformMouseClick(30, 130, MouseButtons.Right, Keys.Control);

@@ -18,7 +18,7 @@ namespace PmlUnit
                 throw new ArgumentNullException(nameof(entries));
 
             Entries = entries;
-            Predicate = entry => entry.Selected;
+            Predicate = entry => entry.IsSelected;
         }
 
         public int Count
@@ -32,20 +32,20 @@ namespace PmlUnit
                 throw new ArgumentNullException(nameof(item));
             if (!Entries.Contains(item))
                 throw new ArgumentException("Entry does not belong to underlying collection.", nameof(item));
-            item.Selected = true;
+            item.IsSelected = true;
         }
 
         public void Clear()
         {
             foreach (var entry in Entries)
-                entry.Selected = false;
+                entry.IsSelected = false;
         }
 
         public bool Contains(TestListEntry item)
         {
             if (item == null)
                 throw new ArgumentNullException(nameof(item));
-            return item.Selected && Entries.Contains(item);
+            return item.IsSelected && Entries.Contains(item);
         }
 
         public bool Remove(TestListEntry item)
@@ -55,8 +55,8 @@ namespace PmlUnit
             if (!Entries.Contains(item))
                 throw new ArgumentException("Entry does not belong to underlying collection.", nameof(item));
 
-            bool result = item.Selected;
-            item.Selected = false;
+            bool result = item.IsSelected;
+            item.IsSelected = false;
             return result;
         }
 

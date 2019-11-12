@@ -62,7 +62,7 @@ namespace PmlUnit
         {
             if (entry == null)
                 throw new ArgumentNullException(nameof(entry));
-            return entry.Selected ? SelectedTextBrush : NormalTextBrush;
+            return entry.IsSelected ? SelectedTextBrush : NormalTextBrush;
         }
 
         public void Dispose()

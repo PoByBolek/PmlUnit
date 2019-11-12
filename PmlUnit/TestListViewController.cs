@@ -94,12 +94,12 @@ namespace PmlUnit
             if (modifierKeys == Keys.None)
             {
                 FocusedEntry = GetEntryRelativeToFocus(0);
-                FocusedEntry.Selected = true;
+                FocusedEntry.IsSelected = true;
             }
             else if (modifierKeys == Keys.Control)
             {
                 FocusedEntry = GetEntryRelativeToFocus(0);
-                FocusedEntry.Selected = !FocusedEntry.Selected;
+                FocusedEntry.IsSelected = !FocusedEntry.IsSelected;
             }
             else if (modifierKeys == Keys.Shift)
             {
@@ -211,7 +211,7 @@ namespace PmlUnit
                 }
                 else if (left && modifierKeys == Keys.Control && clicked != null)
                 {
-                    clicked.Selected = !clicked.Selected;
+                    clicked.IsSelected = !clicked.IsSelected;
                     FocusedEntry = clicked;
                     SelectionStartEntry = clicked;
                 }
@@ -283,7 +283,7 @@ namespace PmlUnit
 
             if (target != null)
             {
-                target.Selected = true;
+                target.IsSelected = true;
                 SelectionStartEntry = target;
                 FocusedEntry = target;
             }
@@ -299,12 +299,12 @@ namespace PmlUnit
             {
                 if (entry == target || entry == SelectionStartEntry)
                 {
-                    entry.Selected = true;
+                    entry.IsSelected = true;
                     selected = target == SelectionStartEntry ? false : !selected;
                 }
                 else
                 {
-                    entry.Selected = selected;
+                    entry.IsSelected = selected;
                 }
             }
 

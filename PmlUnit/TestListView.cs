@@ -146,7 +146,7 @@ namespace PmlUnit
                 var result = new HashSet<Test>();
                 foreach (var group in GroupsField)
                 {
-                    if (group.Selected)
+                    if (group.IsSelected)
                     {
                         foreach (var entry in group.Entries)
                             result.Add(entry.Test);
@@ -155,7 +155,7 @@ namespace PmlUnit
                     {
                         foreach (var entry in group.Entries)
                         {
-                            if (entry.Selected)
+                            if (entry.IsSelected)
                                 result.Add(entry.Test);
                         }
                     }
@@ -255,7 +255,7 @@ namespace PmlUnit
 
         private void PaintEntryBackground(Graphics g, TestListEntry entry, Rectangle bounds, TestListPaintOptions options)
         {
-            if (entry.Selected)
+            if (entry.IsSelected)
             {
                 g.FillRectangle(options.SelectedBackBrush, bounds);
             }

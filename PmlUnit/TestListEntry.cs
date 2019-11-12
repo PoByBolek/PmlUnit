@@ -8,16 +8,16 @@ namespace PmlUnit
     {
         public event EventHandler SelectionChanged;
 
-        private bool SelectedField;
+        private bool IsSelectedField;
 
-        public bool Selected
+        public bool IsSelected
         {
-            get { return SelectedField; }
+            get { return IsSelectedField; }
             set
             {
-                if (value != SelectedField)
+                if (value != IsSelectedField)
                 {
-                    SelectedField = value;
+                    IsSelectedField = value;
                     SelectionChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
