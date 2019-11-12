@@ -1,21 +1,26 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
-using System.Drawing;
 
 namespace PmlUnit
 {
-    interface TestListEntry
+    abstract class TestListEntry
     {
-        Test Test { get; }
-        bool Selected { get; set; }
-    }
+        public event EventHandler SelectionChanged;
 
-    interface TestListBaseEntry
-    {
-        event EventHandler SelectionChanged;
+        private bool IsSelectedField;
 
-        bool Selected { get; set; }
-        void Paint(Graphics g, Rectangle bounds, TestListPaintOptions options);
+        public bool IsSelected
+        {
+            get { return IsSelectedField; }
+            set
+            {
+                if (value != IsSelectedField)
+                {
+                    IsSelectedField = value;
+                    SelectionChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
+        }
     }
 }

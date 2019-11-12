@@ -28,14 +28,8 @@ namespace PmlUnit
 
         public void LoadTests()
         {
-            SetTests(Provider.GetTestCases());
-        }
-
-        private void SetTests(IEnumerable<TestCase> testCases)
-        {
-            TestList.SetTests(testCases.SelectMany(testCase => testCase.Tests));
-            TestSummary.UpdateSummary(TestList.AllTests);
-            TestDetails.Test = TestList.SelectedTests.FirstOrDefault();
+            TestList.TestCases.Clear();
+            TestList.TestCases.AddRange(Provider.GetTestCases());
         }
 
         protected override void Dispose(bool disposing)
@@ -112,7 +106,8 @@ namespace PmlUnit
         private void OnRefreshLinkClick(object sender, EventArgs e)
         {
             Runner.RefreshIndex();
-            SetTests(Provider.GetTestCases().Select(testCase => Reload(testCase)));
+            TestList.TestCases.Clear();
+            TestList.TestCases.AddRange(Provider.GetTestCases().Select(Reload));
         }
 
         private TestCase Reload(TestCase testCase)
