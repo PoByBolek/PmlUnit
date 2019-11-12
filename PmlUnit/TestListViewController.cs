@@ -44,6 +44,7 @@ namespace PmlUnit
                 if (value != FocusedEntryField)
                 {
                     FocusedEntryField = value;
+                    ScrollEntryIntoView(value);
                     View.Invalidate();
                 }
             }
@@ -78,17 +79,17 @@ namespace PmlUnit
         {
             if (modifierKeys == Keys.None)
             {
-                GetEntryRelativeToFocus(0);
+                FocusedEntry = GetEntryRelativeToFocus(0);
                 FocusedEntry.Selected = true;
             }
             else if (modifierKeys == Keys.Control)
             {
-                GetEntryRelativeToFocus(0);
+                FocusedEntry = GetEntryRelativeToFocus(0);
                 FocusedEntry.Selected = !FocusedEntry.Selected;
             }
             else if (modifierKeys == Keys.Shift)
             {
-                GetEntryRelativeToFocus(0);
+                FocusedEntry = GetEntryRelativeToFocus(0);
                 SelectRange(FocusedEntry);
             }
         }
@@ -130,20 +131,17 @@ namespace PmlUnit
             {
                 FocusedEntry = target;
                 SelectOnly(target);
-                ScrollEntryIntoView(target);
                 return true;
             }
             else if (modifierKeys == Keys.Control)
             {
                 FocusedEntry = target;
-                ScrollEntryIntoView(target);
                 return true;
             }
             else if (modifierKeys == Keys.Shift)
             {
                 FocusedEntry = target;
                 SelectRange(target);
-                ScrollEntryIntoView(target);
                 return true;
             }
             else
