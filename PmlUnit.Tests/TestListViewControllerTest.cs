@@ -116,6 +116,36 @@ namespace PmlUnit.Tests
         }
 
         [Test]
+        public void GroupIconClick_TogglesGroup()
+        {
+            PerformMouseClick(10, 10);
+            Assert.That(!TestList.Groups[0].IsExpanded);
+
+            PerformMouseClick(10, 30);
+            Assert.That(!TestList.Groups[1].IsExpanded);
+            PerformMouseClick(10, 30);
+            Assert.That(TestList.Groups[1].IsExpanded);
+
+            PerformMouseClick(10, 10);
+            Assert.That(TestList.Groups[0].IsExpanded);
+        }
+
+        [Test]
+        public void GroupDoubleClick_TogglesGroup()
+        {
+            PerformDoubleClick(10, 10);
+            Assert.That(!TestList.Groups[0].IsExpanded);
+
+            PerformDoubleClick(10, 30);
+            Assert.That(!TestList.Groups[1].IsExpanded);
+            PerformDoubleClick(10, 30);
+            Assert.That(TestList.Groups[1].IsExpanded);
+
+            PerformDoubleClick(10, 10);
+            Assert.That(TestList.Groups[0].IsExpanded);
+        }
+
+        [Test]
         public void LeftControlEntryClick_TooglesSelectionOfThatEntry()
         {
             Assert.That(TestList.SelectedEntries, Is.Empty);
@@ -538,6 +568,11 @@ namespace PmlUnit.Tests
         private void PerformMouseClick(int x, int y, MouseButtons button, Keys modifierKeys)
         {
             Controller.HandleMouseClick(new MouseEventArgs(button, 1, x, y, 0), modifierKeys);
+        }
+
+        private void PerformDoubleClick(int x, int y)
+        {
+            Controller.HandleMouseDoubleClick(new MouseEventArgs(MouseButtons.Left, 2, x, y, 0), Keys.None);
         }
 
         private void PerformKeyPress(Keys keys)
