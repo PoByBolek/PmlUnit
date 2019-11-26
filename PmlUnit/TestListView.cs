@@ -51,16 +51,16 @@ namespace PmlUnit
         private readonly SortedList<string, TestListEntry> AllEntries;
         private readonly SortedList<string, TestListEntry> VisibleEntries;
 
+        private readonly TestListGroupEntry FailedGroup;
+        private readonly TestListGroupEntry NotExecutedGroup;
+        private readonly TestListGroupEntry PassedGroup;
+
         private readonly TestListViewController Controller;
 
         public TestListView()
         {
             TestCases = new TestCaseCollection();
             TestCases.Changed += OnTestCasesChanged;
-            EntriesField = new TestListTestEntryCollection();
-            Entries = EntriesField.AsReadOnly();
-            GroupsField = new TestListGroupEntryCollection();
-            Groups = GroupsField.AsReadOnly();
 
             AllEntries = new SortedList<string, TestListEntry>(StringComparer.OrdinalIgnoreCase);
             VisibleEntries = new SortedList<string, TestListEntry>(StringComparer.OrdinalIgnoreCase);
@@ -68,6 +68,33 @@ namespace PmlUnit
 
             Controller = new TestListViewController(this, AllEntries.Values, VisibleEntries.Values);
             Controller.SelectionChanged += OnControllerSelectionChanged;
+
+            EntriesField = new TestListTestEntryCollection();
+            Entries = EntriesField.AsReadOnly();
+
+            GroupsField = new TestListGroupEntryCollection();
+            Groups = GroupsField.AsReadOnly();
+
+            FailedGroup = new TestListGroupEntry("1_failed", "Failed tests");
+            FailedGroup.EntriesChanged += OnGroupEntriesChanged;
+            FailedGroup.ExpandedChanged += OnGroupExpandedChanged;
+            FailedGroup.SelectionChanged += OnSelectionChanged;
+            AllEntries.Add(FailedGroup.Key, FailedGroup);
+            GroupsField.Add(FailedGroup);
+
+            NotExecutedGroup = new TestListGroupEntry("2_not_executed", "Not executed tests");
+            NotExecutedGroup.EntriesChanged += OnGroupEntriesChanged;
+            NotExecutedGroup.ExpandedChanged += OnGroupExpandedChanged;
+            NotExecutedGroup.SelectionChanged += OnSelectionChanged;
+            AllEntries.Add(NotExecutedGroup.Key, NotExecutedGroup);
+            GroupsField.Add(NotExecutedGroup);
+
+            PassedGroup = new TestListGroupEntry("3_passed", "Passed tests");
+            PassedGroup.EntriesChanged += OnGroupEntriesChanged;
+            PassedGroup.ExpandedChanged += OnGroupExpandedChanged;
+            PassedGroup.SelectionChanged += OnSelectionChanged;
+            AllEntries.Add(PassedGroup.Key, PassedGroup);
+            GroupsField.Add(PassedGroup);
 
             InitializeComponent();
 
@@ -87,33 +114,30 @@ namespace PmlUnit
         {
             foreach (var testCase in e.RemovedTestCases)
             {
-                GroupsField.Remove(testCase.Name);
-                AllEntries.Remove(testCase.Name);
-                VisibleEntries.Remove(testCase.Name);
                 foreach (var test in testCase.Tests)
                 {
-                    EntriesField.Remove(test);
-                    AllEntries.Remove(test.FullName);
-                    VisibleEntries.Remove(test.FullName);
+                    var entry = EntriesField.TryGetValue(test);
+                    if (entry != null)
+                    {
+                        EntriesField.Remove(test);
+                        AllEntries.Remove(entry.Key);
+                        VisibleEntries.Remove(entry.Key);
+                        entry.Group = null;
+                    }
                 }
             }
+            
             foreach (var testCase in e.AddedTestCases)
             {
-                var group = new TestListGroupEntry(testCase.Name);
-                group.SelectionChanged += OnSelectionChanged;
-                group.ExpandedChanged += OnGroupExpandedChanged;
                 foreach (var test in testCase.Tests)
                 {
                     var entry = EntriesField.Add(test);
                     entry.SelectionChanged += OnSelectionChanged;
                     entry.ResultChanged += OnTestResultChanged;
-                    group.Entries.Add(entry);
-                    AllEntries.Add(test.FullName, entry);
-                    VisibleEntries.Add(test.FullName, entry);
+                    entry.Group = NotExecutedGroup;
+                    AllEntries.Add(entry.Key, entry);
+                    VisibleEntries.Add(entry.Key, entry);
                 }
-                GroupsField.Add(group);
-                AllEntries.Add(testCase.Name, group);
-                VisibleEntries.Add(testCase.Name, group);
             }
 
             AutoScrollMinSize = new Size(0, VisibleEntries.Count * EntryHeight);
@@ -358,18 +382,38 @@ namespace PmlUnit
             Controller.HandleMouseDoubleClick(e, ModifierKeys);
         }
 
+        private void OnGroupEntriesChanged(object sender, TestListEntriesChangedEventArgs e)
+        {
+            var group = sender as TestListGroupEntry;
+            if (group == null)
+                return;
+
+            if (group.Entries.Count > 0 && !VisibleEntries.ContainsKey(group.Key))
+            {
+                VisibleEntries.Add(group.Key, group);
+                AutoScrollMinSize = new Size(0, VisibleEntries.Count * EntryHeight);
+            }
+            else if (group.Entries.Count == 0 && VisibleEntries.ContainsKey(group.Key))
+            {
+                VisibleEntries.Remove(group.Key);
+                AutoScrollMinSize = new Size(0, VisibleEntries.Count * EntryHeight);
+            }
+
+            Invalidate();
+        }
+
         private void OnGroupExpandedChanged(object sender, EventArgs e)
         {
             var group = sender as TestListGroupEntry;
             if (group.IsExpanded)
             {
                 foreach (var entry in group.Entries)
-                    VisibleEntries.Add(entry.Test.FullName, entry);
+                    VisibleEntries.Add(entry.Key, entry);
             }
             else
             {
                 foreach (var entry in group.Entries)
-                    VisibleEntries.Remove(entry.Test.FullName);
+                    VisibleEntries.Remove(entry.Key);
             }
 
             AutoScrollMinSize = new Size(0, VisibleEntries.Count * EntryHeight);
@@ -389,6 +433,27 @@ namespace PmlUnit
 
         private void OnTestResultChanged(object sender, EventArgs e)
         {
+            var entry = sender as TestListTestEntry;
+            if (entry != null)
+            {
+                AllEntries.Remove(entry.Key);
+                VisibleEntries.Remove(entry.Key);
+                switch (entry.Test.Status)
+                {
+                    case TestStatus.Failed:
+                        entry.Group = FailedGroup;
+                        break;
+                    case TestStatus.NotExecuted:
+                        entry.Group = NotExecutedGroup;
+                        break;
+                    case TestStatus.Passed:
+                        entry.Group = PassedGroup;
+                        break;
+                }
+                AllEntries.Add(entry.Key, entry);
+                if (entry.Group.IsExpanded)
+                    VisibleEntries.Add(entry.Key, entry);
+            }
             Invalidate();
         }
     }

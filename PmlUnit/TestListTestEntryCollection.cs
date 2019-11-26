@@ -113,6 +113,11 @@ namespace PmlUnit
             }
         }
 
+        public bool ContainsKey(Test test)
+        {
+            return Entries.ContainsKey(test);
+        }
+
         public bool Contains(TestListTestEntry item)
         {
             if (item == null)
@@ -120,6 +125,13 @@ namespace PmlUnit
 
             TestListTestEntry entry;
             return Entries.TryGetValue(item.Test, out entry) && entry == item;
+        }
+
+        public TestListTestEntry TryGetValue(Test test)
+        {
+            TestListTestEntry result;
+            Entries.TryGetValue(test, out result);
+            return result;
         }
 
         public bool Remove(Test test)

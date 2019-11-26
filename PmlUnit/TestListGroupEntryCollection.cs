@@ -29,12 +29,17 @@ namespace PmlUnit
         {
             if (item == null)
                 throw new ArgumentNullException(nameof(item));
-            Entries.Add(item.Name, item);
+            Entries.Add(item.Key, item);
         }
 
         public void Clear()
         {
             Entries.Clear();
+        }
+
+        public bool ContainsKey(string key)
+        {
+            return Entries.ContainsKey(key);
         }
 
         public bool Contains(TestListGroupEntry item)
@@ -43,7 +48,7 @@ namespace PmlUnit
                 throw new ArgumentNullException(nameof(item));
 
             TestListGroupEntry entry;
-            return Entries.TryGetValue(item.Name, out entry) && entry == item;
+            return Entries.TryGetValue(item.Key, out entry) && entry == item;
         }
 
         public void CopyTo(TestListGroupEntry[] array, int arrayIndex)

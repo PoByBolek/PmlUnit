@@ -7,11 +7,7 @@ namespace PmlUnit
     class TestListTestEntry : TestListEntry
     {
         public event EventHandler GroupChanged;
-        public event EventHandler ResultChanged
-        {
-            add { Test.ResultChanged += value; }
-            remove { Test.ResultChanged -= value; }
-        }
+        public event EventHandler ResultChanged;
 
         public Test Test { get; }
 
@@ -28,6 +24,7 @@ namespace PmlUnit
                 throw new ArgumentNullException(nameof(test));
 
             Test = test;
+            Test.ResultChanged += OnResultChanged;
             GroupField = group;
             if (group != null)
                 group.Entries.Add(this);
@@ -56,6 +53,22 @@ namespace PmlUnit
                     GroupChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
+        }
+
+        public string Key
+        {
+            get
+            {
+                if (Group == null)
+                    return Test.FullName;
+                else
+                    return Group.Key + ":" + Test.Name + ":" + Test.TestCase.Name;
+            }
+        }
+
+        private void OnResultChanged(object sender, EventArgs e)
+        {
+            ResultChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }
