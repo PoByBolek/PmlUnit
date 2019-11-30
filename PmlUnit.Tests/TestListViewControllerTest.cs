@@ -14,7 +14,7 @@ namespace PmlUnit.Tests
     {
         private TestListView TestList;
         private TestListViewModel Model;
-        private ReadOnlyTestListEntryCollection<TestListEntry> VisibleEntries;
+        private ReadOnlyTestListEntryCollection VisibleEntries;
         private TestListSelectedEntryCollection SelectedEntries;
         private TestListViewController Controller;
         private TestCase First;

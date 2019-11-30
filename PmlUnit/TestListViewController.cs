@@ -269,7 +269,7 @@ namespace PmlUnit
             if (SelectionStartEntry == null)
                 SelectionStartEntry = Model.VisibleEntries.FirstOrDefault();
 
-            foreach (var entry in Model.AllEntries)
+            foreach (var entry in Model.Entries)
             {
                 if (entry == target || entry == SelectionStartEntry)
                 {

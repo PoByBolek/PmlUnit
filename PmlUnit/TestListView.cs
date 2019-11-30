@@ -78,14 +78,14 @@ namespace PmlUnit
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public IList<Test> SelectedTests => AllTestEntries
+        public IList<Test> SelectedTests => TestEntries
             .Where(entry => entry.IsSelected || entry.Group.IsSelected)
             .Select(entry => entry.Test)
             .ToList();
 
-        private IEnumerable<Test> AllTestsInternal => AllTestEntries.Select(entry => entry.Test);
+        private IEnumerable<Test> AllTestsInternal => TestEntries.Select(entry => entry.Test);
 
-        private IEnumerable<TestListTestEntry> AllTestEntries => Model.AllEntries.OfType<TestListTestEntry>();
+        private IEnumerable<TestListTestEntry> TestEntries => Model.Entries.OfType<TestListTestEntry>();
 
         private void OnModelChanged(object sender, EventArgs e)
         {

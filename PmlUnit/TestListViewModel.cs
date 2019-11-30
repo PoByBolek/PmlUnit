@@ -14,14 +14,12 @@ namespace PmlUnit
 
         public TestCaseCollection TestCases { get; }
 
-        public ReadOnlyTestListEntryCollection<TestListEntry> AllEntries { get; }
+        public ReadOnlyTestListEntryCollection Entries { get; }
         public TestListSelectedEntryCollection SelectedEntries { get; }
-        public ReadOnlyTestListEntryCollection<TestListEntry> VisibleEntries { get; }
-        public ReadOnlyTestListEntryCollection<TestListTestEntry> TestEntries { get; }
+        public ReadOnlyTestListEntryCollection VisibleEntries { get; }
 
-        private readonly TestListEntryCollection<TestListEntry> AllEntriesField;
-        private readonly TestListEntryCollection<TestListEntry> VisibleEntriesField;
-        private readonly TestListEntryCollection<TestListTestEntry> TestEntriesField;
+        private readonly TestListEntryCollection EntriesField;
+        private readonly TestListEntryCollection VisibleEntriesField;
 
         private readonly TestListGroupEntry FailedGroup;
         private readonly TestListGroupEntry NotExecutedGroup;
@@ -35,17 +33,13 @@ namespace PmlUnit
             TestCases = new TestCaseCollection();
             TestCases.Changed += OnTestCasesChanged;
 
-            var groupComparer = new TestListGroupEntryComparer();
-            var testComparer = new TestListTestEntryComparer(groupComparer);
-            var entryComparer = new TestListEntryComparer(groupComparer, testComparer);
+            var comparer = new TestListEntryComparer();
 
-            AllEntriesField = new TestListEntryCollection<TestListEntry>(entryComparer);
-            AllEntries = AllEntriesField.AsReadOnly();
-            SelectedEntries = new TestListSelectedEntryCollection(AllEntries);
-            VisibleEntriesField = new TestListEntryCollection<TestListEntry>(entryComparer);
+            EntriesField = new TestListEntryCollection(comparer);
+            Entries = EntriesField.AsReadOnly();
+            SelectedEntries = new TestListSelectedEntryCollection(Entries);
+            VisibleEntriesField = new TestListEntryCollection(comparer);
             VisibleEntries = VisibleEntriesField.AsReadOnly();
-            TestEntriesField = new TestListEntryCollection<TestListTestEntry>(testComparer);
-            TestEntries = TestEntriesField.AsReadOnly();
 
             FailedGroup = new TestListGroupEntry("1_failed", "Failed Tests");
             SetupGroupEntry(FailedGroup);
@@ -86,7 +80,7 @@ namespace PmlUnit
             group.SelectionChanged += OnSelectionChanged;
             group.EntriesChanged += OnGroupEntriesChanged;
             group.ExpandedChanged += OnGroupExpandedChanged;
-            AllEntriesField.Add(group);
+            EntriesField.Add(group);
         }
 
         private void OnTestCasesChanged(object sender, TestCasesChangedEventArgs e)
@@ -112,8 +106,7 @@ namespace PmlUnit
                 throw new ArgumentNullException(nameof(test));
 
             var entry = new TestListTestEntry(test, GetGroupFor(test));
-            AllEntriesField.Add(entry);
-            TestEntriesField.Add(entry);
+            EntriesField.Add(entry);
             if (entry.Group.IsExpanded)
             {
                 VisibleEntriesField.Add(entry);
@@ -216,20 +209,6 @@ namespace PmlUnit
 
         private class TestListEntryComparer : IComparer<TestListEntry>
         {
-            private readonly IComparer<TestListGroupEntry> GroupComparer;
-            private readonly IComparer<TestListTestEntry> TestComparer;
-
-            public TestListEntryComparer(IComparer<TestListGroupEntry> groupComparer, IComparer<TestListTestEntry> testComparer)
-            {
-                if (groupComparer == null)
-                    throw new ArgumentNullException(nameof(groupComparer));
-                if (testComparer == null)
-                    throw new ArgumentNullException(nameof(testComparer));
-
-                GroupComparer = groupComparer;
-                TestComparer = testComparer;
-            }
-
             public int Compare(TestListEntry left, TestListEntry right)
             {
                 if (left == right)
@@ -245,13 +224,13 @@ namespace PmlUnit
                 var rightTest = right as TestListTestEntry;
 
                 if (leftGroup != null && rightGroup != null)
-                    return GroupComparer.Compare(leftGroup, rightGroup);
+                    return CompareGroups(leftGroup, rightGroup);
                 else if (leftGroup != null && rightTest != null)
                     return -CompareTestInGroup(rightTest, leftGroup);
                 else if (leftTest != null && rightGroup != null)
                     return CompareTestInGroup(leftTest, rightGroup);
                 else if (leftTest != null && rightTest != null)
-                    return TestComparer.Compare(leftTest, rightTest);
+                    return CompareTests(leftTest, rightTest);
                 else
                     throw new ArgumentException(string.Format(
                         "Expected two {} or {} instances but got {} and {} instead.",
@@ -260,20 +239,7 @@ namespace PmlUnit
                     ));
             }
 
-            private int CompareTestInGroup(TestListTestEntry left, TestListGroupEntry right)
-            {
-                if (left.Group == null)
-                    return -1;
-                else if (left.Group == right)
-                    return 1;
-                else
-                    return GroupComparer.Compare(left.Group, right);
-            }
-        }
-
-        private class TestListGroupEntryComparer : IComparer<TestListGroupEntry>
-        {
-            public int Compare(TestListGroupEntry left, TestListGroupEntry right)
+            private int CompareGroups(TestListGroupEntry left, TestListGroupEntry right)
             {
                 if (left == right)
                     return 0;
@@ -284,23 +250,20 @@ namespace PmlUnit
                 else
                     return string.Compare(left.Key, right.Key, StringComparison.Ordinal);
             }
-        }
 
-        private class TestListTestEntryComparer : IComparer<TestListTestEntry>
-        {
-            private readonly IComparer<TestListGroupEntry> GroupComparer;
-
-            public TestListTestEntryComparer(IComparer<TestListGroupEntry> groupComparer)
+            private int CompareTestInGroup(TestListTestEntry left, TestListGroupEntry right)
             {
-                if (groupComparer == null)
-                    throw new ArgumentNullException(nameof(groupComparer));
-
-                GroupComparer = groupComparer;
+                if (left.Group == null)
+                    return -1;
+                else if (left.Group == right)
+                    return 1;
+                else
+                    return CompareGroups(left.Group, right);
             }
 
-            public int Compare(TestListTestEntry left, TestListTestEntry right)
+            private int CompareTests(TestListTestEntry left, TestListTestEntry right)
             {
-                int result = GroupComparer.Compare(left.Group, right.Group);
+                int result = CompareGroups(left.Group, right.Group);
                 if (result == 0)
                     result = string.Compare(left.Key, right.Key, StringComparison.OrdinalIgnoreCase);
                 return result;

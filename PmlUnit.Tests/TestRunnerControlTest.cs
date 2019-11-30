@@ -126,11 +126,11 @@ namespace PmlUnit.Tests
 
             Model = TestList.GetModel();
 
-            foreach (var entry in Model.AllEntries)
+            foreach (var entry in Model.Entries)
             {
                 var testEntry = entry as TestListTestEntry;
-                if (testEntry != null && (testEntry.Test.Name == "two" || testEntry.Test.Name == "four"))
-                    testEntry.IsSelected = true;
+                if (testEntry != null)
+                    testEntry.IsSelected = testEntry.Test.Name == "two" || testEntry.Test.Name == "four";
             }
         }
 
@@ -252,27 +252,30 @@ namespace PmlUnit.Tests
         [Test]
         public void SelectionChanged_AssignsTestOfSingleSelectedEntryToTestDetails()
         {
-            foreach (var entry in Model.TestEntries)
+            foreach (var entry in Model.Entries)
             {
-                entry.IsSelected = true;
-                Assert.AreSame(entry.Test, TestDetails.Test, "Should assign test {0}.", entry.Test);
-                entry.IsSelected = false;
+                var testEntry = entry as TestListTestEntry;
+                if (testEntry != null)
+                {
+                    testEntry.IsSelected = true;
+                    Assert.AreSame(testEntry.Test, TestDetails.Test, "Should assign test {0}.", testEntry.Test);
+                    testEntry.IsSelected = false;
+                }
             }
         }
 
         [Test]
         public void SelectionChanged_ShowsTestDetailsIfExactlyOneEntryIsSelected()
         {
-            // Act & Assert
-            foreach (var entry in Model.AllEntries)
+            foreach (var entry in Model.Entries)
             {
                 var testEntry = entry as TestListTestEntry;
                 if (testEntry != null)
                 {
-                    entry.IsSelected = true;
+                    testEntry.IsSelected = true;
                     Assert.IsTrue(TestDetails.Visible, "Should show test details for test {0}", testEntry.Test);
                     Assert.IsFalse(TestSummary.Visible, "Should not show test summary for test {0}", testEntry.Test);
-                    entry.IsSelected = false;
+                    testEntry.IsSelected = false;
                 }
             }
         }
@@ -284,21 +287,25 @@ namespace PmlUnit.Tests
             Assert.IsFalse(TestDetails.Visible);
             Assert.IsTrue(TestSummary.Visible);
 
-            foreach (var entry in Model.AllEntries)
-                entry.IsSelected = true;
+            foreach (var entry in Model.Entries)
+            {
+                var testEntry = entry as TestListTestEntry;
+                if (testEntry != null)
+                    entry.IsSelected = true;
+            }
 
             Assert.IsFalse(TestDetails.Visible);
             Assert.IsTrue(TestSummary.Visible);
 
-            foreach (var entry in Model.AllEntries)
+            foreach (var entry in Model.Entries)
             {
                 var testEntry = entry as TestListTestEntry;
                 if (testEntry != null)
                 {
-                    entry.IsSelected = false;
+                    testEntry.IsSelected = false;
                     Assert.IsFalse(TestDetails.Visible, "Should not show test details for test {0}", testEntry.Test);
                     Assert.True(TestSummary.Visible, "Should show test summary for test {0}", testEntry.Test);
-                    entry.IsSelected = true;
+                    testEntry.IsSelected = true;
                 }
             }
         }
