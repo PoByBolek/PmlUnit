@@ -20,7 +20,7 @@ namespace PmlUnit
             Duration = duration;
         }
 
-        public bool Success
+        public bool Passed
         {
             get { return Error == null; }
         }

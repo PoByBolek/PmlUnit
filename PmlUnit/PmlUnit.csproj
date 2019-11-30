@@ -193,6 +193,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="TestRunnerControl.resx">
       <DependentUpon>TestRunnerControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -205,11 +206,11 @@
     <None Include="Images\CollapsedHighlight.png" />
     <None Include="Images\Expanded.png" />
     <None Include="Images\ExpandedHighlight.png" />
-    <None Include="Images\Failure.png" />
-    <None Include="Images\Success.png" />
+    <None Include="Images\Failed.png" />
+    <None Include="Images\NotExecuted.png" />
+    <None Include="Images\Passed.png" />
     <None Include="Images\TestRunner.png" />
     <None Include="Images\TestRunnerLarge.png" />
-    <None Include="Images\Unknown.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

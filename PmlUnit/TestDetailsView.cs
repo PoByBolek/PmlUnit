@@ -34,7 +34,7 @@ namespace PmlUnit
                 if (TestField == null)
                 {
                     TestNameLabel.Text = "";
-                    TestResultIconLabel.Image = Resources.Unknown;
+                    TestResultIconLabel.Image = Resources.NotExecuted;
                     TestResultIconLabel.Text = "Not executed";
                     StackTraceLabel.Text = "";
                     ElapsedTimeLabel.Text = "";
@@ -52,21 +52,21 @@ namespace PmlUnit
             var status = TestField.Status;
             if (status == TestStatus.NotExecuted)
             {
-                TestResultIconLabel.Image = Resources.Unknown;
+                TestResultIconLabel.Image = Resources.NotExecuted;
                 TestResultIconLabel.Text = "Not executed";
                 StackTraceLabel.Text = "";
                 ElapsedTimeLabel.Text = "";
             }
-            else if (status == TestStatus.Successful)
+            else if (status == TestStatus.Passed)
             {
-                TestResultIconLabel.Image = Resources.Success;
-                TestResultIconLabel.Text = "Successful";
+                TestResultIconLabel.Image = Resources.Passed;
+                TestResultIconLabel.Text = "Passed";
                 StackTraceLabel.Text = "";
                 ElapsedTimeLabel.Text = "Elapsed time: " + TestField.Result.Duration.Format();
             }
             else
             {
-                TestResultIconLabel.Image = Resources.Failure;
+                TestResultIconLabel.Image = Resources.Failed;
                 TestResultIconLabel.Text = "Failed";
                 StackTraceLabel.Text = TestField.Result.Error.Message;
                 ElapsedTimeLabel.Text = "Elapsed time: " + TestField.Result.Duration.Format();

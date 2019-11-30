@@ -36,7 +36,7 @@ namespace PmlUnit
             this.ResultLabel = new System.Windows.Forms.Label();
             this.RuntimeLabel = new System.Windows.Forms.Label();
             this.FailedTestCountLabel = new PmlUnit.IconLabel();
-            this.SuccessfulTestCountLabel = new PmlUnit.IconLabel();
+            this.PassedTestCountLabel = new PmlUnit.IconLabel();
             this.NotExecutedTestCountLabel = new PmlUnit.IconLabel();
             summaryLabel = new System.Windows.Forms.Label();
             testCountPanel = new System.Windows.Forms.FlowLayoutPanel();
@@ -60,7 +60,7 @@ namespace PmlUnit
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             testCountPanel.Controls.Add(this.FailedTestCountLabel);
-            testCountPanel.Controls.Add(this.SuccessfulTestCountLabel);
+            testCountPanel.Controls.Add(this.PassedTestCountLabel);
             testCountPanel.Controls.Add(this.NotExecutedTestCountLabel);
             testCountPanel.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             testCountPanel.Location = new System.Drawing.Point(3, 48);
@@ -78,7 +78,7 @@ namespace PmlUnit
             this.ResultLabel.Name = "ResultLabel";
             this.ResultLabel.Size = new System.Drawing.Size(148, 13);
             this.ResultLabel.TabIndex = 1;
-            this.ResultLabel.Text = "Last test run: Successful";
+            this.ResultLabel.Text = "Last test run: Passed";
             // 
             // RuntimeLabel
             // 
@@ -94,7 +94,7 @@ namespace PmlUnit
             // 
             this.FailedTestCountLabel.AutoSize = true;
             this.FailedTestCountLabel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.FailedTestCountLabel.Image = global::PmlUnit.Properties.Resources.Failure;
+            this.FailedTestCountLabel.Image = global::PmlUnit.Properties.Resources.Failed;
             this.FailedTestCountLabel.Location = new System.Drawing.Point(0, 0);
             this.FailedTestCountLabel.Margin = new System.Windows.Forms.Padding(0);
             this.FailedTestCountLabel.MinimumSize = new System.Drawing.Size(16, 16);
@@ -104,25 +104,25 @@ namespace PmlUnit
             this.FailedTestCountLabel.Text = "0 failed tests";
             this.FailedTestCountLabel.Visible = false;
             // 
-            // SuccessfulTestCountLabel
+            // PassedTestCountLabel
             // 
-            this.SuccessfulTestCountLabel.AutoSize = true;
-            this.SuccessfulTestCountLabel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.SuccessfulTestCountLabel.Image = global::PmlUnit.Properties.Resources.Success;
-            this.SuccessfulTestCountLabel.Location = new System.Drawing.Point(0, 17);
-            this.SuccessfulTestCountLabel.Margin = new System.Windows.Forms.Padding(0);
-            this.SuccessfulTestCountLabel.MinimumSize = new System.Drawing.Size(16, 16);
-            this.SuccessfulTestCountLabel.Name = "SuccessfulTestCountLabel";
-            this.SuccessfulTestCountLabel.Size = new System.Drawing.Size(107, 17);
-            this.SuccessfulTestCountLabel.TabIndex = 1;
-            this.SuccessfulTestCountLabel.Text = "0 successful tests";
-            this.SuccessfulTestCountLabel.Visible = false;
+            this.PassedTestCountLabel.AutoSize = true;
+            this.PassedTestCountLabel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.PassedTestCountLabel.Image = global::PmlUnit.Properties.Resources.Passed;
+            this.PassedTestCountLabel.Location = new System.Drawing.Point(0, 17);
+            this.PassedTestCountLabel.Margin = new System.Windows.Forms.Padding(0);
+            this.PassedTestCountLabel.MinimumSize = new System.Drawing.Size(16, 16);
+            this.PassedTestCountLabel.Name = "PassedTestCountLabel";
+            this.PassedTestCountLabel.Size = new System.Drawing.Size(107, 17);
+            this.PassedTestCountLabel.TabIndex = 1;
+            this.PassedTestCountLabel.Text = "0 passed tests";
+            this.PassedTestCountLabel.Visible = false;
             // 
             // NotExecutedTestCountLabel
             // 
             this.NotExecutedTestCountLabel.AutoSize = true;
             this.NotExecutedTestCountLabel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.NotExecutedTestCountLabel.Image = global::PmlUnit.Properties.Resources.Unknown;
+            this.NotExecutedTestCountLabel.Image = global::PmlUnit.Properties.Resources.NotExecuted;
             this.NotExecutedTestCountLabel.Location = new System.Drawing.Point(0, 34);
             this.NotExecutedTestCountLabel.Margin = new System.Windows.Forms.Padding(0);
             this.NotExecutedTestCountLabel.MinimumSize = new System.Drawing.Size(16, 16);
@@ -154,7 +154,7 @@ namespace PmlUnit
         private System.Windows.Forms.Label ResultLabel;
         private System.Windows.Forms.Label RuntimeLabel;
         private IconLabel FailedTestCountLabel;
-        private IconLabel SuccessfulTestCountLabel;
+        private IconLabel PassedTestCountLabel;
         private IconLabel NotExecutedTestCountLabel;
     }
 }

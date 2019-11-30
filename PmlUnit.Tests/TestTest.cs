@@ -105,11 +105,11 @@ namespace PmlUnit.Tests
         }
 
         [Test]
-        public void Status_IsSuccessfulWhenResultHasNoError()
+        public void Status_IsPassedWhenResultHasNoError()
         {
             var test = new Test(new TestCase("foo"), "bar");
             test.Result = new TestResult(TimeSpan.FromSeconds(1));
-            Assert.AreEqual(TestStatus.Successful, test.Status);
+            Assert.AreEqual(TestStatus.Passed, test.Status);
         }
 
         [Test]

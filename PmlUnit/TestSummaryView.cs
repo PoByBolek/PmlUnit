@@ -26,9 +26,9 @@ namespace PmlUnit
             FailedTestCountLabel.Text = Pluralize(failedTests, "failed test");
             FailedTestCountLabel.Visible = failedTests > 0;
 
-            int successfulTests = tests.Count(test => test.Status == TestStatus.Successful);
-            SuccessfulTestCountLabel.Text = Pluralize(successfulTests, "successful test");
-            SuccessfulTestCountLabel.Visible = successfulTests > 0;
+            int passedTests = tests.Count(test => test.Status == TestStatus.Passed);
+            PassedTestCountLabel.Text = Pluralize(passedTests, "passed test");
+            PassedTestCountLabel.Visible = passedTests > 0;
 
             int notExecutedTests = tests.Count(test => test.Status == TestStatus.NotExecuted);
             NotExecutedTestCountLabel.Text = Pluralize(notExecutedTests, "not executed test");
@@ -36,8 +36,8 @@ namespace PmlUnit
 
             if (failedTests > 0)
                 ResultLabel.Text = "Last test run: Failed";
-            else if (successfulTests > 0)
-                ResultLabel.Text = "Last test run: Successful";
+            else if (passedTests > 0)
+                ResultLabel.Text = "Last test run: Passed";
             else
                 ResultLabel.Text = "Last test run: Unknown";
 

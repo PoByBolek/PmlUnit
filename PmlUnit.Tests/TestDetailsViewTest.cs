@@ -44,11 +44,11 @@ namespace PmlUnit.Tests
 
         [TestCase(null, "Not executed")]
         [TestCase(false, "Failed")]
-        [TestCase(true, "Successful")]
-        public void Result_SetsStatusLabelText(bool? success, string expected)
+        [TestCase(true, "Passed")]
+        public void Result_SetsStatusLabelText(bool? passed, string expected)
         {
             // Act
-            TestDetails.Test.Result = CreateTestResult(success, TimeSpan.FromSeconds(0));
+            TestDetails.Test.Result = CreateTestResult(passed, TimeSpan.FromSeconds(0));
             // Assert
             Assert.AreEqual(expected, StatusLabel.Text);
         }
@@ -106,11 +106,11 @@ namespace PmlUnit.Tests
             Assert.AreEqual("", StackTraceLabel.Text);
         }
 
-        private static TestResult CreateTestResult(bool? success, TimeSpan duration)
+        private static TestResult CreateTestResult(bool? passed, TimeSpan duration)
         {
-            if (success == null)
+            if (passed == null)
                 return null;
-            else if (success.Value)
+            else if (passed.Value)
                 return new TestResult(duration);
             else
                 return new TestResult(duration, new Exception());

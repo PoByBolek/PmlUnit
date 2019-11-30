@@ -177,11 +177,11 @@ namespace PmlUnit.Tests
         }
 
         [Test]
-        public void Run_ShouldReturnSuccessfulResultWhenTestSucceeds()
+        public void Run_ShouldReturnPassedResultWhenTestPasses()
         {
             var runner = new PmlTestRunner(Mock.Of<ObjectProxy>());
             var result = runner.Run(Test);
-            Assert.IsTrue(result.Success);
+            Assert.IsTrue(result.Passed);
         }
 
         [Test]
@@ -195,7 +195,7 @@ namespace PmlUnit.Tests
             // Act
             var result = runner.Run(Test);
             // Assert
-            Assert.IsFalse(result.Success);
+            Assert.IsFalse(result.Passed);
             Assert.AreSame(error, result.Error);
         }
 
@@ -212,7 +212,7 @@ namespace PmlUnit.Tests
             // Act
             var result = runner.Run(Test);
             // Assert
-            Assert.IsFalse(result.Success);
+            Assert.IsFalse(result.Passed);
             Assert.NotNull(result.Error);
             Assert.AreEqual("This is an error message...\r\n... which spans two lines\r\n", result.Error.Message);
         }

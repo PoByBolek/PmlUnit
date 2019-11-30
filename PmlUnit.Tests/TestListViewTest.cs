@@ -52,13 +52,13 @@ namespace PmlUnit.Tests
         }
 
         [Test]
-        public void SucceededTests_ReturnsSucceededTests()
+        public void PassedTests_OnlyReturnsPassedTests()
         {
             // Arrange
             First.Tests["three"].Result = new TestResult(TimeSpan.FromSeconds(1));
             Second.Tests["five"].Result = new TestResult(TimeSpan.FromSeconds(1));
             // Act
-            var tests = TestList.SucceededTests;
+            var tests = TestList.PassedTests;
             // Assert
             Assert.That(tests.Count, Is.EqualTo(2));
             Assert.That(tests, Contains.Item(First.Tests["three"]));
@@ -66,7 +66,7 @@ namespace PmlUnit.Tests
         }
 
         [Test]
-        public void FailedTests_ReturnsFailedTests()
+        public void FailedTests_OnlyReturnsFailedTests()
         {
             // Arrange
             First.Tests["one"].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("foo"));
@@ -82,7 +82,7 @@ namespace PmlUnit.Tests
         }
 
         [Test]
-        public void NotExecutedTests_ReturnsNotExecutedTests()
+        public void NotExecutedTests_OnlyReturnsNotExecutedTests()
         {
             // Arrange
             First.Tests["two"].Result = new TestResult(TimeSpan.FromSeconds(1));

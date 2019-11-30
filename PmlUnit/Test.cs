@@ -45,8 +45,8 @@ namespace PmlUnit
             {
                 if (ResultField == null)
                     return TestStatus.NotExecuted;
-                else if (ResultField.Success)
-                    return TestStatus.Successful;
+                else if (ResultField.Passed)
+                    return TestStatus.Passed;
                 else
                     return TestStatus.Failed;
             }
@@ -67,6 +67,6 @@ namespace PmlUnit
     {
         NotExecuted,
         Failed,
-        Successful,
+        Passed,
     }
 }

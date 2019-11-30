@@ -17,9 +17,9 @@ namespace PmlUnit
         private const string CollapsedImageKey = "Collapsed";
         private const string CollapsedHighlightImageKey = "CollapsedHighlight";
 
-        private const string SuccessImageKey = "Success";
-        private const string FailureImageKey = "Failure";
-        private const string NotExecutedImageKey = "Unknown";
+        private const string PassedImageKey = "Passed";
+        private const string FailedImageKey = "Failed";
+        private const string NotExecutedImageKey = "NotExecuted";
 
         [Category("Behavior")]
         public event EventHandler SelectionChanged;
@@ -78,9 +78,9 @@ namespace PmlUnit
             EntryImages.Images.Add(CollapsedImageKey, Resources.Collapsed);
             EntryImages.Images.Add(CollapsedHighlightImageKey, Resources.CollapsedHighlight);
 
-            EntryImages.Images.Add(NotExecutedImageKey, Resources.Unknown);
-            EntryImages.Images.Add(FailureImageKey, Resources.Failure);
-            EntryImages.Images.Add(SuccessImageKey, Resources.Success);
+            EntryImages.Images.Add(NotExecutedImageKey, Resources.NotExecuted);
+            EntryImages.Images.Add(FailedImageKey, Resources.Failed);
+            EntryImages.Images.Add(PassedImageKey, Resources.Passed);
         }
 
         private void OnTestCasesChanged(object sender, TestCasesChangedEventArgs e)
@@ -127,7 +127,7 @@ namespace PmlUnit
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<Test> SucceededTests => AllTestsInternal.Where(test => test.Status == TestStatus.Successful).ToList();
+        public List<Test> PassedTests => AllTestsInternal.Where(test => test.Status == TestStatus.Passed).ToList();
 
         [Browsable(false)]
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -271,10 +271,10 @@ namespace PmlUnit
         {
             if (status == TestStatus.NotExecuted)
                 return EntryImages.Images[NotExecutedImageKey];
-            else if (status == TestStatus.Successful)
-                return EntryImages.Images[SuccessImageKey];
+            else if (status == TestStatus.Passed)
+                return EntryImages.Images[PassedImageKey];
             else
-                return EntryImages.Images[FailureImageKey];
+                return EntryImages.Images[FailedImageKey];
         }
 
         private Image GetGroupEntryImage(bool expanded, bool highlighted)

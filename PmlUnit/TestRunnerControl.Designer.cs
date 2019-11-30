@@ -23,7 +23,7 @@ namespace PmlUnit
             System.Windows.Forms.LinkLabel refreshLinkLabel;
             System.Windows.Forms.ToolStripMenuItem failedTestsToolStripMenuItem;
             System.Windows.Forms.ToolStripMenuItem notExecutedTestsToolStripMenuItem;
-            System.Windows.Forms.ToolStripMenuItem succeededTestsToolStripMenuItem;
+            System.Windows.Forms.ToolStripMenuItem passedTestsToolStripMenuItem;
             System.Windows.Forms.ToolStripMenuItem selectedTestsToolStripMenuItem;
             this.TestResultSplitContainer = new System.Windows.Forms.SplitContainer();
             this.TestList = new PmlUnit.TestListView();
@@ -36,7 +36,7 @@ namespace PmlUnit
             refreshLinkLabel = new System.Windows.Forms.LinkLabel();
             failedTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             notExecutedTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            succeededTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            passedTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             selectedTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 #if E3D
             this.TestResultSplitContainer.BeginInit();
@@ -84,12 +84,12 @@ namespace PmlUnit
             notExecutedTestsToolStripMenuItem.Text = "Not Executed Tests";
             notExecutedTestsToolStripMenuItem.Click += new System.EventHandler(this.OnRunNotExecutedTestsMenuItemClick);
             // 
-            // succeededTestsToolStripMenuItem
+            // passedTestsToolStripMenuItem
             // 
-            succeededTestsToolStripMenuItem.Name = "succeededTestsToolStripMenuItem";
-            succeededTestsToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
-            succeededTestsToolStripMenuItem.Text = "Succeeded Tests";
-            succeededTestsToolStripMenuItem.Click += new System.EventHandler(this.OnRunSucceededTestsMenuItemClick);
+            passedTestsToolStripMenuItem.Name = "passedTestsToolStripMenuItem";
+            passedTestsToolStripMenuItem.Size = new System.Drawing.Size(173, 22);
+            passedTestsToolStripMenuItem.Text = "Passed Tests";
+            passedTestsToolStripMenuItem.Click += new System.EventHandler(this.OnRunPassedTestsMenuItemClick);
             // 
             // selectedTestsToolStripMenuItem
             // 
@@ -165,7 +165,7 @@ namespace PmlUnit
             this.RunContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             failedTestsToolStripMenuItem,
             notExecutedTestsToolStripMenuItem,
-            succeededTestsToolStripMenuItem,
+            passedTestsToolStripMenuItem,
             selectedTestsToolStripMenuItem});
             this.RunContextMenu.Name = "RunContextMenu";
             this.RunContextMenu.Size = new System.Drawing.Size(174, 92);

@@ -146,10 +146,10 @@ namespace PmlUnit.Tests
         }
 
         [Test]
-        public void RunSucceededLinkClick_RunsSucceededTests()
+        public void RunPassedLinkClick_OnlyRunsPassedTests()
         {
             // Act
-            RunEventHandler("OnRunSucceededTestsMenuItemClick");
+            RunEventHandler("OnRunPassedTestsMenuItemClick");
             // Assert
             RunnerMock.Verify(runner => runner.Run(TestCase.Tests["one"]), Times.Once());
             RunnerMock.Verify(runner => runner.Run(TestCase.Tests["two"]), Times.Never());
@@ -158,7 +158,7 @@ namespace PmlUnit.Tests
         }
 
         [Test]
-        public void RunFailedLinkClick_RunsFailedTests()
+        public void RunFailedLinkClick_OnlyRunsFailedTests()
         {
             // Act
             RunEventHandler("OnRunFailedTestsMenuItemClick");
@@ -170,7 +170,7 @@ namespace PmlUnit.Tests
         }
 
         [Test]
-        public void RunNotExecutedLinkClick_RunsNotExecutedTests()
+        public void RunNotExecutedLinkClick_OnlyRunsNotExecutedTests()
         {
             // Act
             RunEventHandler("OnRunNotExecutedTestsMenuItemClick");
@@ -182,7 +182,7 @@ namespace PmlUnit.Tests
         }
 
         [Test]
-        public void RunSelectedLinkClick_RunsSelectedTests()
+        public void RunSelectedLinkClick_OnlyRunsSelectedTests()
         {
             // Act
             RunEventHandler("OnRunSelectedTestsMenuItemClick");

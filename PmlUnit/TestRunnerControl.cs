@@ -62,9 +62,9 @@ namespace PmlUnit
             Run(TestList.NotExecutedTests);
         }
 
-        private void OnRunSucceededTestsMenuItemClick(object sender, EventArgs e)
+        private void OnRunPassedTestsMenuItemClick(object sender, EventArgs e)
         {
-            Run(TestList.SucceededTests);
+            Run(TestList.PassedTests);
         }
 
         private void OnRunSelectedTestsMenuItemClick(object sender, EventArgs e)
