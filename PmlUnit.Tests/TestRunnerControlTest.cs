@@ -104,6 +104,7 @@ namespace PmlUnit.Tests
         private Mock<TestRunner> RunnerMock;
         private TestRunnerControl RunnerControl;
         private TestListView TestList;
+        private TestListViewModel Model;
         private TestSummaryView TestSummary;
 
         [SetUp]
@@ -123,8 +124,14 @@ namespace PmlUnit.Tests
             TestList = RunnerControl.FindControl<TestListView>("TestList");
             TestList.TestCases.Add(TestCase);
 
-            TestList.Entries[TestCase.Tests["two"]].IsSelected = true;
-            TestList.Entries[TestCase.Tests["four"]].IsSelected = true;
+            Model = TestList.GetModel();
+
+            foreach (var entry in Model.AllEntries)
+            {
+                var testEntry = entry as TestListTestEntry;
+                if (testEntry != null && (testEntry.Test.Name == "two" || testEntry.Test.Name == "four"))
+                    testEntry.IsSelected = true;
+            }
         }
 
         [TearDown]
@@ -217,6 +224,7 @@ namespace PmlUnit.Tests
         private TestCase TestCase;
         private TestRunnerControl RunnerControl;
         private TestListView TestList;
+        private TestListViewModel Model;
         private TestSummaryView TestSummary;
         private TestDetailsView TestDetails;
 
@@ -232,6 +240,7 @@ namespace PmlUnit.Tests
             TestDetails = RunnerControl.FindControl<TestDetailsView>("TestDetails");
             TestList = RunnerControl.FindControl<TestListView>("TestList");
             TestList.TestCases.Add(TestCase);
+            Model = TestList.GetModel();
         }
 
         [TearDown]
@@ -243,7 +252,7 @@ namespace PmlUnit.Tests
         [Test]
         public void SelectionChanged_AssignsTestOfSingleSelectedEntryToTestDetails()
         {
-            foreach (var entry in TestList.Entries)
+            foreach (var entry in Model.TestEntries)
             {
                 entry.IsSelected = true;
                 Assert.AreSame(entry.Test, TestDetails.Test, "Should assign test {0}.", entry.Test);
@@ -255,12 +264,16 @@ namespace PmlUnit.Tests
         public void SelectionChanged_ShowsTestDetailsIfExactlyOneEntryIsSelected()
         {
             // Act & Assert
-            foreach (var entry in TestList.Entries)
+            foreach (var entry in Model.AllEntries)
             {
-                entry.IsSelected = true;
-                Assert.IsTrue(TestDetails.Visible, "Should show test details for test {0}", entry.Test);
-                Assert.IsFalse(TestSummary.Visible, "Should not show test summary for test {0}", entry.Test);
-                entry.IsSelected = false;
+                var testEntry = entry as TestListTestEntry;
+                if (testEntry != null)
+                {
+                    entry.IsSelected = true;
+                    Assert.IsTrue(TestDetails.Visible, "Should show test details for test {0}", testEntry.Test);
+                    Assert.IsFalse(TestSummary.Visible, "Should not show test summary for test {0}", testEntry.Test);
+                    entry.IsSelected = false;
+                }
             }
         }
 
@@ -271,18 +284,22 @@ namespace PmlUnit.Tests
             Assert.IsFalse(TestDetails.Visible);
             Assert.IsTrue(TestSummary.Visible);
 
-            foreach (var entry in TestList.Entries)
+            foreach (var entry in Model.AllEntries)
                 entry.IsSelected = true;
 
             Assert.IsFalse(TestDetails.Visible);
             Assert.IsTrue(TestSummary.Visible);
 
-            foreach (var entry in TestList.Entries)
+            foreach (var entry in Model.AllEntries)
             {
-                entry.IsSelected = false;
-                Assert.IsFalse(TestDetails.Visible, "Should not show test details for test {0}", entry.Test);
-                Assert.True(TestSummary.Visible, "Should show test summary for test {0}", entry.Test);
-                entry.IsSelected = true;
+                var testEntry = entry as TestListTestEntry;
+                if (testEntry != null)
+                {
+                    entry.IsSelected = false;
+                    Assert.IsFalse(TestDetails.Visible, "Should not show test details for test {0}", testEntry.Test);
+                    Assert.True(TestSummary.Visible, "Should show test summary for test {0}", testEntry.Test);
+                    entry.IsSelected = true;
+                }
             }
         }
     }

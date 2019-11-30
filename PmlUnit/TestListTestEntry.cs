@@ -12,22 +12,19 @@ namespace PmlUnit
         public Test Test { get; }
 
         private TestListGroupEntry GroupField;
-
-        public TestListTestEntry(Test test)
-            : this(test, null)
-        {
-        }
+        private bool GroupIsChanging;
 
         public TestListTestEntry(Test test, TestListGroupEntry group)
         {
             if (test == null)
                 throw new ArgumentNullException(nameof(test));
+            if (group == null)
+                throw new ArgumentNullException(nameof(group));
 
             Test = test;
             Test.ResultChanged += OnResultChanged;
             GroupField = group;
-            if (group != null)
-                group.Entries.Add(this);
+            GroupField.Entries.Add(this);
         }
 
         public TestListGroupEntry Group
@@ -35,19 +32,22 @@ namespace PmlUnit
             get { return GroupField; }
             set
             {
+                if (GroupIsChanging)
+                    return;
+                if (value == null)
+                    throw new ArgumentNullException(nameof(value));
                 if (value != GroupField)
                 {
-                    var oldGroup = GroupField;
-                    var newGroup = value;
-                    if (oldGroup != null)
+                    GroupIsChanging = true;
+                    try
                     {
-                        GroupField = null;
-                        oldGroup.Entries.Remove(this);
+                        GroupField.Entries.Remove(this);
+                        GroupField = value;
+                        GroupField.Entries.Add(this);
                     }
-                    GroupField = newGroup;
-                    if (newGroup != null && !newGroup.Entries.Contains(this))
+                    finally
                     {
-                        newGroup.Entries.Add(this);
+                        GroupIsChanging = false;
                     }
 
                     GroupChanged?.Invoke(this, EventArgs.Empty);
@@ -55,20 +55,16 @@ namespace PmlUnit
             }
         }
 
-        public string Key
-        {
-            get
-            {
-                if (Group == null)
-                    return Test.FullName;
-                else
-                    return Group.Key + ":" + Test.Name + ":" + Test.TestCase.Name;
-            }
-        }
+        public string Key => Test.Name + ":" + Test.TestCase.Name;
 
         private void OnResultChanged(object sender, EventArgs e)
         {
             ResultChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        public override string ToString()
+        {
+            return Test.FullName;
         }
     }
 }

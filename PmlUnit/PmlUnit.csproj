@@ -141,8 +141,8 @@
       <DependentUpon>TestDetailsView.cs</DependentUpon>
     </Compile>
     <Compile Include="TestListEntry.cs" />
+    <Compile Include="TestListEntryCollection.cs" />
     <Compile Include="TestListGroupEntry.cs" />
-    <Compile Include="TestListGroupEntryCollection.cs" />
     <Compile Include="TestListPaintOptions.cs" />
     <Compile Include="TestListSelectedEntryCollection.cs" />
     <Compile Include="TestListTestEntry.cs" />
@@ -154,6 +154,7 @@
       <DependentUpon>TestListView.cs</DependentUpon>
     </Compile>
     <Compile Include="TestListViewController.cs" />
+    <Compile Include="TestListViewModel.cs" />
     <Compile Include="TestResult.cs" />
     <Compile Include="TestRunner.cs" />
     <Compile Include="TestRunnerControl.cs">

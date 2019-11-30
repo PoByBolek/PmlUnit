@@ -82,18 +82,6 @@ namespace PmlUnit
             return new ReadOnlyTestListTestEntryCollection(this);
         }
 
-        public TestListTestEntry Add(Test test)
-        {
-            if (test == null)
-                throw new ArgumentNullException(nameof(test));
-
-            var result = new TestListTestEntry(test);
-            Entries.Add(test, result);
-            OnChanged(result, null);
-
-            return result;
-        }
-
         public void Add(TestListTestEntry item)
         {
             if (item == null)

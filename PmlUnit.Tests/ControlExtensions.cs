@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Windows.Forms;
 
 using NUnit.Framework;
@@ -34,6 +35,33 @@ namespace PmlUnit.Tests
 
             Assert.Fail("Unable to find a {0} named \"{1}\".", typeof(T), name);
             return null;
+        }
+
+        public static TestListViewModel GetModel(this TestListView view)
+        {
+            return view.GetField<TestListViewModel>("Model");
+        }
+
+        public static TestListViewController GetController(this TestListView view)
+        {
+            return view.GetField<TestListViewController>("Controller");
+        }
+
+        public static T GetField<T>(this object value, string name) where T : class
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException(nameof(name));
+
+            var field = value.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic);
+            Assert.NotNull(field, "{} has non prive instance field named \"{}\".", value.GetType(), name);
+
+            var result = field.GetValue(value);
+            Assert.NotNull(result, "{}.{} is null.", value.GetType(), name);
+            Assert.IsInstanceOf(typeof(T), result, "{}.{} is not an instance of {}.", value.GetType(), name, typeof(T));
+
+            return result as T;
         }
     }
 }

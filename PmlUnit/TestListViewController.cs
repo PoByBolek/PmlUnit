@@ -1,5 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿// Copyright (c) 2019 Florian Zimmermann.
+// Licensed under the MIT License: https://opensource.org/licenses/MIT
+using System;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -10,58 +11,31 @@ namespace PmlUnit
     {
         public event EventHandler SelectionChanged;
 
+        private readonly TestListViewModel Model;
         private readonly TestListView View;
-        private readonly IList<TestListEntry> AllEntries;
-        private readonly IList<TestListEntry> VisibleEntries;
 
         private bool IgnoreSelectionChanged;
         private int IgnoredSelectionChanges;
         private TestListEntry SelectionStartEntry;
-        private TestListEntry FocusedEntryField;
-        private TestListGroupEntry HighlightedIconEntryField;
 
-        public TestListViewController(TestListView view, IList<TestListEntry> allEntries, IList<TestListEntry> visibleEntries)
+        public TestListViewController(TestListViewModel model, TestListView view)
         {
+            if (model == null)
+                throw new ArgumentNullException(nameof(model));
             if (view == null)
                 throw new ArgumentNullException(nameof(view));
-            if (allEntries == null)
-                throw new ArgumentNullException(nameof(allEntries));
-            if (visibleEntries == null)
-                throw new ArgumentNullException(nameof(visibleEntries));
 
+            Model = model;
+            Model.FocusedEntryChanged += OnFocusedEntryChanged;
             View = view;
-            AllEntries = allEntries;
-            VisibleEntries = visibleEntries;
 
             IgnoreSelectionChanged = false;
             IgnoredSelectionChanges = 0;
         }
 
-        public TestListEntry FocusedEntry
+        private void OnFocusedEntryChanged(object sender, EventArgs e)
         {
-            get { return FocusedEntryField; }
-            private set
-            {
-                if (value != FocusedEntryField)
-                {
-                    FocusedEntryField = value;
-                    ScrollEntryIntoView(value);
-                    View.Invalidate();
-                }
-            }
-        }
-
-        public TestListGroupEntry HighlightedIconEntry
-        {
-            get { return HighlightedIconEntryField; }
-            private set
-            {
-                if (value != HighlightedIconEntryField)
-                {
-                    HighlightedIconEntryField = value;
-                    View.Invalidate();
-                }
-            }
+            ScrollEntryIntoView(Model.FocusedEntry);
         }
 
         public void HandleSelectionChanged(object sender, EventArgs e)
@@ -74,7 +48,7 @@ namespace PmlUnit
 
         public void HandleKeyDown(KeyEventArgs e)
         {
-            if (VisibleEntries.Count == 0)
+            if (Model.VisibleEntries.Count == 0)
                 return;
             
             if (e.KeyCode == Keys.Space)
@@ -93,18 +67,18 @@ namespace PmlUnit
         {
             if (modifierKeys == Keys.None)
             {
-                FocusedEntry = GetEntryRelativeToFocus(0);
-                FocusedEntry.IsSelected = true;
+                Model.FocusedEntry = GetEntryRelativeToFocus(0);
+                Model.FocusedEntry.IsSelected = true;
             }
             else if (modifierKeys == Keys.Control)
             {
-                FocusedEntry = GetEntryRelativeToFocus(0);
-                FocusedEntry.IsSelected = !FocusedEntry.IsSelected;
+                Model.FocusedEntry = GetEntryRelativeToFocus(0);
+                Model.FocusedEntry.IsSelected = !Model.FocusedEntry.IsSelected;
             }
             else if (modifierKeys == Keys.Shift)
             {
-                FocusedEntry = GetEntryRelativeToFocus(0);
-                SelectRange(FocusedEntry);
+                Model.FocusedEntry = GetEntryRelativeToFocus(0);
+                SelectRange(Model.FocusedEntry);
             }
         }
 
@@ -143,18 +117,18 @@ namespace PmlUnit
         {
             if (modifierKeys == Keys.None)
             {
-                FocusedEntry = target;
+                Model.FocusedEntry = target;
                 SelectOnly(target);
                 return true;
             }
             else if (modifierKeys == Keys.Control)
             {
-                FocusedEntry = target;
+                Model.FocusedEntry = target;
                 return true;
             }
             else if (modifierKeys == Keys.Shift)
             {
-                FocusedEntry = target;
+                Model.FocusedEntry = target;
                 SelectRange(target);
                 return true;
             }
@@ -167,12 +141,12 @@ namespace PmlUnit
         private TestListEntry GetEntryRelativeToFocus(int offset)
         {
             int index = 0;
-            if (FocusedEntry != null)
-                index = VisibleEntries.IndexOf(FocusedEntry);
-            index = Math.Max(0, Math.Min(index + offset, VisibleEntries.Count - 1));
+            if (Model.FocusedEntry != null)
+                index = Model.VisibleEntries.IndexOf(Model.FocusedEntry);
+            index = Math.Max(0, Math.Min(index + offset, Model.VisibleEntries.Count - 1));
 
-            if (index < VisibleEntries.Count)
-                return VisibleEntries[index];
+            if (index < Model.VisibleEntries.Count)
+                return Model.VisibleEntries[index];
             else
                 return null;
 
@@ -182,14 +156,14 @@ namespace PmlUnit
         {
             var group = FindEntry(e.Location) as TestListGroupEntry;
             if (group != null && IsWithinIconBounds(e.Location))
-                HighlightedIconEntry = group;
+                Model.HighlightedIconEntry = group;
             else
-                HighlightedIconEntry = null;
+                Model.HighlightedIconEntry = null;
         }
 
         public void HandleMouseLeave(EventArgs e)
         {
-            HighlightedIconEntry = null;
+            Model.HighlightedIconEntry = null;
         }
 
         public void HandleMouseClick(MouseEventArgs e, Keys modifierKeys)
@@ -212,7 +186,7 @@ namespace PmlUnit
                 else if (left && modifierKeys == Keys.Control && clicked != null)
                 {
                     clicked.IsSelected = !clicked.IsSelected;
-                    FocusedEntry = clicked;
+                    Model.FocusedEntry = clicked;
                     SelectionStartEntry = clicked;
                 }
                 else if (left && modifierKeys == Keys.Shift && clicked != null)
@@ -249,15 +223,15 @@ namespace PmlUnit
         {
             int clientY = location.Y + View.VerticalScroll.Value;
             int index = clientY / View.EntryHeight;
-            if (index < 0 || index >= VisibleEntries.Count)
+            if (index < 0 || index >= Model.VisibleEntries.Count)
                 return null;
             else
-                return VisibleEntries[index];
+                return Model.VisibleEntries[index];
         }
 
         private void ScrollEntryIntoView(TestListEntry entry)
         {
-            int index = VisibleEntries.IndexOf(entry);
+            int index = Model.VisibleEntries.IndexOf(entry);
             if (index >= 0)
             {
                 int offset = index * View.EntryHeight;
@@ -279,13 +253,13 @@ namespace PmlUnit
 
         private void SelectOnly(TestListEntry target)
         {
-            View.SelectedEntries.Clear();
+            Model.SelectedEntries.Clear();
 
             if (target != null)
             {
                 target.IsSelected = true;
                 SelectionStartEntry = target;
-                FocusedEntry = target;
+                Model.FocusedEntry = target;
             }
         }
 
@@ -293,9 +267,9 @@ namespace PmlUnit
         {
             bool selected = false;
             if (SelectionStartEntry == null)
-                SelectionStartEntry = AllEntries.FirstOrDefault();
+                SelectionStartEntry = Model.VisibleEntries.FirstOrDefault();
 
-            foreach (var entry in AllEntries)
+            foreach (var entry in Model.AllEntries)
             {
                 if (entry == target || entry == SelectionStartEntry)
                 {
@@ -308,7 +282,7 @@ namespace PmlUnit
                 }
             }
 
-            FocusedEntry = target;
+            Model.FocusedEntry = target;
         }
 
         private void BeginUpdate()
