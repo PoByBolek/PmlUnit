@@ -38,9 +38,11 @@ namespace PmlUnit
             Model = new TestListViewModel();
             Model.Changed += OnModelChanged;
             Model.FocusedEntryChanged += OnModelChanged;
-            Model.SelectionChanged += OnSelectionChanged;
             Model.VisibleEntriesChanged += OnVisibleEntriesChanged;
+            Model.SelectionChanged += OnModelSelectionChanged;
+
             Controller = new TestListViewController(Model, this);
+            Controller.SelectionChanged += OnControllerSelectionChanged;
 
             InitializeComponent();
 
@@ -92,16 +94,21 @@ namespace PmlUnit
             Invalidate();
         }
 
-        private void OnSelectionChanged(object sender, EventArgs e)
-        {
-            Invalidate();
-            SelectionChanged?.Invoke(this, EventArgs.Empty);
-        }
-
         private void OnVisibleEntriesChanged(object sender, EventArgs e)
         {
             AutoScrollMinSize = new Size(0, Model.VisibleEntries.Count * EntryHeight);
             Invalidate();
+        }
+
+        private void OnModelSelectionChanged(object sender, EventArgs e)
+        {
+            Controller.HandleSelectionChanged(sender, e);
+        }
+
+        private void OnControllerSelectionChanged(object sender, EventArgs e)
+        {
+            Invalidate();
+            SelectionChanged?.Invoke(this, EventArgs.Empty);
         }
 
         protected override void OnPaint(PaintEventArgs e)
