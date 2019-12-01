@@ -12,19 +12,22 @@ namespace PmlUnit
         public Test Test { get; }
 
         private TestListGroupEntry GroupField;
-        private bool GroupIsChanging;
+
+        public TestListTestEntry(Test test)
+            : this(test, null)
+        {
+        }
 
         public TestListTestEntry(Test test, TestListGroupEntry group)
         {
             if (test == null)
                 throw new ArgumentNullException(nameof(test));
-            if (group == null)
-                throw new ArgumentNullException(nameof(group));
 
             Test = test;
             Test.ResultChanged += OnResultChanged;
             GroupField = group;
-            GroupField.Entries.Add(this);
+            if (GroupField != null)
+                GroupField.Entries.Add(this);
         }
 
         public TestListGroupEntry Group
@@ -32,23 +35,18 @@ namespace PmlUnit
             get { return GroupField; }
             set
             {
-                if (GroupIsChanging)
-                    return;
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
                 if (value != GroupField)
                 {
-                    GroupIsChanging = true;
-                    try
+                    var oldValue = GroupField;
+                    if (oldValue != null)
                     {
-                        GroupField.Entries.Remove(this);
-                        GroupField = value;
+                        GroupField = null;
+                        oldValue.Entries.Remove(this);
+                    }
+
+                    GroupField = value;
+                    if (value != null)
                         GroupField.Entries.Add(this);
-                    }
-                    finally
-                    {
-                        GroupIsChanging = false;
-                    }
 
                     GroupChanged?.Invoke(this, EventArgs.Empty);
                 }

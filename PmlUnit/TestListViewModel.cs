@@ -118,7 +118,7 @@ namespace PmlUnit
             entry.GroupChanged += OnGroupChanged;
         }
 
-        public void Remove(TestCase testCase)
+        private void Remove(TestCase testCase)
         {
             if (testCase == null)
                 throw new ArgumentNullException(nameof(testCase));
@@ -127,9 +127,21 @@ namespace PmlUnit
                 Remove(test);
         }
 
-        public void Remove(Test test)
+        private void Remove(Test test)
         {
-            throw new NotImplementedException();
+            if (test == null)
+                throw new ArgumentNullException(nameof(test));
+
+            TestListTestEntry entry;
+            if (EntriesField.TryGetTestEntry(test, out entry))
+            {
+                entry.GroupChanged -= OnGroupChanged;
+                entry.ResultChanged -= OnTestResultChanged;
+                entry.SelectionChanged -= OnSelectionChanged;
+                entry.Group = null;
+                EntriesField.Remove(entry);
+                VisibleEntriesField.Remove(entry);
+            }
         }
 
         private TestListGroupEntry GetGroupFor(Test test)
@@ -167,7 +179,7 @@ namespace PmlUnit
             if (entry == null)
                 return;
 
-            if (entry.Group.IsExpanded)
+            if (entry.Group != null && entry.Group.IsExpanded)
                 VisibleEntriesField.Add(entry);
             else
                 VisibleEntriesField.Remove(entry);

@@ -8,68 +8,159 @@ namespace PmlUnit
 {
     class TestListEntryCollection : ICollection<TestListEntry>
     {
-        private readonly SortedList<TestListEntry, TestListEntry> Entries;
+        private readonly List<TestListEntry> Entries;
+        private readonly IComparer<TestListEntry> Comparer;
 
         public TestListEntryCollection(IComparer<TestListEntry> comparer)
         {
             if (comparer == null)
                 throw new ArgumentNullException(nameof(comparer));
-            Entries = new SortedList<TestListEntry, TestListEntry>(comparer);
+            
+            Entries = new List<TestListEntry>();
+            Comparer = comparer;
         }
 
         public int Count => Entries.Count;
 
-        public TestListEntry this[int index] => Entries.Values[index];
+        public TestListEntry this[int index] => Entries[index];
 
         public ReadOnlyTestListEntryCollection AsReadOnly()
         {
             return new ReadOnlyTestListEntryCollection(this);
         }
 
-        public void Add(TestListEntry item)
+        public bool Add(TestListEntry item)
         {
             if (item == null)
                 throw new ArgumentNullException(nameof(item));
 
-            if (!Entries.ContainsKey(item))
-                Entries.Add(item, item);
+            if (Entries.Contains(item))
+            {
+                return false;
+            }
+            else
+            {
+                Register(item);
+                Entries.Add(item);
+                Entries.Sort(Comparer);
+                return true;
+            }
+        }
+
+        public bool TryGetTestEntry(Test test, out TestListTestEntry entry)
+        {
+            int index = IndexOf(test);
+            if (index >= 0)
+            {
+                entry = Entries[index] as TestListTestEntry;
+                return entry != null;
+            }
+            else
+            {
+                entry = null;
+                return false;
+            }
+        }
+
+        public bool Contains(Test test)
+        {
+            return IndexOf(test) >= 0;
         }
 
         public bool Contains(TestListEntry item)
         {
-            return Entries.ContainsKey(item);
+            return Entries.Contains(item);
+        }
+
+        public int IndexOf(Test test)
+        {
+            if (test == null)
+                throw new ArgumentNullException(nameof(test));
+
+            for (int i = 0; i < Entries.Count; i++)
+            {
+                var entry = Entries[i] as TestListTestEntry;
+                if (entry != null && entry.Test == test)
+                    return i;
+            }
+
+            return -1;
         }
 
         public int IndexOf(TestListEntry item)
         {
-            return Entries.IndexOfKey(item);
+            return Entries.IndexOf(item);
+        }
+
+        public bool Remove(Test test)
+        {
+            int index = IndexOf(test);
+            if (index >= 0)
+            {
+                Deregister(Entries[index]);
+                Entries.RemoveAt(index);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         public bool Remove(TestListEntry item)
         {
-            return Entries.Remove(item);
+            bool result = Entries.Remove(item);
+            if (result)
+                Deregister(item);
+            return result;
         }
 
         public void Clear()
         {
+            foreach (var entry in Entries)
+                Deregister(entry);
             Entries.Clear();
         }
 
         public void CopyTo(TestListEntry[] array, int arrayIndex)
         {
-            Entries.Values.CopyTo(array, arrayIndex);
+            Entries.CopyTo(array, arrayIndex);
         }
 
         public IEnumerator<TestListEntry> GetEnumerator()
         {
-            return Entries.Values.GetEnumerator();
+            return Entries.GetEnumerator();
         }
 
         bool ICollection<TestListEntry>.IsReadOnly => false;
 
+        void ICollection<TestListEntry>.Add(TestListEntry item)
+        {
+            Add(item);
+        }
+
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        private void Register(TestListEntry item)
+        {
+            var entry = item as TestListTestEntry;
+            if (entry != null)
+                entry.GroupChanged += OnTestEntryGroupChanged;
+        }
+
+        private void Deregister(TestListEntry item)
+        {
+            var entry = item as TestListTestEntry;
+            if (entry != null)
+                entry.GroupChanged -= OnTestEntryGroupChanged;
+        }
+
+        private void OnTestEntryGroupChanged(object sender, EventArgs e)
+        {
+            Entries.Sort(Comparer);
         }
     }
 
