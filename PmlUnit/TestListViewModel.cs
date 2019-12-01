@@ -21,10 +21,7 @@ namespace PmlUnit
         private readonly TestListEntryCollection EntriesField;
         private readonly TestListEntryCollection VisibleEntriesField;
 
-        private readonly TestListGroupEntry FailedGroup;
-        private readonly TestListGroupEntry PassedGroup;
-        private readonly TestListGroupEntry NotExecutedGroup;
-
+        private TestGrouper Grouper;
         private TestListGroupEntry HighlightedIconEntryField;
         private TestListEntry FocusedEntryField;
 
@@ -41,12 +38,7 @@ namespace PmlUnit
             VisibleEntriesField = new TestListEntryCollection(comparer);
             VisibleEntries = VisibleEntriesField.AsReadOnly();
 
-            FailedGroup = new TestListGroupEntry(1, "Failed Tests");
-            SetupGroupEntry(FailedGroup);
-            PassedGroup = new TestListGroupEntry(2, "Passed Tests");
-            SetupGroupEntry(PassedGroup);
-            NotExecutedGroup = new TestListGroupEntry(3, "Not executed Tests");
-            SetupGroupEntry(NotExecutedGroup);
+            Grouper = new TestResultGrouper();
         }
 
         public TestListEntry FocusedEntry
@@ -75,14 +67,6 @@ namespace PmlUnit
             }
         }
 
-        private void SetupGroupEntry(TestListGroupEntry group)
-        {
-            group.SelectionChanged += OnSelectionChanged;
-            group.EntriesChanged += OnGroupEntriesChanged;
-            group.ExpandedChanged += OnGroupExpandedChanged;
-            EntriesField.Add(group);
-        }
-
         private void OnTestCasesChanged(object sender, TestCasesChangedEventArgs e)
         {
             foreach (var testCase in e.RemovedTestCases)
@@ -105,17 +89,14 @@ namespace PmlUnit
             if (test == null)
                 throw new ArgumentNullException(nameof(test));
 
-            var entry = new TestListTestEntry(test, GetGroupFor(test));
-            EntriesField.Add(entry);
-            if (entry.Group.IsExpanded)
-            {
-                VisibleEntriesField.Add(entry);
-                VisibleEntriesChanged?.Invoke(this, EventArgs.Empty);
-            }
-
+            var entry = new TestListTestEntry(test);
             entry.SelectionChanged += OnSelectionChanged;
             entry.ResultChanged += OnTestResultChanged;
             entry.GroupChanged += OnGroupChanged;
+            entry.Group = Grouper.GetGroupFor(test); // invokes OnGroupChanged
+            EntriesField.Add(entry);
+
+            Changed?.Invoke(this, EventArgs.Empty);
         }
 
         private void Remove(TestCase testCase)
@@ -141,21 +122,8 @@ namespace PmlUnit
                 entry.Group = null;
                 EntriesField.Remove(entry);
                 VisibleEntriesField.Remove(entry);
-            }
-        }
 
-        private TestListGroupEntry GetGroupFor(Test test)
-        {
-            switch (test.Status)
-            {
-                case TestStatus.Failed:
-                    return FailedGroup;
-                case TestStatus.NotExecuted:
-                    return NotExecutedGroup;
-                case TestStatus.Passed:
-                    return PassedGroup;
-                default:
-                    return null;
+                Changed?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -170,7 +138,7 @@ namespace PmlUnit
             if (entry == null)
                 return;
 
-            entry.Group = GetGroupFor(entry.Test);
+            entry.Group = Grouper.GetGroupFor(entry.Test);
         }
 
         private void OnGroupChanged(object sender, EventArgs e)
@@ -179,10 +147,31 @@ namespace PmlUnit
             if (entry == null)
                 return;
 
-            if (entry.Group != null && entry.Group.IsExpanded)
-                VisibleEntriesField.Add(entry);
+            bool changed = false;
+            bool visibleChanged = false;
+            if (entry.Group != null)
+            {
+                if (EntriesField.Add(entry.Group))
+                {
+                    entry.Group.EntriesChanged += OnGroupEntriesChanged;
+                    entry.Group.ExpandedChanged += OnGroupExpandedChanged;
+                    entry.Group.SelectionChanged += OnSelectionChanged;
+                    visibleChanged = VisibleEntriesField.Add(entry.Group);
+                    changed = true;
+                }
+
+                if (entry.Group.IsExpanded)
+                    visibleChanged = VisibleEntriesField.Add(entry) || visibleChanged;
+            }
             else
-                VisibleEntriesField.Remove(entry);
+            {
+                visibleChanged = VisibleEntriesField.Remove(entry);
+            }
+
+            if (visibleChanged)
+                VisibleEntriesChanged?.Invoke(this, EventArgs.Empty);
+            if (changed)
+                Changed?.Invoke(this, EventArgs.Empty);
         }
 
         private void OnGroupEntriesChanged(object sender, TestListEntriesChangedEventArgs e)
@@ -191,12 +180,25 @@ namespace PmlUnit
             if (group == null)
                 return;
 
+            bool changed = false;
+            bool visibleChanged = false;
             if (group.Entries.Count > 0)
-                VisibleEntriesField.Add(group);
+            {
+                visibleChanged = VisibleEntriesField.Add(group);
+            }
             else
-                VisibleEntriesField.Remove(group);
+            {
+                visibleChanged = VisibleEntriesField.Remove(group);
+                changed = EntriesField.Remove(group);
+                group.SelectionChanged -= OnSelectionChanged;
+                group.ExpandedChanged -= OnGroupExpandedChanged;
+                group.EntriesChanged -= OnGroupEntriesChanged;
+            }
 
-            VisibleEntriesChanged?.Invoke(this, EventArgs.Empty);
+            if (visibleChanged)
+                VisibleEntriesChanged?.Invoke(this, EventArgs.Empty);
+            if (changed)
+                Changed?.Invoke(this, EventArgs.Empty);
         }
 
         private void OnGroupExpandedChanged(object sender, EventArgs e)
