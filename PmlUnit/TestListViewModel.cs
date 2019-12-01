@@ -161,6 +161,7 @@ namespace PmlUnit
                 return;
 
             entry.Group = GrouperField.GetGroupFor(entry.Test);
+            Changed?.Invoke(this, EventArgs.Empty);
         }
 
         private void OnGroupChanged(object sender, EventArgs e)
@@ -169,7 +170,6 @@ namespace PmlUnit
             if (entry == null)
                 return;
 
-            bool changed = false;
             bool visibleChanged = false;
             if (entry.Group != null)
             {
@@ -179,7 +179,6 @@ namespace PmlUnit
                     entry.Group.ExpandedChanged += OnGroupExpandedChanged;
                     entry.Group.SelectionChanged += OnSelectionChanged;
                     visibleChanged = VisibleEntriesField.Add(entry.Group);
-                    changed = true;
                 }
 
                 if (entry.Group.IsExpanded)
@@ -192,8 +191,7 @@ namespace PmlUnit
 
             if (visibleChanged)
                 VisibleEntriesChanged?.Invoke(this, EventArgs.Empty);
-            if (changed)
-                Changed?.Invoke(this, EventArgs.Empty);
+            Changed?.Invoke(this, EventArgs.Empty);
         }
 
         private void OnGroupEntriesChanged(object sender, TestListEntriesChangedEventArgs e)
