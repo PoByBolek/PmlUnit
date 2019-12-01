@@ -25,13 +25,17 @@ namespace PmlUnit
             System.Windows.Forms.ToolStripMenuItem notExecutedTestsToolStripMenuItem;
             System.Windows.Forms.ToolStripMenuItem passedTestsToolStripMenuItem;
             System.Windows.Forms.ToolStripMenuItem selectedTestsToolStripMenuItem;
+            this.GroupByTestResultToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.GroupByTestCaseNameToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.TestResultSplitContainer = new System.Windows.Forms.SplitContainer();
+            this.RunLinkLabel = new System.Windows.Forms.LinkLabel();
+            this.RunContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.GroupByLinkLabel = new System.Windows.Forms.LinkLabel();
+            this.GroupByMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.ExecutionProgressBar = new PmlUnit.ColorizedProgressBar();
             this.TestList = new PmlUnit.TestListView();
             this.TestDetails = new PmlUnit.TestDetailsView();
             this.TestSummary = new PmlUnit.TestSummaryView();
-            this.RunLinkLabel = new System.Windows.Forms.LinkLabel();
-            this.RunContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.ExecutionProgressBar = new PmlUnit.ColorizedProgressBar();
             runAllLinkLabel = new System.Windows.Forms.LinkLabel();
             refreshLinkLabel = new System.Windows.Forms.LinkLabel();
             failedTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -45,6 +49,7 @@ namespace PmlUnit
             this.TestResultSplitContainer.Panel2.SuspendLayout();
             this.TestResultSplitContainer.SuspendLayout();
             this.RunContextMenu.SuspendLayout();
+            this.GroupByMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // runAllLinkLabel
@@ -98,6 +103,22 @@ namespace PmlUnit
             selectedTestsToolStripMenuItem.Text = "Selected Tests";
             selectedTestsToolStripMenuItem.Click += new System.EventHandler(this.OnRunSelectedTestsMenuItemClick);
             // 
+            // GroupByTestResultToolStripMenuItem
+            // 
+            this.GroupByTestResultToolStripMenuItem.Checked = true;
+            this.GroupByTestResultToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.GroupByTestResultToolStripMenuItem.Name = "GroupByTestResultToolStripMenuItem";
+            this.GroupByTestResultToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
+            this.GroupByTestResultToolStripMenuItem.Text = "&Result";
+            this.GroupByTestResultToolStripMenuItem.Click += new System.EventHandler(this.OnGroupByTestResultMenuItemClick);
+            // 
+            // GroupByTestCaseNameToolStripMenuItem
+            // 
+            this.GroupByTestCaseNameToolStripMenuItem.Name = "GroupByTestCaseNameToolStripMenuItem";
+            this.GroupByTestCaseNameToolStripMenuItem.Size = new System.Drawing.Size(144, 22);
+            this.GroupByTestCaseNameToolStripMenuItem.Text = "&Object Name";
+            this.GroupByTestCaseNameToolStripMenuItem.Click += new System.EventHandler(this.OnGroupByTestCaseNameMenuItemClick);
+            // 
             // TestResultSplitContainer
             // 
             this.TestResultSplitContainer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -105,6 +126,10 @@ namespace PmlUnit
             | System.Windows.Forms.AnchorStyles.Right)));
             this.TestResultSplitContainer.Location = new System.Drawing.Point(0, 32);
             this.TestResultSplitContainer.Name = "TestResultSplitContainer";
+            this.TestResultSplitContainer.Size = new System.Drawing.Size(399, 268);
+            this.TestResultSplitContainer.SplitterDistance = 167;
+            this.TestResultSplitContainer.TabIndex = 5;
+            this.TestResultSplitContainer.SizeChanged += new System.EventHandler(this.OnSplitContainerSizeChanged);
             // 
             // TestResultSplitContainer.Panel1
             // 
@@ -114,10 +139,6 @@ namespace PmlUnit
             // 
             this.TestResultSplitContainer.Panel2.Controls.Add(this.TestDetails);
             this.TestResultSplitContainer.Panel2.Controls.Add(this.TestSummary);
-            this.TestResultSplitContainer.Size = new System.Drawing.Size(399, 268);
-            this.TestResultSplitContainer.SplitterDistance = 167;
-            this.TestResultSplitContainer.TabIndex = 4;
-            this.TestResultSplitContainer.SizeChanged += new System.EventHandler(this.OnSplitContainerSizeChanged);
             // 
             // TestList
             // 
@@ -126,6 +147,7 @@ namespace PmlUnit
             this.TestList.Name = "TestList";
             this.TestList.Size = new System.Drawing.Size(167, 268);
             this.TestList.TabIndex = 0;
+            this.TestList.GroupingChanged += new System.EventHandler(this.OnTestListGroupingChanged);
             this.TestList.SelectionChanged += new System.EventHandler(this.OnTestListSelectionChanged);
             // 
             // TestDetails
@@ -170,6 +192,25 @@ namespace PmlUnit
             this.RunContextMenu.Name = "RunContextMenu";
             this.RunContextMenu.Size = new System.Drawing.Size(174, 92);
             // 
+            // GroupByLinkLabel
+            // 
+            this.GroupByLinkLabel.AutoSize = true;
+            this.GroupByLinkLabel.Location = new System.Drawing.Point(140, 13);
+            this.GroupByLinkLabel.Name = "GroupByLinkLabel";
+            this.GroupByLinkLabel.Size = new System.Drawing.Size(84, 13);
+            this.GroupByLinkLabel.TabIndex = 4;
+            this.GroupByLinkLabel.TabStop = true;
+            this.GroupByLinkLabel.Text = "Group tests by...";
+            this.GroupByLinkLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnGroupByLinkLabelLinkClicked);
+            // 
+            // GroupByMenu
+            // 
+            this.GroupByMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.GroupByTestResultToolStripMenuItem,
+            this.GroupByTestCaseNameToolStripMenuItem});
+            this.GroupByMenu.Name = "GroupByMenu";
+            this.GroupByMenu.Size = new System.Drawing.Size(145, 48);
+            // 
             // ExecutionProgressBar
             // 
             this.ExecutionProgressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -187,6 +228,7 @@ namespace PmlUnit
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Window;
+            this.Controls.Add(this.GroupByLinkLabel);
             this.Controls.Add(this.RunLinkLabel);
             this.Controls.Add(this.ExecutionProgressBar);
             this.Controls.Add(this.TestResultSplitContainer);
@@ -202,6 +244,7 @@ namespace PmlUnit
 #endif
             this.TestResultSplitContainer.ResumeLayout(false);
             this.RunContextMenu.ResumeLayout(false);
+            this.GroupByMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -216,5 +259,9 @@ namespace PmlUnit
         private System.Windows.Forms.LinkLabel RunLinkLabel;
         private System.Windows.Forms.ContextMenuStrip RunContextMenu;
         private TestDetailsView TestDetails;
+        private System.Windows.Forms.LinkLabel GroupByLinkLabel;
+        private System.Windows.Forms.ContextMenuStrip GroupByMenu;
+        private System.Windows.Forms.ToolStripMenuItem GroupByTestResultToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem GroupByTestCaseNameToolStripMenuItem;
     }
 }

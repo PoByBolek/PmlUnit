@@ -132,6 +132,7 @@
     <Compile Include="Test.cs" />
     <Compile Include="TestCase.cs" />
     <Compile Include="TestCaseCollection.cs" />
+    <Compile Include="TestCaseGrouper.cs" />
     <Compile Include="TestCaseParser.cs" />
     <Compile Include="TestCaseProvider.cs" />
     <Compile Include="TestDetailsView.cs">
@@ -144,6 +145,7 @@
     <Compile Include="TestListEntry.cs" />
     <Compile Include="TestListEntryCollection.cs" />
     <Compile Include="TestListGroupEntry.cs" />
+    <Compile Include="TestListGrouping.cs" />
     <Compile Include="TestListPaintOptions.cs" />
     <Compile Include="TestListSelectedEntryCollection.cs" />
     <Compile Include="TestListTestEntry.cs" />

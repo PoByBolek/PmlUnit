@@ -9,14 +9,16 @@ namespace PmlUnit
         public event EventHandler<TestListEntriesChangedEventArgs> EntriesChanged;
         public event EventHandler ExpandedChanged;
 
-        public int Key { get; }
+        public string Key { get; }
         public string Name { get; }
         public TestListTestEntryCollection Entries { get; }
 
         private bool ExpandedField;
 
-        public TestListGroupEntry(int key, string name)
+        public TestListGroupEntry(string key, string name)
         {
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException(nameof(key));
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
 

@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+
 using PmlUnit.Properties;
 
 namespace PmlUnit
@@ -24,6 +25,9 @@ namespace PmlUnit
         [Category("Behavior")]
         public event EventHandler SelectionChanged;
 
+        [Category("Behavior")]
+        public event EventHandler GroupingChanged;
+
         public int EntryHeight => 20;
 
         public int EntryPadding => 2;
@@ -32,10 +36,14 @@ namespace PmlUnit
 
         private readonly TestListViewModel Model;
         private readonly TestListViewController Controller;
+        private TestListGrouping GroupingField;
 
         public TestListView()
         {
+            GroupingField = TestListGrouping.Result;
+
             Model = new TestListViewModel();
+            Model.Grouper = new TestResultGrouper();
             Model.Changed += OnModelChanged;
             Model.FocusedEntryChanged += OnModelChanged;
             Model.VisibleEntriesChanged += OnVisibleEntriesChanged;
@@ -56,6 +64,31 @@ namespace PmlUnit
             EntryImages.Images.Add(NotExecutedImageKey, Resources.NotExecuted);
             EntryImages.Images.Add(FailedImageKey, Resources.Failed);
             EntryImages.Images.Add(PassedImageKey, Resources.Passed);
+        }
+
+        [Category("Behavior")]
+        [DefaultValue(TestListGrouping.Result)]
+        public TestListGrouping Grouping
+        {
+            get { return GroupingField; }
+            set
+            {
+                if (value != GroupingField)
+                {
+                    GroupingField = value;
+
+                    if (value == TestListGrouping.Result)
+                        Model.Grouper = new TestResultGrouper();
+                    else if (value == TestListGrouping.TestCase)
+                        Model.Grouper = new TestCaseGrouper();
+                    else
+                        throw new NotImplementedException(string.Format(
+                            "No grouper registered for grouping mode {}", value
+                        ));
+
+                    GroupingChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
         }
 
         [Browsable(false)]

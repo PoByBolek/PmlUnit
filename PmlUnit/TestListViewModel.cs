@@ -2,6 +2,7 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace PmlUnit
 {
@@ -21,9 +22,9 @@ namespace PmlUnit
         private readonly TestListEntryCollection EntriesField;
         private readonly TestListEntryCollection VisibleEntriesField;
 
-        private TestGrouper Grouper;
-        private TestListGroupEntry HighlightedIconEntryField;
+        private TestGrouper GrouperField;
         private TestListEntry FocusedEntryField;
+        private TestListGroupEntry HighlightedIconEntryField;
 
         public TestListViewModel()
         {
@@ -38,7 +39,28 @@ namespace PmlUnit
             VisibleEntriesField = new TestListEntryCollection(comparer);
             VisibleEntries = VisibleEntriesField.AsReadOnly();
 
-            Grouper = new TestResultGrouper();
+            GrouperField = new TestResultGrouper();
+        }
+
+        public TestGrouper Grouper
+        {
+            get { return GrouperField; }
+            set
+            {
+                if (value == null)
+                    throw new ArgumentNullException(nameof(value));
+
+                if (value != GrouperField)
+                {
+                    GrouperField = value;
+                    foreach (var entry in EntriesField.ToList())
+                    {
+                        var testEntry = entry as TestListTestEntry;
+                        if (testEntry != null)
+                            testEntry.Group = GrouperField.GetGroupFor(testEntry.Test);
+                    }
+                }
+            }
         }
 
         public TestListEntry FocusedEntry
@@ -93,7 +115,7 @@ namespace PmlUnit
             entry.SelectionChanged += OnSelectionChanged;
             entry.ResultChanged += OnTestResultChanged;
             entry.GroupChanged += OnGroupChanged;
-            entry.Group = Grouper.GetGroupFor(test); // invokes OnGroupChanged
+            entry.Group = GrouperField.GetGroupFor(test); // invokes OnGroupChanged
             EntriesField.Add(entry);
 
             Changed?.Invoke(this, EventArgs.Empty);
@@ -138,7 +160,7 @@ namespace PmlUnit
             if (entry == null)
                 return;
 
-            entry.Group = Grouper.GetGroupFor(entry.Test);
+            entry.Group = GrouperField.GetGroupFor(entry.Test);
         }
 
         private void OnGroupChanged(object sender, EventArgs e)
@@ -262,7 +284,7 @@ namespace PmlUnit
                 else if (right == null)
                     return 1;
                 else
-                    return left.Key - right.Key;
+                    return string.Compare(left.Key, right.Key, StringComparison.OrdinalIgnoreCase);
             }
 
             private int CompareTestInGroup(TestListTestEntry left, TestListGroupEntry right)

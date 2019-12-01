@@ -12,9 +12,9 @@ namespace PmlUnit
 
         public TestResultGrouper()
         {
-            FailedGroup = new TestListGroupEntry(1, "Failed Tests");
-            PassedGroup = new TestListGroupEntry(2, "Passed Tests");
-            NotExecutedGroup = new TestListGroupEntry(3, "Not executed Tests");
+            FailedGroup = new TestListGroupEntry("1", "Failed Tests");
+            PassedGroup = new TestListGroupEntry("2", "Passed Tests");
+            NotExecutedGroup = new TestListGroupEntry("3", "Not executed Tests");
         }
 
         public TestListGroupEntry GetGroupFor(Test test)
