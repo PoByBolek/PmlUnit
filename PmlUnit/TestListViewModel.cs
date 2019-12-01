@@ -301,8 +301,31 @@ namespace PmlUnit
             {
                 int result = CompareGroups(left.Group, right.Group);
                 if (result == 0)
-                    result = string.Compare(left.Key, right.Key, StringComparison.OrdinalIgnoreCase);
+                    result = CompareStatus(left.Test.Status, right.Test.Status);
+                if (result == 0)
+                    result = string.Compare(left.Test.Name, right.Test.Name, StringComparison.OrdinalIgnoreCase);
+                if (result == 0)
+                    result = string.Compare(left.Test.TestCase.Name, right.Test.TestCase.Name, StringComparison.OrdinalIgnoreCase);
                 return result;
+            }
+
+            private int CompareStatus(TestStatus left, TestStatus right)
+            {
+                return GetStatusOrder(left) - GetStatusOrder(right);
+            }
+
+            private int GetStatusOrder(TestStatus value)
+            {
+                if (value == TestStatus.Failed)
+                    return 0;
+                else if (value == TestStatus.Passed)
+                    return 1;
+                else if (value == TestStatus.NotExecuted)
+                    return 2;
+                else
+                    throw new NotImplementedException(string.Format(
+                        "Unknown test status {}", value
+                    ));
             }
         }
     }

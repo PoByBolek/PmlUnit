@@ -148,17 +148,23 @@ namespace PmlUnit
         {
             var entry = item as TestListTestEntry;
             if (entry != null)
-                entry.GroupChanged += OnTestEntryGroupChanged;
+            {
+                entry.ResultChanged += OnTestEntryChanged;
+                entry.GroupChanged += OnTestEntryChanged;
+            }
         }
 
         private void Deregister(TestListEntry item)
         {
             var entry = item as TestListTestEntry;
             if (entry != null)
-                entry.GroupChanged -= OnTestEntryGroupChanged;
+            {
+                entry.GroupChanged -= OnTestEntryChanged;
+                entry.ResultChanged -= OnTestEntryChanged;
+            }
         }
 
-        private void OnTestEntryGroupChanged(object sender, EventArgs e)
+        private void OnTestEntryChanged(object sender, EventArgs e)
         {
             Entries.Sort(Comparer);
         }

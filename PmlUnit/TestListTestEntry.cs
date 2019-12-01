@@ -53,8 +53,6 @@ namespace PmlUnit
             }
         }
 
-        public string Key => Test.Name + ":" + Test.TestCase.Name;
-
         private void OnResultChanged(object sender, EventArgs e)
         {
             ResultChanged?.Invoke(this, EventArgs.Empty);
