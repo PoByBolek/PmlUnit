@@ -22,8 +22,8 @@ namespace PmlUnit
         private readonly TestListEntryCollection VisibleEntriesField;
 
         private readonly TestListGroupEntry FailedGroup;
-        private readonly TestListGroupEntry NotExecutedGroup;
         private readonly TestListGroupEntry PassedGroup;
+        private readonly TestListGroupEntry NotExecutedGroup;
 
         private TestListGroupEntry HighlightedIconEntryField;
         private TestListEntry FocusedEntryField;
@@ -41,12 +41,12 @@ namespace PmlUnit
             VisibleEntriesField = new TestListEntryCollection(comparer);
             VisibleEntries = VisibleEntriesField.AsReadOnly();
 
-            FailedGroup = new TestListGroupEntry("1_failed", "Failed Tests");
+            FailedGroup = new TestListGroupEntry(1, "Failed Tests");
             SetupGroupEntry(FailedGroup);
-            NotExecutedGroup = new TestListGroupEntry("2_not_executed", "Not executed Tests");
-            SetupGroupEntry(NotExecutedGroup);
-            PassedGroup = new TestListGroupEntry("3_passed", "Passed Tests");
+            PassedGroup = new TestListGroupEntry(2, "Passed Tests");
             SetupGroupEntry(PassedGroup);
+            NotExecutedGroup = new TestListGroupEntry(3, "Not executed Tests");
+            SetupGroupEntry(NotExecutedGroup);
         }
 
         public TestListEntry FocusedEntry
@@ -260,7 +260,7 @@ namespace PmlUnit
                 else if (right == null)
                     return 1;
                 else
-                    return string.Compare(left.Key, right.Key, StringComparison.Ordinal);
+                    return left.Key - right.Key;
             }
 
             private int CompareTestInGroup(TestListTestEntry left, TestListGroupEntry right)
