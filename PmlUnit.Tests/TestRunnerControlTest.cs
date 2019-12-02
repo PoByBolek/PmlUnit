@@ -3,8 +3,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reflection;
+
 using Moq;
+
 using NUnit.Framework;
 
 namespace PmlUnit.Tests
@@ -86,12 +89,7 @@ namespace PmlUnit.Tests
             RunnerControl.LoadTests();
             // Assert
             var allTests = TestList.AllTests;
-            Assert.That(allTests.Count, Is.EqualTo(5));
-            Assert.That(allTests, Contains.Item(TestCases[0].Tests["one"]));
-            Assert.That(allTests, Contains.Item(TestCases[0].Tests["two"]));
-            Assert.That(allTests, Contains.Item(TestCases[1].Tests["three"]));
-            Assert.That(allTests, Contains.Item(TestCases[1].Tests["four"]));
-            Assert.That(allTests, Contains.Item(TestCases[1].Tests["five"]));
+            Assert.That(allTests, Is.EquivalentTo(TestCases[0].Tests.Concat(TestCases[1].Tests)));
         }
     }
 
@@ -105,6 +103,7 @@ namespace PmlUnit.Tests
         private TestRunnerControl RunnerControl;
         private TestListView TestList;
         private TestSummaryView TestSummary;
+        private IEnumerable<Test> Tests;
 
         [SetUp]
         public void Setup()
@@ -116,10 +115,11 @@ namespace PmlUnit.Tests
             TestCase.Tests.Add("four");
 
             RunnerMock = new Mock<AsyncTestRunner>();
-            RunnerMock.Setup(runner => runner.Run(It.IsAny<Test>())).Returns(new TestResult(TimeSpan.FromSeconds(1)));
+            RunnerMock
+                .Setup(runner => runner.RunAsync(It.IsAny<IEnumerable<Test>>()))
+                .Callback((IEnumerable<Test> tests) => Tests = tests);
 
             RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), RunnerMock.Object);
-            RunnerControl.CreateControl();
             TestSummary = RunnerControl.FindControl<TestSummaryView>("TestSummary");
             TestList = RunnerControl.FindControl<TestListView>("TestList");
             TestList.TestCases.Add(TestCase);
@@ -140,10 +140,8 @@ namespace PmlUnit.Tests
             // Act
             RunEventHandler("OnRunAllLinkClick");
             // Assert
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["one"]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["two"]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["three"]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["four"]), Times.Once());
+            RunnerMock.Verify(runner => runner.RunAsync(It.IsAny<IEnumerable<Test>>()), Times.Once());
+            Assert.That(Tests, Is.EquivalentTo(TestCase.Tests));
         }
 
         [Test]
@@ -152,10 +150,8 @@ namespace PmlUnit.Tests
             // Act
             RunEventHandler("OnRunPassedTestsMenuItemClick");
             // Assert
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["one"]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["two"]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["three"]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["four"]), Times.Never());
+            RunnerMock.Verify(runner => runner.RunAsync(It.IsAny<IEnumerable<Test>>()), Times.Once());
+            Assert.That(Tests, Is.EquivalentTo(new List<Test>() { TestCase.Tests["one"], TestCase.Tests["three"] }));
         }
 
         [Test]
@@ -164,10 +160,8 @@ namespace PmlUnit.Tests
             // Act
             RunEventHandler("OnRunFailedTestsMenuItemClick");
             // Assert
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["one"]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["two"]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["three"]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["four"]), Times.Never());
+            RunnerMock.Verify(runner => runner.RunAsync(It.IsAny<IEnumerable<Test>>()), Times.Once());
+            Assert.That(Tests, Is.EquivalentTo(new List<Test>() { TestCase.Tests["two"] }));
         }
 
         [Test]
@@ -176,10 +170,8 @@ namespace PmlUnit.Tests
             // Act
             RunEventHandler("OnRunNotExecutedTestsMenuItemClick");
             // Assert
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["one"]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["two"]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["three"]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["four"]), Times.Once());
+            RunnerMock.Verify(runner => runner.RunAsync(It.IsAny<IEnumerable<Test>>()), Times.Once());
+            Assert.That(Tests, Is.EquivalentTo(new List<Test>() { TestCase.Tests["four"] }));
         }
 
         [Test]
@@ -188,10 +180,8 @@ namespace PmlUnit.Tests
             // Act
             RunEventHandler("OnRunSelectedTestsMenuItemClick");
             // Assert
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["one"]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["two"]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["three"]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests["four"]), Times.Once());
+            RunnerMock.Verify(runner => runner.RunAsync(It.IsAny<IEnumerable<Test>>()), Times.Once());
+            Assert.That(Tests, Is.EquivalentTo(new List<Test>() { TestCase.Tests["two"], TestCase.Tests["four"] }));
         }
 
         private void RunEventHandler(string handler)
