@@ -1,6 +1,7 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
+using System.Windows.Forms;
 using Aveva.ApplicationFramework;
 
 #if PDMS || E3D_11
@@ -17,7 +18,7 @@ namespace PmlUnit
 {
     public class PmlUnitAddin : IAddin, IDisposable
     {
-        private readonly TestRunner TestRunner;
+        private readonly AsyncTestRunner TestRunner;
         private readonly TestCaseProvider TestCaseProvider;
         private readonly TestRunnerControl TestRunnerControl;
         private readonly AboutDialog AboutDialog;
@@ -26,7 +27,7 @@ namespace PmlUnit
         {
             try
             {
-                TestRunner = new PmlTestRunner();
+                TestRunner = new PmlTestRunner(new SimpleMethodInvoker(() => TestRunnerControl));
                 TestCaseProvider = new EnvironmentVariableTestCaseProvider();
                 TestRunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner);
                 AboutDialog = new AboutDialog();
@@ -43,7 +44,7 @@ namespace PmlUnit
             }
         }
 
-        internal PmlUnitAddin(TestCaseProvider provider, TestRunner runner)
+        internal PmlUnitAddin(TestCaseProvider provider, AsyncTestRunner runner)
         {
             if (provider == null)
                 throw new ArgumentNullException(nameof(provider));
@@ -138,6 +139,24 @@ namespace PmlUnit
             // PDMS crashes if we also dispose the TestRunnerControl here
             TestRunner.Dispose();
             AboutDialog.Dispose();
+        }
+
+        private class SimpleMethodInvoker : MethodInvoker
+        {
+            private readonly Func<Control> Factory;
+            private Control Invoker;
+
+            public SimpleMethodInvoker(Func<Control> factory)
+            {
+                Factory = factory;
+            }
+
+            public void BeginInvoke(Delegate method, params object[] arguments)
+            {
+                if (Invoker == null)
+                    Invoker = Factory();
+                Invoker.BeginInvoke(method, arguments);
+            }
         }
     }
 }

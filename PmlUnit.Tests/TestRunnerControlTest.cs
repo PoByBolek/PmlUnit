@@ -18,13 +18,13 @@ namespace PmlUnit.Tests
         {
             Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, null));
             Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(Mock.Of<TestCaseProvider>(), null));
-            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, Mock.Of<TestRunner>()));
+            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, Mock.Of<AsyncTestRunner>()));
         }
 
         [Test]
         public void Dispose_DisposesTestRunner()
         {
-            var runnerMock = new Mock<TestRunner>();
+            var runnerMock = new Mock<AsyncTestRunner>();
             var control = new TestRunnerControl(Mock.Of<TestCaseProvider>(), runnerMock.Object);
             // Act
             control.Dispose();
@@ -60,7 +60,7 @@ namespace PmlUnit.Tests
             ProviderMock = new Mock<TestCaseProvider>();
             ProviderMock.Setup(provider => provider.GetTestCases()).Returns(TestCases);
 
-            RunnerControl = new TestRunnerControl(ProviderMock.Object, Mock.Of<TestRunner>());
+            RunnerControl = new TestRunnerControl(ProviderMock.Object, Mock.Of<AsyncTestRunner>());
             TestList = RunnerControl.FindControl<TestListView>("TestList");
         }
 
@@ -101,7 +101,7 @@ namespace PmlUnit.Tests
     public class TestRunnerControlRunTest
     {
         private TestCase TestCase;
-        private Mock<TestRunner> RunnerMock;
+        private Mock<AsyncTestRunner> RunnerMock;
         private TestRunnerControl RunnerControl;
         private TestListView TestList;
         private TestSummaryView TestSummary;
@@ -115,10 +115,11 @@ namespace PmlUnit.Tests
             TestCase.Tests.Add("three").Result = new TestResult(TimeSpan.FromSeconds(1));
             TestCase.Tests.Add("four");
 
-            RunnerMock = new Mock<TestRunner>();
+            RunnerMock = new Mock<AsyncTestRunner>();
             RunnerMock.Setup(runner => runner.Run(It.IsAny<Test>())).Returns(new TestResult(TimeSpan.FromSeconds(1)));
 
             RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), RunnerMock.Object);
+            RunnerControl.CreateControl();
             TestSummary = RunnerControl.FindControl<TestSummaryView>("TestSummary");
             TestList = RunnerControl.FindControl<TestListView>("TestList");
             TestList.TestCases.Add(TestCase);
@@ -227,7 +228,7 @@ namespace PmlUnit.Tests
             TestCase.Tests.Add("one");
             TestCase.Tests.Add("two");
             TestCase.Tests.Add("three");
-            RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), Mock.Of<TestRunner>());
+            RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), Mock.Of<AsyncTestRunner>());
             TestSummary = RunnerControl.FindControl<TestSummaryView>("TestSummary");
             TestDetails = RunnerControl.FindControl<TestDetailsView>("TestDetails");
             TestList = RunnerControl.FindControl<TestListView>("TestList");

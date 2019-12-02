@@ -32,7 +32,7 @@ namespace PmlUnit.Tests
                 return WindowMock.Object;
             });
 
-            Control = new TestRunnerControl(Mock.Of<TestCaseProvider>(), Mock.Of<TestRunner>());
+            Control = new TestRunnerControl(Mock.Of<TestCaseProvider>(), Mock.Of<AsyncTestRunner>());
             Command = new ShowTestRunnerCommand(WindowManagerMock.Object, Control);
         }
 

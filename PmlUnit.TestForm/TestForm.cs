@@ -1,13 +1,14 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 
 namespace PmlUnit
 {
-    partial class TestForm : Form
+    partial class TestForm : Form, MethodInvoker
     {
         private readonly TestRunnerControl RunnerControl;
         private readonly MutablePathTestCaseProvider Provider;
@@ -15,7 +16,8 @@ namespace PmlUnit
         public TestForm()
         {
             Provider = new MutablePathTestCaseProvider(Path.GetFullPath("..\\..\\..\\..\\pmllib-tests"));
-            RunnerControl = new TestRunnerControl(Provider, new DummyTestRunner());
+            var runner = new PmlTestRunner(new StubObjectProxy(), new StubClock(), this);
+            RunnerControl = new TestRunnerControl(Provider, runner);
             RunnerControl.Dock = DockStyle.Fill;
 
             InitializeComponent();
@@ -24,6 +26,11 @@ namespace PmlUnit
             FolderBrowser.SelectedPath = Provider.Path;
 
             ControlPanel.Controls.Add(RunnerControl);
+        }
+
+        void MethodInvoker.BeginInvoke(Delegate method, params object[] args)
+        {
+            BeginInvoke(method, args);
         }
 
         private void OnBrowseButtonClick(object sender, EventArgs e)
@@ -66,11 +73,11 @@ namespace PmlUnit
             }
         }
 
-        private class DummyTestRunner : TestRunner
+        private class StubObjectProxy : ObjectProxy
         {
             private readonly Random RNG;
 
-            public DummyTestRunner()
+            public StubObjectProxy()
             {
                 RNG = new Random();
             }
@@ -79,32 +86,35 @@ namespace PmlUnit
             {
             }
 
-            public void RefreshIndex()
+            public object Invoke(string method, params object[] arguments)
             {
-            }
-
-            public void Reload(TestCase testCase)
-            {
-            }
-
-            public TestResult Run(Test test)
-            {
-                var duration = TimeSpan.FromMilliseconds(RNG.Next(2000));
-                TestResult result;
-
-                if (RNG.NextDouble() <= 0.8)
-                    result = new TestResult(duration);
-                else
-                    result = new TestResult(duration, new PmlException());
-
-                test.Result = result;
+                var result = new Hashtable();
+                if (RNG.NextDouble() > 0.8)
+                {
+                    result[1.0] = "Fail";
+                }
                 return result;
             }
+        }
 
-            public void Run(TestCase testCase)
+        private class StubClock : Clock
+        {
+            private readonly Random RNG;
+            private long Ticks;
+
+            public StubClock()
             {
-                foreach (var test in testCase.Tests)
-                    Run(test);
+                RNG = new Random();
+                Ticks = DateTime.Now.Ticks;
+            }
+
+            public Instant CurrentInstant
+            {
+                get
+                {
+                    Ticks += TimeSpan.FromMilliseconds(RNG.Next(2000)).Ticks;
+                    return Instant.FromTicks(Ticks);
+                }
             }
         }
     }

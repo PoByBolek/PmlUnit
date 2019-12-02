@@ -10,10 +10,12 @@ namespace PmlUnit
 {
     partial class TestRunnerControl : UserControl
     {
-        private readonly TestCaseProvider Provider;
-        private readonly TestRunner Runner;
+        private delegate void RunDelegate(IList<Test> tests, int index);
 
-        public TestRunnerControl(TestCaseProvider provider, TestRunner runner)
+        private readonly TestCaseProvider Provider;
+        private readonly AsyncTestRunner Runner;
+
+        public TestRunnerControl(TestCaseProvider provider, AsyncTestRunner runner)
         {
             if (provider == null)
                 throw new ArgumentNullException(nameof(provider));
@@ -22,6 +24,8 @@ namespace PmlUnit
 
             Provider = provider;
             Runner = runner;
+            Runner.TestCompleted += OnTestCompleted;
+            Runner.RunCompleted += OnRunCompleted;
             InitializeComponent();
             ResetSplitContainerOrientation();
         }
@@ -72,34 +76,67 @@ namespace PmlUnit
             Run(TestList.SelectedTests);
         }
 
-        private void Run(ICollection<Test> tests)
+        private void Run(IList<Test> tests)
         {
             Enabled = false;
-            try
-            {
-                RunInternal(tests);
-            }
-            finally
-            {
-                Enabled = true;
-                TestSummary.UpdateSummary(tests);
-            }
-        }
 
-        private void RunInternal(ICollection<Test> tests)
-        {
             ExecutionProgressBar.Value = 0;
             ExecutionProgressBar.Maximum = tests.Count;
             ExecutionProgressBar.Color = Color.Green;
 
-            foreach (var test in tests)
+            try
             {
-                Runner.Run(test);
-                ExecutionProgressBar.Increment(1);
-                if (test.Status == TestStatus.Failed)
-                    ExecutionProgressBar.Color = Color.Red;
+                Runner.RunAsync(tests);
+            }
+            catch (Exception error)
+            {
+                Enabled = true;
+                MessageBox.Show(error.ToString(), "Test run failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
 
-                Application.DoEvents();
+        private void OnTestCompleted(object sender, TestCompletedEventArgs e)
+        {
+            ExecutionProgressBar.Increment(1);
+            if (e.Test.Status == TestStatus.Failed)
+                ExecutionProgressBar.Color = Color.Red;
+
+            Update();
+        }
+
+        private void OnRunCompleted(object sender, TestRunCompletedEventArgs e)
+        {
+            Enabled = true;
+            TestSummary.UpdateSummary(e.Tests.ToList());
+            if (e.Error != null)
+                MessageBox.Show(e.Error.ToString(), "Test run failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private void RunInternal(IList<Test> tests, int index)
+        {
+            if (index < tests.Count)
+            {
+                try
+                {
+                    var test = tests[index];
+                    Runner.Run(test);
+                    ExecutionProgressBar.Increment(1);
+                    if (test.Status == TestStatus.Failed)
+                        ExecutionProgressBar.Color = Color.Red;
+                    
+                    Update();
+                    BeginInvoke(new RunDelegate(RunInternal), tests, index + 1);
+                }
+                catch
+                {
+                    Enabled = true;
+                    throw;
+                }
+            }
+            else
+            {
+                Enabled = true;
+                TestSummary.UpdateSummary(tests);
             }
         }
 

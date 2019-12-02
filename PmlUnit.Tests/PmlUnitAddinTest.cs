@@ -22,7 +22,7 @@ namespace PmlUnit.Tests
     {
         private Mock<ICommandManager> CommandManagerMock;
         private Mock<ServiceProvider> ServiceProviderMock;
-        private Mock<TestRunner> TestRunnerMock;
+        private Mock<AsyncTestRunner> TestRunnerMock;
         private Mock<TestCaseProvider> TestCaseProviderMock;
         private PmlUnitAddin Addin;
 
@@ -46,7 +46,7 @@ namespace PmlUnit.Tests
             TestCaseProviderMock = new Mock<TestCaseProvider>();
             TestCaseProviderMock.Setup(provider => provider.GetTestCases())
                 .Returns(new List<TestCase>());
-            TestRunnerMock = new Mock<TestRunner>();
+            TestRunnerMock = new Mock<AsyncTestRunner>();
             Addin = new PmlUnitAddin(TestCaseProviderMock.Object, TestRunnerMock.Object);
         }
 
