@@ -106,6 +106,7 @@
     <Compile Include="ColorizedProgressBar.Designer.cs">
       <DependentUpon>ColorizedProgressBar.cs</DependentUpon>
     </Compile>
+    <Compile Include="ControlMethodInvoker.cs" />
     <Compile Include="EnvironmentVariableTestCaseProvider.cs" />
     <Compile Include="IconLabel.cs">
       <SubType>UserControl</SubType>

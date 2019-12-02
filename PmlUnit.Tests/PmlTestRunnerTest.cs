@@ -25,11 +25,23 @@ namespace PmlUnit.Tests
         [Test]
         public void Constructor_ShouldCheckForNullArguments()
         {
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner((ObjectProxy)null, (MethodInvoker)null));
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner((Clock)null, (MethodInvoker)null));
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(Mock.Of<ObjectProxy>(), null, null));
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(null, Mock.Of<Clock>(), null));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(null));
+
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner((Clock)null, null));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(Mock.Of<Clock>(), null));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner((Clock)null, Mock.Of<MethodInvoker>()));
+
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner((ObjectProxy)null, null));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(Mock.Of<ObjectProxy>(), null));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner((ObjectProxy)null, Mock.Of<MethodInvoker>()));
+            
             Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(null, null, Mock.Of<MethodInvoker>()));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(null, Mock.Of<Clock>(), null));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(null, Mock.Of<Clock>(), Mock.Of<MethodInvoker>()));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(Mock.Of<ObjectProxy>(), null, null));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(Mock.Of<ObjectProxy>(), null, Mock.Of<MethodInvoker>()));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(Mock.Of<ObjectProxy>(), Mock.Of<Clock>(), null));
         }
 
         [Test]

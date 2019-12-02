@@ -8,7 +8,7 @@ using System.Windows.Forms;
 
 namespace PmlUnit
 {
-    partial class TestForm : Form, MethodInvoker
+    partial class TestForm : Form
     {
         private readonly TestRunnerControl RunnerControl;
         private readonly MutablePathTestCaseProvider Provider;
@@ -16,7 +16,7 @@ namespace PmlUnit
         public TestForm()
         {
             Provider = new MutablePathTestCaseProvider(Path.GetFullPath("..\\..\\..\\..\\pmllib-tests"));
-            var runner = new PmlTestRunner(new StubObjectProxy(), new StubClock(), this);
+            var runner = new PmlTestRunner(new StubObjectProxy(), new StubClock(), new ControlMethodInvoker(this));
             RunnerControl = new TestRunnerControl(Provider, runner);
             RunnerControl.Dock = DockStyle.Fill;
 
@@ -26,11 +26,6 @@ namespace PmlUnit
             FolderBrowser.SelectedPath = Provider.Path;
 
             ControlPanel.Controls.Add(RunnerControl);
-        }
-
-        void MethodInvoker.BeginInvoke(Delegate method, params object[] args)
-        {
-            BeginInvoke(method, args);
         }
 
         private void OnBrowseButtonClick(object sender, EventArgs e)

@@ -1,7 +1,6 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
-using System.Windows.Forms;
 using Aveva.ApplicationFramework;
 
 #if PDMS || E3D_11
@@ -27,7 +26,7 @@ namespace PmlUnit
         {
             try
             {
-                TestRunner = new PmlTestRunner(new SimpleMethodInvoker(() => TestRunnerControl));
+                TestRunner = new PmlTestRunner(new ControlMethodInvoker(() => TestRunnerControl));
                 TestCaseProvider = new EnvironmentVariableTestCaseProvider();
                 TestRunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner);
                 AboutDialog = new AboutDialog();
@@ -139,24 +138,6 @@ namespace PmlUnit
             // PDMS crashes if we also dispose the TestRunnerControl here
             TestRunner.Dispose();
             AboutDialog.Dispose();
-        }
-
-        private class SimpleMethodInvoker : MethodInvoker
-        {
-            private readonly Func<Control> Factory;
-            private Control Invoker;
-
-            public SimpleMethodInvoker(Func<Control> factory)
-            {
-                Factory = factory;
-            }
-
-            public void BeginInvoke(Delegate method, params object[] arguments)
-            {
-                if (Invoker == null)
-                    Invoker = Factory();
-                Invoker.BeginInvoke(method, arguments);
-            }
         }
     }
 }
