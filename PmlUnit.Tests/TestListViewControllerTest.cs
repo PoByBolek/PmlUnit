@@ -10,7 +10,7 @@ using NUnit.Framework;
 namespace PmlUnit.Tests
 {
     [TestFixture]
-    [TestOf(typeof(TestListView))]
+    [TestOf(typeof(TestListViewController))]
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class TestListViewControllerTest
     {
