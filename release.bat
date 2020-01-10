@@ -109,10 +109,15 @@ if %errorlevel% neq 0 (
     goto end
 )
 
-call :write_info "Copying README and LICENSE to output directory"
+call :write_info "Copying README, CHANGELOG, and LICENSE to output directory"
 copy "%BASE_DIR%\README.md" "%BUILD_DIR%\README.txt"
 if %errorlevel% neq 0 (
     call :write_error "Failed to copy README to output directory"
+    goto end
+)
+copy "%BASE_DIR%\CHANGELOG.md" "%BUILD_DIR%\CHANGELOG.txt"
+if %errorlevel% neq 0 (
+    call :write_error "Failed to copy CHANGELOG to output directory"
     goto end
 )
 copy "%BASE_DIR%\LICENSE" "%BUILD_DIR%\LICENSE.txt"
