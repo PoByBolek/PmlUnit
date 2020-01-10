@@ -122,6 +122,7 @@
     <Compile Include="TestCaseTest.cs" />
     <Compile Include="TestDetailsViewTest.cs" />
     <Compile Include="TestListViewControllerTest.cs" />
+    <Compile Include="TestListViewModelTest.cs" />
     <Compile Include="TestListViewTest.cs" />
     <Compile Include="TestRunnerControlTest.cs" />
     <Compile Include="TestTest.cs" />

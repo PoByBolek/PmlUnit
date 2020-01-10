@@ -7,25 +7,52 @@ using System.Linq;
 
 namespace PmlUnit
 {
-    class ReadOnlyTestListTestEntryCollection : ICollection<TestListTestEntry>
+    class TestListTestEntryCollection : ICollection<TestListTestEntry>
     {
-        TestListTestEntryCollection Entries;
+        public event EventHandler<TestListEntriesChangedEventArgs> Changed;
 
-        public ReadOnlyTestListTestEntryCollection(TestListTestEntryCollection entries)
+        private readonly HashSet<TestListTestEntry> Entries;
+
+        public TestListTestEntryCollection()
         {
-            if (entries == null)
-                throw new ArgumentNullException(nameof(entries));
-            Entries = entries;
+            Entries = new HashSet<TestListTestEntry>();
         }
 
         public int Count => Entries.Count;
 
-        public TestListTestEntry this[Test test] => Entries[test];
-        public TestListTestEntry this[int index] => Entries[index];
+        public void Add(TestListTestEntry item)
+        {
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+
+            if (Entries.Add(item))
+                OnChanged(item, null);
+        }
+
+        public void Clear()
+        {
+            if (Entries.Count > 0)
+            {
+                var copy = new HashSet<TestListTestEntry>(Entries);
+                Entries.Clear();
+                OnChanged(null, copy);
+            }
+        }
 
         public bool Contains(TestListTestEntry item)
         {
+            if (item == null)
+                throw new ArgumentNullException(nameof(item));
+
             return Entries.Contains(item);
+        }
+
+        public bool Remove(TestListTestEntry item)
+        {
+            bool result = Entries.Remove(item);
+            if (result)
+                OnChanged(null, item);
+            return result;
         }
 
         public void CopyTo(TestListTestEntry[] array, int arrayIndex)
@@ -43,123 +70,6 @@ namespace PmlUnit
             return GetEnumerator();
         }
 
-        bool ICollection<TestListTestEntry>.IsReadOnly => true;
-
-        void ICollection<TestListTestEntry>.Add(TestListTestEntry item)
-        {
-            throw new NotSupportedException();
-        }
-
-        void ICollection<TestListTestEntry>.Clear()
-        {
-            throw new NotSupportedException();
-        }
-
-        bool ICollection<TestListTestEntry>.Remove(TestListTestEntry item)
-        {
-            throw new NotSupportedException();
-        }
-    }
-
-    class TestListTestEntryCollection : ICollection<TestListTestEntry>
-    {
-        public event EventHandler<TestListEntriesChangedEventArgs> Changed;
-
-        private readonly SortedList<Test, TestListTestEntry> Entries;
-
-        public TestListTestEntryCollection()
-        {
-            Entries = new SortedList<Test, TestListTestEntry>(new TestComparer());
-        }
-
-        public int Count => Entries.Count;
-
-        public TestListTestEntry this[Test test] => Entries[test];
-        public TestListTestEntry this[int index] => Entries.Values[index];
-
-        public ReadOnlyTestListTestEntryCollection AsReadOnly()
-        {
-            return new ReadOnlyTestListTestEntryCollection(this);
-        }
-
-        public TestListTestEntry Add(Test test)
-        {
-            if (test == null)
-                throw new ArgumentNullException(nameof(test));
-
-            var result = new TestListTestEntry(test);
-            Entries.Add(test, result);
-            OnChanged(result, null);
-
-            return result;
-        }
-
-        public void Add(TestListTestEntry item)
-        {
-            if (item == null)
-                throw new ArgumentNullException(nameof(item));
-
-            Entries.Add(item.Test, item);
-            OnChanged(item, null);
-        }
-
-        public void Clear()
-        {
-            if (Entries.Count > 0)
-            {
-                var copy = Entries.Values.ToList();
-                Entries.Clear();
-                OnChanged(null, copy);
-            }
-        }
-
-        public bool Contains(TestListTestEntry item)
-        {
-            if (item == null)
-                throw new ArgumentNullException(nameof(item));
-
-            TestListTestEntry entry;
-            return Entries.TryGetValue(item.Test, out entry) && entry == item;
-        }
-
-        public bool Remove(Test test)
-        {
-            if (test == null)
-                throw new ArgumentNullException(nameof(test));
-
-            TestListTestEntry entry;
-            bool result = Entries.TryGetValue(test, out entry);
-            if (result)
-            {
-                Entries.Remove(test);
-                OnChanged(null, entry);
-            }
-            return result;
-        }
-
-        public bool Remove(TestListTestEntry item)
-        {
-            bool result = Contains(item) && Entries.Remove(item.Test);
-            if (result)
-                OnChanged(null, item);
-            return result;
-        }
-
-        public void CopyTo(TestListTestEntry[] array, int arrayIndex)
-        {
-            Entries.Values.CopyTo(array, arrayIndex);
-        }
-
-        public IEnumerator<TestListTestEntry> GetEnumerator()
-        {
-            return Entries.Values.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
         bool ICollection<TestListTestEntry>.IsReadOnly => false;
 
         private void OnChanged(TestListTestEntry added, TestListTestEntry removed)
@@ -170,22 +80,6 @@ namespace PmlUnit
         private void OnChanged(IEnumerable<TestListTestEntry> added, IEnumerable<TestListTestEntry> removed)
         {
             Changed?.Invoke(this, new TestListEntriesChangedEventArgs(added, removed));
-        }
-
-        private class TestComparer : IComparer<Test>
-        {
-            public int Compare(Test left, Test right)
-            {
-                if (left == null)
-                    throw new ArgumentNullException(nameof(left));
-                if (right == null)
-                    throw new ArgumentNullException(nameof(right));
-
-                int result = string.Compare(left.Name, right.Name, StringComparison.OrdinalIgnoreCase);
-                if (result == 0)
-                    result = string.Compare(left.TestCase.Name, right.TestCase.Name, StringComparison.OrdinalIgnoreCase);
-                return result;
-            }
         }
     }
 

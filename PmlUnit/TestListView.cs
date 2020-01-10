@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+
 using PmlUnit.Properties;
 
 namespace PmlUnit
@@ -24,21 +25,8 @@ namespace PmlUnit
         [Category("Behavior")]
         public event EventHandler SelectionChanged;
 
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public TestCaseCollection TestCases { get; }
-
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public ReadOnlyTestListTestEntryCollection Entries { get; }
-
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public ReadOnlyTestListGroupEntryCollection Groups { get; }
-
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public TestListSelectedEntryCollection SelectedEntries { get; }
+        [Category("Behavior")]
+        public event EventHandler GroupingChanged;
 
         public int EntryHeight => 20;
 
@@ -46,27 +34,22 @@ namespace PmlUnit
 
         public Size ImageSize => EntryImages.ImageSize;
 
-        private readonly TestListTestEntryCollection EntriesField;
-        private readonly TestListGroupEntryCollection GroupsField;
-        private readonly SortedList<string, TestListEntry> AllEntries;
-        private readonly SortedList<string, TestListEntry> VisibleEntries;
-
+        private readonly TestListViewModel Model;
         private readonly TestListViewController Controller;
+        private TestListGrouping GroupingField;
 
         public TestListView()
         {
-            TestCases = new TestCaseCollection();
-            TestCases.Changed += OnTestCasesChanged;
-            EntriesField = new TestListTestEntryCollection();
-            Entries = EntriesField.AsReadOnly();
-            GroupsField = new TestListGroupEntryCollection();
-            Groups = GroupsField.AsReadOnly();
+            GroupingField = TestListGrouping.Result;
 
-            AllEntries = new SortedList<string, TestListEntry>(StringComparer.OrdinalIgnoreCase);
-            VisibleEntries = new SortedList<string, TestListEntry>(StringComparer.OrdinalIgnoreCase);
-            SelectedEntries = new TestListSelectedEntryCollection(AllEntries.Values);
+            Model = new TestListViewModel();
+            Model.Grouper = new TestResultGrouper();
+            Model.Changed += OnModelChanged;
+            Model.FocusedEntryChanged += OnModelChanged;
+            Model.VisibleEntriesChanged += OnVisibleEntriesChanged;
+            Model.SelectionChanged += OnModelSelectionChanged;
 
-            Controller = new TestListViewController(this, AllEntries.Values, VisibleEntries.Values);
+            Controller = new TestListViewController(Model, this);
             Controller.SelectionChanged += OnControllerSelectionChanged;
 
             InitializeComponent();
@@ -83,88 +66,83 @@ namespace PmlUnit
             EntryImages.Images.Add(PassedImageKey, Resources.Passed);
         }
 
-        private void OnTestCasesChanged(object sender, TestCasesChangedEventArgs e)
+        [Category("Behavior")]
+        [DefaultValue(TestListGrouping.Result)]
+        public TestListGrouping Grouping
         {
-            foreach (var testCase in e.RemovedTestCases)
+            get { return GroupingField; }
+            set
             {
-                GroupsField.Remove(testCase.Name);
-                AllEntries.Remove(testCase.Name);
-                VisibleEntries.Remove(testCase.Name);
-                foreach (var test in testCase.Tests)
+                if (value != GroupingField)
                 {
-                    EntriesField.Remove(test);
-                    AllEntries.Remove(test.FullName);
-                    VisibleEntries.Remove(test.FullName);
+                    GroupingField = value;
+
+                    if (value == TestListGrouping.Result)
+                        Model.Grouper = new TestResultGrouper();
+                    else if (value == TestListGrouping.TestCase)
+                        Model.Grouper = new TestCaseGrouper();
+                    else
+                        throw new NotImplementedException(string.Format(
+                            "No grouper registered for grouping mode {}", value
+                        ));
+
+                    GroupingChanged?.Invoke(this, EventArgs.Empty);
                 }
             }
-            foreach (var testCase in e.AddedTestCases)
-            {
-                var group = new TestListGroupEntry(testCase.Name);
-                group.SelectionChanged += OnSelectionChanged;
-                group.ExpandedChanged += OnGroupExpandedChanged;
-                foreach (var test in testCase.Tests)
-                {
-                    var entry = EntriesField.Add(test);
-                    entry.SelectionChanged += OnSelectionChanged;
-                    entry.ResultChanged += OnTestResultChanged;
-                    group.Entries.Add(entry);
-                    AllEntries.Add(test.FullName, entry);
-                    VisibleEntries.Add(test.FullName, entry);
-                }
-                GroupsField.Add(group);
-                AllEntries.Add(testCase.Name, group);
-                VisibleEntries.Add(testCase.Name, group);
-            }
+        }
 
-            AutoScrollMinSize = new Size(0, VisibleEntries.Count * EntryHeight);
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public TestCaseCollection TestCases => Model.TestCases;
 
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public IList<Test> AllTests => AllTestsInternal.ToList();
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public IList<Test> PassedTests => AllTestsInternal.Where(test => test.Status == TestStatus.Passed).ToList();
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public IList<Test> FailedTests => AllTestsInternal.Where(test => test.Status == TestStatus.Failed).ToList();
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public IList<Test> NotExecutedTests => AllTestsInternal.Where(test => test.Status == TestStatus.NotExecuted).ToList();
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public IList<Test> SelectedTests => TestEntries
+            .Where(entry => entry.IsSelected || entry.Group.IsSelected)
+            .Select(entry => entry.Test)
+            .ToList();
+
+        private IEnumerable<Test> AllTestsInternal => TestEntries.Select(entry => entry.Test);
+
+        private IEnumerable<TestListTestEntry> TestEntries => Model.Entries.OfType<TestListTestEntry>();
+
+        private void OnModelChanged(object sender, EventArgs e)
+        {
             Invalidate();
         }
 
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<Test> AllTests => AllTestsInternal.ToList();
-
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<Test> PassedTests => AllTestsInternal.Where(test => test.Status == TestStatus.Passed).ToList();
-
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<Test> FailedTests => AllTestsInternal.Where(test => test.Status == TestStatus.Failed).ToList();
-
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<Test> NotExecutedTests => AllTestsInternal.Where(test => test.Status == TestStatus.NotExecuted).ToList();
-
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<Test> SelectedTests
+        private void OnVisibleEntriesChanged(object sender, EventArgs e)
         {
-            get
-            {
-                var result = new HashSet<Test>();
-                foreach (var group in GroupsField)
-                {
-                    if (group.IsSelected)
-                    {
-                        foreach (var entry in group.Entries)
-                            result.Add(entry.Test);
-                    }
-                    else
-                    {
-                        foreach (var entry in group.Entries)
-                        {
-                            if (entry.IsSelected)
-                                result.Add(entry.Test);
-                        }
-                    }
-                }
-                return result.ToList();
-            }
+            AutoScrollMinSize = new Size(0, Model.VisibleEntries.Count * EntryHeight);
+            Invalidate();
         }
 
-        private IEnumerable<Test> AllTestsInternal => Entries.Select(entry => entry.Test);
+        private void OnModelSelectionChanged(object sender, EventArgs e)
+        {
+            Controller.HandleSelectionChanged(sender, e);
+        }
+
+        private void OnControllerSelectionChanged(object sender, EventArgs e)
+        {
+            Invalidate();
+            SelectionChanged?.Invoke(this, EventArgs.Empty);
+        }
 
         protected override void OnPaint(PaintEventArgs e)
         {
@@ -177,19 +155,19 @@ namespace PmlUnit
                 g.FillRectangle(brush, e.ClipRectangle);
             }
 
-            using (var options = new TestListPaintOptions(this, e.ClipRectangle, Controller.FocusedEntry))
+            using (var options = new TestListPaintOptions(this, e.ClipRectangle, Model.FocusedEntry))
             {
                 int width = ClientSize.Width;
                 int offset = VerticalScroll.Value;
                 int startIndex = (e.ClipRectangle.Top + offset) / EntryHeight;
                 startIndex = Math.Max(0, startIndex);
                 int endIndex = (e.ClipRectangle.Bottom + offset) / EntryHeight;
-                endIndex = Math.Min(endIndex, VisibleEntries.Count - 1);
+                endIndex = Math.Min(endIndex, Model.VisibleEntries.Count - 1);
 
                 for (int i = startIndex; i <= endIndex; i++)
                 {
                     var bounds = new Rectangle(0, i * EntryHeight - offset, width, EntryHeight);
-                    var entry = VisibleEntries.Values[i];
+                    var entry = Model.VisibleEntries[i];
                     PaintEntryBackground(g, entry, bounds, options);
 
                     var testEntry = entry as TestListTestEntry;
@@ -240,7 +218,7 @@ namespace PmlUnit
             int x = bounds.Left + EntryPadding;
             int y = bounds.Top + EntryPadding;
 
-            var image = GetGroupEntryImage(group.IsExpanded, group == Controller.HighlightedIconEntry);
+            var image = GetGroupEntryImage(group.IsExpanded, group == Model.HighlightedIconEntry);
             g.DrawImage(image, x, y);
             x += 16 + EntryPadding;
 
@@ -356,40 +334,6 @@ namespace PmlUnit
         {
             base.OnMouseDoubleClick(e);
             Controller.HandleMouseDoubleClick(e, ModifierKeys);
-        }
-
-        private void OnGroupExpandedChanged(object sender, EventArgs e)
-        {
-            var group = sender as TestListGroupEntry;
-            if (group.IsExpanded)
-            {
-                foreach (var entry in group.Entries)
-                    VisibleEntries.Add(entry.Test.FullName, entry);
-            }
-            else
-            {
-                foreach (var entry in group.Entries)
-                    VisibleEntries.Remove(entry.Test.FullName);
-            }
-
-            AutoScrollMinSize = new Size(0, VisibleEntries.Count * EntryHeight);
-            Invalidate();
-        }
-
-        private void OnSelectionChanged(object sender, EventArgs e)
-        {
-            Controller.HandleSelectionChanged(sender, e);
-        }
-
-        private void OnControllerSelectionChanged(object sender, EventArgs e)
-        {
-            Invalidate();
-            SelectionChanged?.Invoke(this, EventArgs.Empty);
-        }
-
-        private void OnTestResultChanged(object sender, EventArgs e)
-        {
-            Invalidate();
         }
     }
 }

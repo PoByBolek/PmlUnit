@@ -1,7 +1,9 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 using NUnit.Framework;
 
@@ -40,45 +42,37 @@ namespace PmlUnit.Tests
         [Test]
         public void AllTests_ReturnsAllRegisteredTests()
         {
-            // Act
-            var tests = TestList.AllTests;
             // Assert
-            Assert.That(tests.Count, Is.EqualTo(5));
-            Assert.That(tests, Contains.Item(First.Tests["one"]));
-            Assert.That(tests, Contains.Item(First.Tests["two"]));
-            Assert.That(tests, Contains.Item(First.Tests["three"]));
-            Assert.That(tests, Contains.Item(Second.Tests["four"]));
-            Assert.That(tests, Contains.Item(Second.Tests["five"]));
+            var expected = First.Tests.Concat(Second.Tests);
+            Assert.That(TestList.AllTests, Is.EquivalentTo(expected));
         }
 
         [Test]
         public void PassedTests_OnlyReturnsPassedTests()
         {
             // Arrange
-            First.Tests["three"].Result = new TestResult(TimeSpan.FromSeconds(1));
-            Second.Tests["five"].Result = new TestResult(TimeSpan.FromSeconds(1));
-            // Act
-            var tests = TestList.PassedTests;
+            var first = First.Tests["three"];
+            first.Result = new TestResult(TimeSpan.FromSeconds(1));
+            var second = Second.Tests["five"];
+            second.Result = new TestResult(TimeSpan.FromSeconds(1));
             // Assert
-            Assert.That(tests.Count, Is.EqualTo(2));
-            Assert.That(tests, Contains.Item(First.Tests["three"]));
-            Assert.That(tests, Contains.Item(Second.Tests["five"]));
+            var expected = new List<Test>() { first, second };
+            Assert.That(TestList.PassedTests, Is.EquivalentTo(expected));
         }
 
         [Test]
         public void FailedTests_OnlyReturnsFailedTests()
         {
             // Arrange
-            First.Tests["one"].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("foo"));
-            First.Tests["three"].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("bar"));
-            Second.Tests["four"].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("baz"));
-            // Act
-            var tests = TestList.FailedTests;
+            var first = First.Tests["one"];
+            first.Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("foo"));
+            var second = First.Tests["three"];
+            second.Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("bar"));
+            var third = Second.Tests["four"];
+            third.Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("baz"));
             // Assert
-            Assert.That(tests.Count, Is.EqualTo(3));
-            Assert.That(tests, Contains.Item(First.Tests["one"]));
-            Assert.That(tests, Contains.Item(First.Tests["three"]));
-            Assert.That(tests, Contains.Item(Second.Tests["four"]));
+            var expected = new List<Test>() { first, second, third };
+            Assert.That(TestList.FailedTests, Is.EquivalentTo(expected));
         }
 
         [Test]
@@ -90,17 +84,8 @@ namespace PmlUnit.Tests
             // Act
             var tests = TestList.NotExecutedTests;
             // Assert
-            Assert.That(tests.Count, Is.EqualTo(3));
-            Assert.That(tests, Contains.Item(First.Tests["one"]));
-            Assert.That(tests, Contains.Item(First.Tests["three"]));
-            Assert.That(tests, Contains.Item(Second.Tests["five"]));
-        }
-
-        [Test]
-        public void SetTests_ClearsResultOfNewTests()
-        {
-            foreach (var test in TestList.AllTests)
-                Assert.That(test.Result, Is.Null);
+            var expected = new List<Test>() { First.Tests["one"], First.Tests["three"], Second.Tests["five"] };
+            Assert.That(TestList.NotExecutedTests, Is.EquivalentTo(expected));
         }
     }
 }

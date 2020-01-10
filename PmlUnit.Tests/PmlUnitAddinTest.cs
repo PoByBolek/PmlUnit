@@ -2,7 +2,6 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Windows.Forms;
 using Aveva.ApplicationFramework.Presentation;
 using Moq;
@@ -93,10 +92,7 @@ namespace PmlUnit.Tests
             // Act
             Addin.Stop();
             // Assert
-            var control = Addin.GetType()
-                .GetField("TestRunnerControl", BindingFlags.Instance | BindingFlags.NonPublic)
-                .GetValue(Addin) as Control;
-            Assert.IsFalse(control.IsDisposed);
+            Assert.IsFalse(Addin.GetField<Control>("TestRunnerControl").IsDisposed);
         }
     }
 }

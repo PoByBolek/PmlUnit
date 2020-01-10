@@ -1,7 +1,8 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
+using System.Linq;
 using System.Windows.Forms;
 
 using NUnit.Framework;
@@ -9,11 +10,14 @@ using NUnit.Framework;
 namespace PmlUnit.Tests
 {
     [TestFixture]
-    [TestOf(typeof(TestListView))]
+    [TestOf(typeof(TestListViewController))]
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class TestListViewControllerTest
     {
         private TestListView TestList;
+        private TestListViewModel Model;
+        private ReadOnlyTestListEntryCollection VisibleEntries;
+        private TestListSelectedEntryCollection SelectedEntries;
         private TestListViewController Controller;
         private TestCase First;
         private TestCase Second;
@@ -22,10 +26,10 @@ namespace PmlUnit.Tests
         public void Setup()
         {
             TestList = new TestListView();
-            Controller = TestList.GetType()
-                .GetField("Controller", BindingFlags.Instance | BindingFlags.NonPublic)
-                .GetValue(TestList) as TestListViewController;
-            Assert.NotNull(Controller);
+            Model = TestList.GetModel();
+            VisibleEntries = Model.VisibleEntries;
+            SelectedEntries = Model.SelectedEntries;
+            Controller = TestList.GetController();
 
             First = new TestCase("First");
             First.Tests.Add("a1");
@@ -45,183 +49,166 @@ namespace PmlUnit.Tests
             TestList.Dispose();
         }
 
-        [TestCase(0, 30, 30, MouseButtons.Left)]
-        [TestCase(1, 30, 50, MouseButtons.Left)]
-        [TestCase(2, 30, 70, MouseButtons.Left)]
-        [TestCase(3, 30, 110, MouseButtons.Left)]
-        [TestCase(4, 30, 130, MouseButtons.Left)]
-        [TestCase(5, 30, 150, MouseButtons.Left)]
-        [TestCase(0, 30, 30, MouseButtons.Right)]
-        [TestCase(1, 30, 50, MouseButtons.Right)]
-        [TestCase(2, 30, 70, MouseButtons.Right)]
-        [TestCase(3, 30, 110, MouseButtons.Right)]
-        [TestCase(4, 30, 130, MouseButtons.Right)]
-        [TestCase(5, 30, 150, MouseButtons.Right)]
+        [TestCase(0, 30, 10, MouseButtons.Left)]
+        [TestCase(1, 30, 30, MouseButtons.Left)]
+        [TestCase(2, 30, 50, MouseButtons.Left)]
+        [TestCase(3, 30, 70, MouseButtons.Left)]
+        [TestCase(4, 30, 90, MouseButtons.Left)]
+        [TestCase(5, 30, 110, MouseButtons.Left)]
+        [TestCase(0, 30, 10, MouseButtons.Right)]
+        [TestCase(1, 30, 30, MouseButtons.Right)]
+        [TestCase(2, 30, 50, MouseButtons.Right)]
+        [TestCase(3, 30, 70, MouseButtons.Right)]
+        [TestCase(4, 30, 90, MouseButtons.Right)]
+        [TestCase(5, 30, 110, MouseButtons.Right)]
         public void EntryClick_SelectsThatEntry(int index, int x, int y, MouseButtons button)
         {
+            // Act
             PerformMouseClick(x, y, button);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[index]));
+            // Assert
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(index)));
         }
 
-        [TestCase(0, 30, 30, MouseButtons.Left)]
-        [TestCase(1, 30, 50, MouseButtons.Left)]
-        [TestCase(2, 30, 70, MouseButtons.Left)]
-        [TestCase(3, 30, 110, MouseButtons.Left)]
-        [TestCase(4, 30, 130, MouseButtons.Left)]
-        [TestCase(5, 30, 150, MouseButtons.Left)]
-        [TestCase(0, 30, 30, MouseButtons.Right)]
-        [TestCase(1, 30, 50, MouseButtons.Right)]
-        [TestCase(2, 30, 70, MouseButtons.Right)]
-        [TestCase(3, 30, 110, MouseButtons.Right)]
-        [TestCase(4, 30, 130, MouseButtons.Right)]
-        [TestCase(5, 30, 150, MouseButtons.Right)]
+        [TestCase(0, 30, 10, MouseButtons.Left)]
+        [TestCase(1, 30, 30, MouseButtons.Left)]
+        [TestCase(2, 30, 50, MouseButtons.Left)]
+        [TestCase(3, 30, 70, MouseButtons.Left)]
+        [TestCase(4, 30, 90, MouseButtons.Left)]
+        [TestCase(5, 30, 110, MouseButtons.Left)]
+        [TestCase(0, 30, 10, MouseButtons.Right)]
+        [TestCase(1, 30, 30, MouseButtons.Right)]
+        [TestCase(2, 30, 50, MouseButtons.Right)]
+        [TestCase(3, 30, 70, MouseButtons.Right)]
+        [TestCase(4, 30, 90, MouseButtons.Right)]
+        [TestCase(5, 30, 110, MouseButtons.Right)]
         public void EntryClick_SelectsOnlyThatEntry(int index, int x, int y, MouseButtons button)
         {
-            foreach (var entry in TestList.Entries)
+            // Arrange
+            foreach (var entry in VisibleEntries)
                 entry.IsSelected = true;
-
+            // Act
             PerformMouseClick(x, y, button);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[index]));
+            // Assert
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(index)));
         }
 
-        [TestCase(0, 30, 30, MouseButtons.Left)]
-        [TestCase(1, 30, 50, MouseButtons.Left)]
-        [TestCase(2, 30, 70, MouseButtons.Left)]
-        [TestCase(3, 30, 110, MouseButtons.Left)]
-        [TestCase(4, 30, 130, MouseButtons.Left)]
-        [TestCase(5, 30, 150, MouseButtons.Left)]
-        [TestCase(0, 30, 30, MouseButtons.Right)]
-        [TestCase(1, 30, 50, MouseButtons.Right)]
-        [TestCase(2, 30, 70, MouseButtons.Right)]
-        [TestCase(3, 30, 110, MouseButtons.Right)]
-        [TestCase(4, 30, 130, MouseButtons.Right)]
-        [TestCase(5, 30, 150, MouseButtons.Right)]
+        [TestCase(0, 30, 10, MouseButtons.Left)]
+        [TestCase(1, 30, 30, MouseButtons.Left)]
+        [TestCase(2, 30, 50, MouseButtons.Left)]
+        [TestCase(3, 30, 70, MouseButtons.Left)]
+        [TestCase(4, 30, 90, MouseButtons.Left)]
+        [TestCase(5, 30, 110, MouseButtons.Left)]
+        [TestCase(0, 30, 10, MouseButtons.Right)]
+        [TestCase(1, 30, 30, MouseButtons.Right)]
+        [TestCase(2, 30, 50, MouseButtons.Right)]
+        [TestCase(3, 30, 70, MouseButtons.Right)]
+        [TestCase(4, 30, 90, MouseButtons.Right)]
+        [TestCase(5, 30, 110, MouseButtons.Right)]
         public void EntryClick_FocusesThatEntry(int index, int x, int y, MouseButtons button)
         {
+            // Act
             PerformMouseClick(x, y, button);
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Entries[index]));
+            // Assert
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[index]));
         }
 
         [TestCase(MouseButtons.Left)]
         [TestCase(MouseButtons.Right)]
         public void OutsideClick_SelectsNothing(MouseButtons button)
         {
-            foreach (var entry in TestList.Entries)
+            // Arrange
+            foreach (var entry in VisibleEntries)
                 entry.IsSelected = true;
-
+            // Act
             PerformMouseClick(30, 170, button);
-            Assert.That(TestList.SelectedEntries, Is.Empty);
+            // Assert
+            Assert.That(SelectedEntries, Is.Empty);
         }
 
         [Test]
         public void GroupIconClick_TogglesGroup()
         {
-            PerformMouseClick(10, 10);
-            Assert.That(!TestList.Groups[0].IsExpanded);
-
-            PerformMouseClick(10, 30);
-            Assert.That(!TestList.Groups[1].IsExpanded);
-            PerformMouseClick(10, 30);
-            Assert.That(TestList.Groups[1].IsExpanded);
+            var group = VisibleEntries[0] as TestListGroupEntry;
+            Assert.That(group.IsExpanded);
 
             PerformMouseClick(10, 10);
-            Assert.That(TestList.Groups[0].IsExpanded);
+            Assert.That(!group.IsExpanded);
+
+            PerformMouseClick(10, 10);
+            Assert.That(group.IsExpanded);
         }
 
         [Test]
         public void GroupDoubleClick_TogglesGroup()
         {
-            PerformDoubleClick(10, 10);
-            Assert.That(!TestList.Groups[0].IsExpanded);
+            var group = VisibleEntries[0] as TestListGroupEntry;
+            Assert.That(group.IsExpanded);
 
-            PerformDoubleClick(10, 30);
-            Assert.That(!TestList.Groups[1].IsExpanded);
-            PerformDoubleClick(10, 30);
-            Assert.That(TestList.Groups[1].IsExpanded);
+            PerformDoubleClick(30, 10);
+            Assert.That(!group.IsExpanded);
 
-            PerformDoubleClick(10, 10);
-            Assert.That(TestList.Groups[0].IsExpanded);
+            PerformDoubleClick(30, 10);
+            Assert.That(group.IsExpanded);
         }
 
         [Test]
         public void LeftControlEntryClick_TooglesSelectionOfThatEntry()
         {
-            Assert.That(TestList.SelectedEntries, Is.Empty);
+            Assert.That(SelectedEntries, Is.Empty);
 
             PerformMouseClick(30, 110, Keys.Control);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[3]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(5)));
 
             PerformMouseClick(30, 110, Keys.Control);
-            Assert.That(TestList.SelectedEntries, Is.Empty);
+            Assert.That(SelectedEntries, Is.Empty);
 
-            foreach (var entry in TestList.Entries)
+            foreach (var entry in VisibleEntries)
                 entry.IsSelected = true;
 
             PerformMouseClick(30, 110, Keys.Control);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(5));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[0]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[2]));
-            Assert.That(TestList.SelectedEntries, Does.Not.Contain(TestList.Entries[3]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[4]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[5]));
+            var expected = VisibleEntries.Where((entry, index) => index != 5);
+            Assert.That(SelectedEntries, Is.EquivalentTo(expected));
         }
 
         [Test]
         public void RightControlEntryClick_KeepsCurrentSelection()
         {
-            Assert.That(TestList.SelectedEntries, Is.Empty);
+            Assert.That(SelectedEntries, Is.Empty);
 
             PerformMouseClick(30, 130, MouseButtons.Right, Keys.Control);
-            Assert.That(TestList.SelectedEntries, Is.Empty);
+            Assert.That(SelectedEntries, Is.Empty);
 
-            foreach (var entry in TestList.Entries)
+            foreach (var entry in VisibleEntries)
                 entry.IsSelected = true;
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(6));
+            Assert.That(SelectedEntries, Is.EquivalentTo(VisibleEntries));
 
             PerformMouseClick(30, 130, MouseButtons.Right, Keys.Control);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(6));
+            Assert.That(SelectedEntries, Is.EquivalentTo(VisibleEntries));
         }
 
         [Test]
-        public void LeftShiftEntryClick_SelectsAllEntriesBetweenLastAndCurrentClick()
+        public void LeftShiftEntryClick_SelectsVisibleEntriesBetweenLastAndCurrentClick()
         {
             PerformMouseClick(30, 50);
 
             PerformMouseClick(30, 70, Keys.Shift);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(2));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[2]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(2, 3)));
 
             PerformMouseClick(30, 30, Keys.Shift);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(2));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[0]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(1, 2)));
 
             PerformMouseClick(30, 50, Keys.Shift);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(2)));
 
             PerformMouseClick(30, 130, Keys.Shift);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(5));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[2]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[1]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[3]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[4]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(2, 6)));
         }
 
         [Test]
         public void LeftShiftEntryClick_StartsAtFirstEntry()
         {
             PerformMouseClick(30, 50, Keys.Shift);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(3));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[0]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[0]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(0, 2)));
         }
     
 
@@ -230,36 +217,28 @@ namespace PmlUnit.Tests
         {
             PerformMouseClick(30, 50);
             PerformMouseClick(30, 70, MouseButtons.Right, Keys.Shift);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(2)));
         }
 
         [Test]
         public void UpDownArrow_MovesSelection()
         {
             PerformKeyPress(Keys.Down);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[0]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(1)));
 
             PerformKeyPress(Keys.Up);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[0]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(0)));
             PerformKeyPress(Keys.Up);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[0]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(0)));
 
             PerformKeyPress(Keys.Down);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[0]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(1)));
             PerformKeyPress(Keys.Down);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(2)));
             PerformKeyPress(Keys.Down);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[2]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(3)));
             PerformKeyPress(Keys.Down);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[1]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(4)));
         }
 
         [Test]
@@ -268,8 +247,7 @@ namespace PmlUnit.Tests
             PerformMouseClick(30, 50);
 
             PerformKeyPress(Keys.Down);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[2]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(3)));
         }
 
         [Test]
@@ -277,40 +255,40 @@ namespace PmlUnit.Tests
         {
             PerformMouseClick(30, 50);
 
-            PerformKeyPress(Keys.Down | Keys.Control);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Entries[2]));
-            PerformKeyPress(Keys.Down | Keys.Control);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Groups[1]));
-
             PerformKeyPress(Keys.Up | Keys.Control);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Entries[2]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(2)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[1]));
+            PerformKeyPress(Keys.Up | Keys.Control);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(2)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[0]));
+            PerformKeyPress(Keys.Up | Keys.Control);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(2)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[0]));
+
+            PerformKeyPress(Keys.Down | Keys.Control);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(2)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[1]));
         }
 
         [Test]
         public void CtrlUpDownArrow_MovesFocusWithoutSelection()
         {
             PerformKeyPress(Keys.Down | Keys.Control);
-            Assert.That(TestList.SelectedEntries, Is.Empty);
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Entries[0]));
+            Assert.That(SelectedEntries, Is.Empty);
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[1]));
             PerformKeyPress(Keys.Down | Keys.Control);
-            Assert.That(TestList.SelectedEntries, Is.Empty);
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Entries[1]));
+            Assert.That(SelectedEntries, Is.Empty);
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[2]));
 
             PerformKeyPress(Keys.Up | Keys.Control);
-            Assert.That(TestList.SelectedEntries, Is.Empty);
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Entries[0]));
+            Assert.That(SelectedEntries, Is.Empty);
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[1]));
             PerformKeyPress(Keys.Up | Keys.Control);
-            Assert.That(TestList.SelectedEntries, Is.Empty);
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Groups[0]));
+            Assert.That(SelectedEntries, Is.Empty);
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[0]));
             PerformKeyPress(Keys.Up | Keys.Control);
-            Assert.That(TestList.SelectedEntries, Is.Empty);
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Groups[0]));
+            Assert.That(SelectedEntries, Is.Empty);
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[0]));
         }
 
         [Test]
@@ -319,73 +297,54 @@ namespace PmlUnit.Tests
             PerformMouseClick(30, 30);
 
             PerformKeyPress(Keys.Down | Keys.Shift);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(2));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[0]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Entries[1]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(1, 2)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[2]));
             PerformKeyPress(Keys.Down | Keys.Shift);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(3));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[0]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[2]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Entries[2]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(1, 3)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[3]));
             PerformKeyPress(Keys.Down | Keys.Shift);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(4));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[0]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[2]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[1]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Groups[1]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(1, 4)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[4]));
 
             PerformKeyPress(Keys.Up | Keys.Shift);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(3));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[0]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[2]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Entries[2]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(1, 3)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[3]));
         }
 
         [Test]
         public void Space_AddsFocusedEntryToSelection()
         {
             PerformKeyPress(Keys.Space);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[0]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(0)));
             PerformKeyPress(Keys.Space);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[0]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(0)));
 
             PerformKeyPress(Keys.Down | Keys.Control);
             PerformKeyPress(Keys.Down | Keys.Control);
 
             PerformKeyPress(Keys.Space);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(2));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[0]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
+            var expected = Slice(0).Concat(Slice(2));
+            Assert.That(SelectedEntries, Is.EquivalentTo(expected));
         }
 
         [Test]
         public void CtrlSpace_TogglesSelectionOfFocusedEntry()
         {
             PerformKeyPress(Keys.Space | Keys.Control);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[0]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(0)));
             PerformKeyPress(Keys.Space | Keys.Control);
-            Assert.That(TestList.SelectedEntries, Is.Empty);
+            Assert.That(SelectedEntries, Is.Empty);
             PerformKeyPress(Keys.Space | Keys.Control);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[0]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(0)));
 
             PerformKeyPress(Keys.Down | Keys.Control);
             PerformKeyPress(Keys.Down | Keys.Control);
 
             PerformKeyPress(Keys.Space | Keys.Control);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(2));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[0]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
+            var expected = Slice(0).Concat(Slice(2));
+            Assert.That(SelectedEntries, Is.EquivalentTo(expected));
             PerformKeyPress(Keys.Space | Keys.Control);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[0]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(0)));
         }
 
         [Test]
@@ -397,11 +356,7 @@ namespace PmlUnit.Tests
             PerformKeyPress(Keys.Down | Keys.Control);
 
             PerformKeyPress(Keys.Space | Keys.Shift);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(4));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[0]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[2]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[1]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(1, 4)));
         }
 
         [Test]
@@ -409,15 +364,13 @@ namespace PmlUnit.Tests
         {
             PerformMouseClick(30, 30);
             PerformKeyPress(Keys.Left);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[0]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Groups[0]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(0)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[0]));
 
             PerformMouseClick(30, 130);
             PerformKeyPress(Keys.Left);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[1]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Groups[1]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(0)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[0]));
         }
 
         [Test]
@@ -425,15 +378,13 @@ namespace PmlUnit.Tests
         {
             PerformMouseClick(30, 30);
             PerformKeyPress(Keys.Left | Keys.Control);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[0]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Groups[0]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(1)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[0]));
 
             PerformMouseClick(30, 130);
             PerformKeyPress(Keys.Left | Keys.Control);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[4]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Groups[1]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(6)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[0]));
         }
 
         [Test]
@@ -441,18 +392,13 @@ namespace PmlUnit.Tests
         {
             PerformMouseClick(30, 30);
             PerformKeyPress(Keys.Left | Keys.Shift);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(2));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[0]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[0]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Groups[0]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(0, 1)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[0]));
 
-            PerformMouseClick(30, 130);
+            PerformMouseClick(30, 70);
             PerformKeyPress(Keys.Left | Keys.Shift);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(3));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[1]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[3]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[4]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Groups[1]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(0, 3)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[0]));
         }
 
         [TestCase(Keys.None)]
@@ -460,13 +406,14 @@ namespace PmlUnit.Tests
         [TestCase(Keys.Shift)]
         public void Left_CollapsesGroupEntry(Keys modifierKeys)
         {
+            var group = VisibleEntries[0] as TestListGroupEntry;
             PerformMouseClick(30, 30);
             PerformKeyPress(Keys.Left | modifierKeys);
-            Assert.That(TestList.Groups[0].IsExpanded);
+            Assert.That(group.IsExpanded);
             PerformKeyPress(Keys.Left | modifierKeys);
-            Assert.That(!TestList.Groups[0].IsExpanded);
+            Assert.That(!group.IsExpanded);
             PerformKeyPress(Keys.Left | modifierKeys);
-            Assert.That(!TestList.Groups[0].IsExpanded);
+            Assert.That(!group.IsExpanded);
         }
 
         [Test]
@@ -474,15 +421,8 @@ namespace PmlUnit.Tests
         {
             PerformMouseClick(30, 10);
             PerformKeyPress(Keys.Right);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[0]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Entries[0]));
-
-            PerformMouseClick(30, 90);
-            PerformKeyPress(Keys.Right);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[3]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Entries[3]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(1)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[1]));
         }
 
         [Test]
@@ -492,13 +432,11 @@ namespace PmlUnit.Tests
             PerformKeyPress(Keys.Down);
             PerformKeyPress(Keys.Down);
             PerformKeyPress(Keys.Right);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Entries[1]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(2)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[2]));
             PerformKeyPress(Keys.Right);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[1]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Entries[1]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(2)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[2]));
         }
 
         [Test]
@@ -506,15 +444,8 @@ namespace PmlUnit.Tests
         {
             PerformMouseClick(30, 10);
             PerformKeyPress(Keys.Right | Keys.Control);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[0]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Entries[0]));
-
-            PerformMouseClick(30, 90);
-            PerformKeyPress(Keys.Right | Keys.Control);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(1));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[1]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Entries[3]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(0)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[1]));
         }
 
         [Test]
@@ -522,17 +453,16 @@ namespace PmlUnit.Tests
         {
             PerformMouseClick(30, 10);
             PerformKeyPress(Keys.Right | Keys.Shift);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(2));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[0]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[0]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Entries[0]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(0, 1)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[1]));
 
-            PerformMouseClick(30, 90);
+            PerformMouseClick(30, 70);
+            PerformKeyPress(Keys.Up | Keys.Control);
+            PerformKeyPress(Keys.Up | Keys.Control);
+            PerformKeyPress(Keys.Up | Keys.Control);
             PerformKeyPress(Keys.Right | Keys.Shift);
-            Assert.That(TestList.SelectedEntries.Count, Is.EqualTo(2));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Groups[1]));
-            Assert.That(TestList.SelectedEntries, Contains.Item(TestList.Entries[3]));
-            Assert.That(Controller.FocusedEntry, Is.SameAs(TestList.Entries[3]));
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(1, 3)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[1]));
         }
 
         [TestCase(Keys.None)]
@@ -540,13 +470,29 @@ namespace PmlUnit.Tests
         [TestCase(Keys.Shift)]
         public void Right_ExpandsGroupEntry(Keys modifierKeys)
         {
+            var group = VisibleEntries[0] as TestListGroupEntry;
+            Assert.That(group.IsExpanded);
+
             PerformMouseClick(30, 10);
-            TestList.Groups[0].IsExpanded = false;
+            group.IsExpanded = false;
 
             PerformKeyPress(Keys.Right | modifierKeys);
-            Assert.That(TestList.Groups[0].IsExpanded);
+            Assert.That(group.IsExpanded);
             PerformKeyPress(Keys.Right | modifierKeys);
-            Assert.That(TestList.Groups[0].IsExpanded);
+            Assert.That(group.IsExpanded);
+        }
+
+        private IEnumerable<TestListEntry> Slice(int index)
+        {
+            return Slice(index, index);
+        }
+
+        private IEnumerable<TestListEntry> Slice(int start, int end)
+        {
+            var result = new List<TestListEntry>();
+            for (int i = start; i <= end; i++)
+                result.Add(VisibleEntries[i]);
+            return result;
         }
 
 

@@ -51,7 +51,7 @@ namespace PmlUnit
             Run(TestList.AllTests);
         }
 
-        private void OnRunLinkClicked(object sender, EventArgs e)
+        private void OnRunLinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             RunContextMenu.Show(RunLinkLabel, new Point(0, RunLinkLabel.Height));
         }
@@ -162,6 +162,27 @@ namespace PmlUnit
             return testCase;
         }
 
+        private void OnGroupByLinkLabelLinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            GroupByMenu.Show(GroupByLinkLabel, new Point(0, GroupByLinkLabel.Height));
+        }
+
+        private void OnGroupByTestResultMenuItemClick(object sender, EventArgs e)
+        {
+            TestList.Grouping = TestListGrouping.Result;
+        }
+
+        private void OnGroupByTestCaseNameMenuItemClick(object sender, EventArgs e)
+        {
+            TestList.Grouping = TestListGrouping.TestCase;
+        }
+
+        private void OnTestListGroupingChanged(object sender, EventArgs e)
+        {
+            GroupByTestResultToolStripMenuItem.Checked = TestList.Grouping == TestListGrouping.Result;
+            GroupByTestCaseNameToolStripMenuItem.Checked = TestList.Grouping == TestListGrouping.TestCase;
+        }
+
         private void OnTestListSelectionChanged(object sender, EventArgs e)
         {
             var selected = TestList.SelectedTests;
@@ -180,6 +201,11 @@ namespace PmlUnit
             var size = TestResultSplitContainer.Size;
             var orientation = size.Width > size.Height ? Orientation.Vertical : Orientation.Horizontal;
             TestResultSplitContainer.Orientation = orientation;
+        }
+
+        private void TestList_GroupingChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
