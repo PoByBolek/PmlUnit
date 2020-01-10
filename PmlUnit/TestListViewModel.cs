@@ -2,6 +2,7 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace PmlUnit
@@ -267,7 +268,8 @@ namespace PmlUnit
                     return CompareTests(leftTest, rightTest);
                 else
                     throw new ArgumentException(string.Format(
-                        "Expected two {} or {} instances but got {} and {} instead.",
+                        CultureInfo.InvariantCulture,
+                        "Expected two {0} or {1} instances but got {2} and {3} instead.",
                         typeof(TestListTestEntry).FullName, typeof(TestListGroupEntry).FullName,
                         left.GetType().FullName, right.GetType().FullName
                     ));
@@ -322,7 +324,7 @@ namespace PmlUnit
                     return 2;
                 else
                     throw new NotImplementedException(string.Format(
-                        "Unknown test status {}", value
+                        CultureInfo.InvariantCulture, "Unknown test status {0}", value
                     ));
             }
         }

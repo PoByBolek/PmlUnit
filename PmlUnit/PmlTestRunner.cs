@@ -130,7 +130,7 @@ namespace PmlUnit
                     if (CancellationPending)
                         break;
                     if (test == null)
-                        throw new ArgumentNullException(nameof(test));
+                        throw new ArgumentException("tests must not be null", nameof(tests));
 
                     RunInternal(test);
                 }
@@ -196,7 +196,7 @@ namespace PmlUnit
             var test = tests[index];
             if (test == null)
             {
-                OnTestRunCompleted(tests, new ArgumentNullException(nameof(test)));
+                OnTestRunCompleted(tests, new ArgumentException("tests must not be null", nameof(tests)));
                 return;
             }
 

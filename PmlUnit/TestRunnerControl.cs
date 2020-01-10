@@ -202,10 +202,5 @@ namespace PmlUnit
             var orientation = size.Width > size.Height ? Orientation.Vertical : Orientation.Horizontal;
             TestResultSplitContainer.Orientation = orientation;
         }
-
-        private void TestList_GroupingChanged(object sender, EventArgs e)
-        {
-
-        }
     }
 }

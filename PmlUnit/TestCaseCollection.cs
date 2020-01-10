@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace PmlUnit
@@ -33,7 +34,7 @@ namespace PmlUnit
                     throw new ArgumentException("name does not match value.Name");
 
                 TestCase old;
-                bool exists = TestCases.TryGetValue(name, out old);
+                TestCases.TryGetValue(name, out old);
                 if (value != old)
                 {
                     TestCases[name] = value;
@@ -66,9 +67,9 @@ namespace PmlUnit
                 if (testCase == null)
                     throw new ArgumentException("Collection contains null.", nameof(collection));
                 if (!names.Add(testCase.Name))
-                    throw new ArgumentException(string.Format("Collection contains duplicate test case name \"{0}\".", testCase.Name), nameof(collection));
+                    throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "Collection contains duplicate test case name \"{0}\".", testCase.Name), nameof(collection));
                 if (TestCases.ContainsKey(testCase.Name))
-                    throw new ArgumentException(string.Format("There already is a test case named \"{0}\" in this collection.", testCase.Name), nameof(collection));
+                    throw new ArgumentException(string.Format(CultureInfo.InvariantCulture, "There already is a test case named \"{0}\" in this collection.", testCase.Name), nameof(collection));
             }
 
             foreach (var testCase in copy)

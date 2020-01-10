@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -83,7 +84,8 @@ namespace PmlUnit
                         Model.Grouper = new TestCaseGrouper();
                     else
                         throw new NotImplementedException(string.Format(
-                            "No grouper registered for grouping mode {}", value
+                            CultureInfo.InvariantCulture,
+                            "No grouper registered for grouping mode {0}", value
                         ));
 
                     GroupingChanged?.Invoke(this, EventArgs.Empty);
@@ -147,6 +149,8 @@ namespace PmlUnit
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
+            if (e == null)
+                return;
 
             var g = e.Graphics;
 
