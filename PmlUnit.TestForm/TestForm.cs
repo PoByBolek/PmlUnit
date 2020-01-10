@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Windows.Forms;
 
@@ -13,19 +14,42 @@ namespace PmlUnit
         private readonly TestRunnerControl RunnerControl;
         private readonly MutablePathTestCaseProvider Provider;
 
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
+            Justification="proxy, runner, and control are all disposed if an Exception occurs")]
         public TestForm()
         {
-            Provider = new MutablePathTestCaseProvider(Path.GetFullPath("..\\..\\..\\..\\pmllib-tests"));
-            var runner = new PmlTestRunner(new StubObjectProxy(), new StubClock(), new ControlMethodInvoker(this));
-            RunnerControl = new TestRunnerControl(Provider, runner);
-            RunnerControl.Dock = DockStyle.Fill;
+            ObjectProxy proxy = null;
+            AsyncTestRunner runner = null;
+            TestRunnerControl control = null;
+            try
+            {
+                Provider = new MutablePathTestCaseProvider(Path.GetFullPath("..\\..\\..\\..\\pmllib-tests"));
+                proxy = new StubObjectProxy();
+                runner = new PmlTestRunner(proxy, new StubClock(), new ControlMethodInvoker(this));
+                proxy = null;
+                control = new TestRunnerControl(Provider, runner);
+                RunnerControl = control;
+                runner = null;
+                control.Dock = DockStyle.Fill;
 
-            InitializeComponent();
+                InitializeComponent();
 
-            PathComboBox.Text = Provider.Path;
-            FolderBrowser.SelectedPath = Provider.Path;
+                PathComboBox.Text = Provider.Path;
+                FolderBrowser.SelectedPath = Provider.Path;
 
-            ControlPanel.Controls.Add(RunnerControl);
+                ControlPanel.Controls.Add(control);
+                
+                control = null;
+            }
+            finally
+            {
+                if (control != null)
+                    control.Dispose();
+                if (runner != null)
+                    runner.Dispose();
+                if (proxy != null)
+                    proxy.Dispose();
+            }
         }
 
         private void OnBrowseButtonClick(object sender, EventArgs e)

@@ -2,28 +2,36 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 using NUnit.Framework;
 
 namespace PmlUnit
 {
     [TestFixture]
-    public class SmokeTest
+    public static class SmokeTest
     {
         [Test]
-        public void TestRunnerControlInstantiation()
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
+            Justification = "proxy, runner, and control are all disposed if an Exception occurs")]
+        public static void TestRunnerControlInstantiation()
         {
             TestRunnerControl control = null;
             AsyncTestRunner runner = null;
+            ObjectProxy proxy = null;
 
             try
             {
-                runner = new PmlTestRunner(new StubObjectProxy(), new StubMethodInvoker());
+                proxy = new StubObjectProxy();
+                runner = new PmlTestRunner(proxy, new StubMethodInvoker());
+                proxy = null;
                 control = new TestRunnerControl(new EnvironmentVariableTestCaseProvider(), runner);
                 runner = null;
             }
             finally
             {
+                if (proxy != null)
+                    proxy.Dispose();
                 if (runner != null)
                     runner.Dispose();
                 if (control != null)
@@ -32,7 +40,7 @@ namespace PmlUnit
         }
 
         [Test]
-        public void TestAboutDialogInstantiation()
+        public static void TestAboutDialogInstantiation()
         {
             AboutDialog dialog = null;
             try
