@@ -34,6 +34,7 @@ namespace PmlUnit
         {
             TestList.TestCases.Clear();
             TestList.TestCases.AddRange(Provider.GetTestCases());
+            TestSummary.UpdateSummary(TestList.AllTests);
         }
 
         protected override void Dispose(bool disposing)
