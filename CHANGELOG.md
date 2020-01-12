@@ -1,6 +1,9 @@
 # Changelog
 
-## [Unreleased]
+## Unreleased
+
+
+## [v0.3.0] - 2020-01-12
 
 ### Added
 - Allow to change test grouping behavior.
@@ -30,5 +33,6 @@ Initial Release
 
 
   [Unreleased]: https://github.com/PoByBolek/PmlUnit/compare/master...develop
+  [v0.3.0]: https://github.com/PoByBolek/PmlUnit/releases/tag/v0.3.0
   [v0.2.0]: https://github.com/PoByBolek/PmlUnit/releases/tag/v0.2.0
   [v0.1.0]: https://github.com/PoByBolek/PmlUnit/releases/tag/v0.1.0
