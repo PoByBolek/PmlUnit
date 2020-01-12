@@ -14,7 +14,7 @@ namespace PmlUnit
         {
             FailedGroup = new TestListGroupEntry("1", "Failed Tests");
             PassedGroup = new TestListGroupEntry("2", "Passed Tests");
-            NotExecutedGroup = new TestListGroupEntry("3", "Not executed Tests");
+            NotExecutedGroup = new TestListGroupEntry("3", "Not Executed Tests");
         }
 
         public TestListGroupEntry GetGroupFor(Test test)
