@@ -4,6 +4,7 @@
 
 ### Added
 - Allow to change test grouping behavior.
+- Allow to move the focus in the test list with the <kbd>PageUp</kbd>, <kbd>PageDown</kbd>, <kbd>Home</kbd>, and <kbd>End</kbd> keys.
 
 ### Changed
 - Group tests by their test result by default (instead of by test case name).
