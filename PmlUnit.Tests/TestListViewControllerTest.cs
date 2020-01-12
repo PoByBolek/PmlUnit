@@ -2,6 +2,7 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -309,6 +310,88 @@ namespace PmlUnit.Tests
             PerformKeyPress(Keys.Up | Keys.Shift);
             Assert.That(SelectedEntries, Is.EquivalentTo(Slice(1, 3)));
             Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[3]));
+        }
+
+        [Test]
+        public void PageUpPageDown_MovesSelection()
+        {
+            TestList.Size = new Size(300, 50);
+
+            PerformKeyPress(Keys.PageDown);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(2)));
+            PerformKeyPress(Keys.PageDown);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(4)));
+            PerformKeyPress(Keys.PageDown);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(6)));
+
+            PerformKeyPress(Keys.PageUp);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(4)));
+            PerformKeyPress(Keys.PageUp);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(2)));
+            PerformKeyPress(Keys.PageUp);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(0)));
+        }
+
+        [Test]
+        public void CtrlPageUpPageDown_MovesFocusButKeepsSelection()
+        {
+            TestList.Size = new Size(300, 50);
+
+            PerformMouseClick(30, 30);
+            PerformKeyPress(Keys.PageUp | Keys.Control);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(1)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[0]));
+            PerformKeyPress(Keys.PageUp | Keys.Control);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(1)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[0]));
+
+            PerformMouseClick(30, 30);
+            PerformKeyPress(Keys.PageDown | Keys.Control);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(1)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[3]));
+            PerformKeyPress(Keys.PageDown | Keys.Control);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(1)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[5]));
+        }
+
+        [Test]
+        public void CtrlPageUpPageDown_MovesFocusWithoutSelection()
+        {
+            TestList.Size = new Size(300, 50);
+
+            PerformKeyPress(Keys.PageDown | Keys.Control);
+            Assert.That(SelectedEntries, Is.Empty);
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[2]));
+            PerformKeyPress(Keys.PageDown | Keys.Control);
+            Assert.That(SelectedEntries, Is.Empty);
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[4]));
+
+            PerformKeyPress(Keys.PageUp | Keys.Control);
+            Assert.That(SelectedEntries, Is.Empty);
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[2]));
+            PerformKeyPress(Keys.PageUp | Keys.Control);
+            Assert.That(SelectedEntries, Is.Empty);
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[0]));
+        }
+
+        [Test]
+        public void ShiftPageUpPageDown_ExtendsSelectionFromLastClick()
+        {
+            TestList.Size = new Size(300, 50);
+
+            PerformMouseClick(30, 30);
+
+            PerformKeyPress(Keys.PageUp | Keys.Shift);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(0, 1)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[0]));
+
+            PerformKeyPress(Keys.PageDown | Keys.Shift);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(1, 2)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[2]));
+            PerformKeyPress(Keys.Down | Keys.Shift);
+            PerformKeyPress(Keys.PageDown | Keys.Shift);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(1, 5)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[5]));
         }
 
         [Test]

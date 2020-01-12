@@ -55,10 +55,14 @@ namespace PmlUnit
                 ToggleSelectionOfFocusedEntry(e.Modifiers);
             else if (e.KeyCode == Keys.Home)
                 MoveFocus(-Model.VisibleEntries.Count, e.Modifiers);
+            else if (e.KeyCode == Keys.PageUp)
+                MoveFocus(-CalculatePageOffset(), e.Modifiers);
             else if (e.KeyCode == Keys.Up)
                 MoveFocus(-1, e.Modifiers);
             else if (e.KeyCode == Keys.Down)
                 MoveFocus(+1, e.Modifiers);
+            else if (e.KeyCode == Keys.PageDown)
+                MoveFocus(CalculatePageOffset(), e.Modifiers);
             else if (e.KeyCode == Keys.End)
                 MoveFocus(Model.VisibleEntries.Count, e.Modifiers);
             else if (e.KeyCode == Keys.Left)
@@ -84,6 +88,13 @@ namespace PmlUnit
                 Model.FocusedEntry = GetEntryRelativeToFocus(0);
                 SelectRange(Model.FocusedEntry);
             }
+        }
+
+        private int CalculatePageOffset()
+        {
+            if (View.EntryHeight == 0)
+                return 1;
+            return Math.Max(1, View.Height / View.EntryHeight);
         }
 
         private void MoveFocus(int offset, Keys modifierKeys)
