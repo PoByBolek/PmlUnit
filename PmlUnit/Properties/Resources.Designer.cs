@@ -8,10 +8,10 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace PmlUnit.Properties {
-    using System;
-    
-    
+namespace PmlUnit.Properties
+{
+
+
     /// <summary>
     ///   Eine stark typisierte Ressourcenklasse zum Suchen von lokalisierten Zeichenfolgen usw.
     /// </summary>
@@ -103,19 +103,31 @@ namespace PmlUnit.Properties {
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Failure {
+        internal static System.Drawing.Bitmap Failed {
             get {
-                object obj = ResourceManager.GetObject("Failure", resourceCulture);
+                object obj = ResourceManager.GetObject("Failed", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
-        
+
         /// <summary>
         ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
         /// </summary>
-        internal static System.Drawing.Bitmap Success {
+        internal static System.Drawing.Bitmap NotExecuted
+        {
+            get
+            {
+                object obj = ResourceManager.GetObject("NotExecuted", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+
+        /// <summary>
+        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Passed {
             get {
-                object obj = ResourceManager.GetObject("Success", resourceCulture);
+                object obj = ResourceManager.GetObject("Passed", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -136,16 +148,6 @@ namespace PmlUnit.Properties {
         internal static System.Drawing.Bitmap TestRunnerLarge {
             get {
                 object obj = ResourceManager.GetObject("TestRunnerLarge", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Ressource vom Typ System.Drawing.Bitmap.
-        /// </summary>
-        internal static System.Drawing.Bitmap Unknown {
-            get {
-                object obj = ResourceManager.GetObject("Unknown", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

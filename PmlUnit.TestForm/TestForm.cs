@@ -1,7 +1,9 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Windows.Forms;
 
@@ -12,18 +14,42 @@ namespace PmlUnit
         private readonly TestRunnerControl RunnerControl;
         private readonly MutablePathTestCaseProvider Provider;
 
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
+            Justification="proxy, runner, and control are all disposed if an Exception occurs")]
         public TestForm()
         {
-            Provider = new MutablePathTestCaseProvider(Path.GetFullPath("..\\..\\..\\..\\pmllib-tests"));
-            RunnerControl = new TestRunnerControl(Provider, new DummyTestRunner());
-            RunnerControl.Dock = DockStyle.Fill;
+            ObjectProxy proxy = null;
+            AsyncTestRunner runner = null;
+            TestRunnerControl control = null;
+            try
+            {
+                Provider = new MutablePathTestCaseProvider(Path.GetFullPath("..\\..\\..\\..\\pmllib-tests"));
+                proxy = new StubObjectProxy();
+                runner = new PmlTestRunner(proxy, new StubClock(), new ControlMethodInvoker(this));
+                proxy = null;
+                control = new TestRunnerControl(Provider, runner);
+                RunnerControl = control;
+                runner = null;
+                control.Dock = DockStyle.Fill;
 
-            InitializeComponent();
+                InitializeComponent();
 
-            PathComboBox.Text = Provider.Path;
-            FolderBrowser.SelectedPath = Provider.Path;
+                PathComboBox.Text = Provider.Path;
+                FolderBrowser.SelectedPath = Provider.Path;
 
-            ControlPanel.Controls.Add(RunnerControl);
+                ControlPanel.Controls.Add(control);
+                
+                control = null;
+            }
+            finally
+            {
+                if (control != null)
+                    control.Dispose();
+                if (runner != null)
+                    runner.Dispose();
+                if (proxy != null)
+                    proxy.Dispose();
+            }
         }
 
         private void OnBrowseButtonClick(object sender, EventArgs e)
@@ -66,11 +92,11 @@ namespace PmlUnit
             }
         }
 
-        private class DummyTestRunner : TestRunner
+        private class StubObjectProxy : ObjectProxy
         {
             private readonly Random RNG;
 
-            public DummyTestRunner()
+            public StubObjectProxy()
             {
                 RNG = new Random();
             }
@@ -79,28 +105,35 @@ namespace PmlUnit
             {
             }
 
-            public void RefreshIndex()
+            public object Invoke(string method, params object[] arguments)
             {
+                var result = new Hashtable();
+                if (RNG.NextDouble() > 0.8)
+                {
+                    result[1.0] = "Fail";
+                }
+                return result;
+            }
+        }
+
+        private class StubClock : Clock
+        {
+            private readonly Random RNG;
+            private long Ticks;
+
+            public StubClock()
+            {
+                RNG = new Random();
+                Ticks = DateTime.Now.Ticks;
             }
 
-            public void Reload(TestCase testCase)
+            public Instant CurrentInstant
             {
-            }
-
-            public TestResult Run(Test test)
-            {
-                var duration = TimeSpan.FromMilliseconds(RNG.Next(2000));
-
-                if (RNG.NextDouble() <= 0.8)
-                    return new TestResult(duration);
-                else
-                    return new TestResult(duration, new Exception());
-            }
-
-            public void Run(TestCase testCase)
-            {
-                foreach (var test in testCase.Tests)
-                    Run(test);
+                get
+                {
+                    Ticks += TimeSpan.FromMilliseconds(RNG.Next(2000)).Ticks;
+                    return Instant.FromTicks(Ticks);
+                }
             }
         }
     }

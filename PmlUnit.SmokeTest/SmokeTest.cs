@@ -1,27 +1,37 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
+using System.Collections;
+using System.Diagnostics.CodeAnalysis;
+
 using NUnit.Framework;
 
 namespace PmlUnit
 {
     [TestFixture]
-    public class SmokeTest
+    public static class SmokeTest
     {
         [Test]
-        public void TestRunnerControlInstantiation()
+        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
+            Justification = "proxy, runner, and control are all disposed if an Exception occurs")]
+        public static void TestRunnerControlInstantiation()
         {
             TestRunnerControl control = null;
-            TestRunner runner = null;
+            AsyncTestRunner runner = null;
+            ObjectProxy proxy = null;
 
             try
             {
-                runner = new StubTestRunner();
+                proxy = new StubObjectProxy();
+                runner = new PmlTestRunner(proxy, new StubMethodInvoker());
+                proxy = null;
                 control = new TestRunnerControl(new EnvironmentVariableTestCaseProvider(), runner);
                 runner = null;
             }
             finally
             {
+                if (proxy != null)
+                    proxy.Dispose();
                 if (runner != null)
                     runner.Dispose();
                 if (control != null)
@@ -30,31 +40,35 @@ namespace PmlUnit
         }
 
         [Test]
-        public void TestAboutDialogInstantiation()
+        public static void TestAboutDialogInstantiation()
         {
-            new AboutDialog();
+            AboutDialog dialog = null;
+            try
+            {
+                dialog = new AboutDialog();
+            }
+            finally
+            {
+                if (dialog != null)
+                    dialog.Dispose();
+            }
         }
 
-        private class StubTestRunner : TestRunner
+        private class StubObjectProxy : ObjectProxy
         {
             public void Dispose()
             {
             }
 
-            public void RefreshIndex()
+            public object Invoke(string method, params object[] arguments)
             {
+                return new Hashtable();
             }
+        }
 
-            public void Reload(TestCase testCase)
-            {
-            }
-
-            public TestResult Run(Test test)
-            {
-                return new TestResult(TimeSpan.FromSeconds(1));
-            }
-
-            public void Run(TestCase testCase)
+        private class StubMethodInvoker : MethodInvoker
+        {
+            public void BeginInvoke(Delegate method, params object[] arguments)
             {
             }
         }

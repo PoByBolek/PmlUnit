@@ -17,7 +17,7 @@ namespace PmlUnit
 {
     public class PmlUnitAddin : IAddin, IDisposable
     {
-        private readonly TestRunner TestRunner;
+        private readonly AsyncTestRunner TestRunner;
         private readonly TestCaseProvider TestCaseProvider;
         private readonly TestRunnerControl TestRunnerControl;
         private readonly AboutDialog AboutDialog;
@@ -26,7 +26,7 @@ namespace PmlUnit
         {
             try
             {
-                TestRunner = new PmlTestRunner();
+                TestRunner = new PmlTestRunner(new ControlMethodInvoker(() => TestRunnerControl));
                 TestCaseProvider = new EnvironmentVariableTestCaseProvider();
                 TestRunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner);
                 AboutDialog = new AboutDialog();
@@ -43,7 +43,7 @@ namespace PmlUnit
             }
         }
 
-        internal PmlUnitAddin(TestCaseProvider provider, TestRunner runner)
+        internal PmlUnitAddin(TestCaseProvider provider, AsyncTestRunner runner)
         {
             if (provider == null)
                 throw new ArgumentNullException(nameof(provider));

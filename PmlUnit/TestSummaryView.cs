@@ -17,33 +17,33 @@ namespace PmlUnit
             InitializeComponent();
         }
 
-        public void UpdateSummary(ICollection<TestListEntry> entries)
+        public void UpdateSummary(ICollection<Test> tests)
         {
-            if (entries == null)
-                throw new ArgumentNullException(nameof(entries));
+            if (tests == null)
+                throw new ArgumentNullException(nameof(tests));
 
-            int failedTests = entries.Count(entry => entry.Result != null && !entry.Result.Success);
+            int failedTests = tests.Count(test => test.Status == TestStatus.Failed);
             FailedTestCountLabel.Text = Pluralize(failedTests, "failed test");
             FailedTestCountLabel.Visible = failedTests > 0;
 
-            int successfulTests = entries.Count(entry => entry.Result != null && entry.Result.Success);
-            SuccessfulTestCountLabel.Text = Pluralize(successfulTests, "successful test");
-            SuccessfulTestCountLabel.Visible = successfulTests > 0;
+            int passedTests = tests.Count(test => test.Status == TestStatus.Passed);
+            PassedTestCountLabel.Text = Pluralize(passedTests, "passed test");
+            PassedTestCountLabel.Visible = passedTests > 0;
 
-            int notExecutedTests = entries.Count(entry => entry.Result == null);
+            int notExecutedTests = tests.Count(test => test.Status == TestStatus.NotExecuted);
             NotExecutedTestCountLabel.Text = Pluralize(notExecutedTests, "not executed test");
             NotExecutedTestCountLabel.Visible = notExecutedTests > 0;
 
             if (failedTests > 0)
                 ResultLabel.Text = "Last test run: Failed";
-            else if (successfulTests > 0)
-                ResultLabel.Text = "Last test run: Successful";
+            else if (passedTests > 0)
+                ResultLabel.Text = "Last test run: Passed";
             else
                 ResultLabel.Text = "Last test run: Unknown";
 
             TimeSpan totalRuntime = TimeSpan.FromSeconds(Math.Round(
-                entries.Where(entry => entry.Result != null)
-                .Sum(entry => entry.Result.Duration.TotalSeconds)
+                tests.Where(test => test.Result != null)
+                .Sum(test => test.Result.Duration.TotalSeconds)
             ));
             RuntimeLabel.Text = string.Format(CultureInfo.CurrentCulture, "(Total runtime: {0:c})", totalRuntime);
             RuntimeLabel.Left = ResultLabel.Right;

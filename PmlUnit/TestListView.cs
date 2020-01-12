@@ -4,160 +4,153 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
+
 using PmlUnit.Properties;
 
 namespace PmlUnit
 {
     partial class TestListView : ScrollableControl
     {
-        public const int EntryHeight = 20;
+        private const string ExpandedImageKey = "Expanded";
+        private const string ExpandedHighlightImageKey = "ExpandedHighlight";
+        private const string CollapsedImageKey = "Collapsed";
+        private const string CollapsedHighlightImageKey = "CollapsedHighlight";
+
+        private const string PassedImageKey = "Passed";
+        private const string FailedImageKey = "Failed";
+        private const string NotExecutedImageKey = "NotExecuted";
 
         [Category("Behavior")]
         public event EventHandler SelectionChanged;
 
-        private readonly List<TestListGroupEntry> Groups;
-        private bool IgnoreSelectionChanged;
-        private int IgnoredSelectionChanges;
-        private TestListBaseEntry SelectionStartEntry;
-        private TestListBaseEntry FocusedEntryField;
+        [Category("Behavior")]
+        public event EventHandler GroupingChanged;
+
+        public int EntryHeight => 20;
+
+        public int EntryPadding => 2;
+
+        public Size ImageSize => EntryImages.ImageSize;
+
+        private readonly TestListViewModel Model;
+        private readonly TestListViewController Controller;
+        private TestListGrouping GroupingField;
 
         public TestListView()
         {
+            GroupingField = TestListGrouping.Result;
+
+            Model = new TestListViewModel();
+            Model.Grouper = new TestResultGrouper();
+            Model.Changed += OnModelChanged;
+            Model.FocusedEntryChanged += OnModelChanged;
+            Model.VisibleEntriesChanged += OnVisibleEntriesChanged;
+            Model.SelectionChanged += OnModelSelectionChanged;
+
+            Controller = new TestListViewController(Model, this);
+            Controller.SelectionChanged += OnControllerSelectionChanged;
+
             InitializeComponent();
 
             DoubleBuffered = true;
-            Groups = new List<TestListGroupEntry>();
-            IgnoreSelectionChanged = false;
-            IgnoredSelectionChanges = 0;
 
-            ExpanderImageList.Images.Add(TestListGroupEntry.ExpandedImageKey, Resources.Expanded);
-            ExpanderImageList.Images.Add(TestListGroupEntry.ExpandedHighlightImageKey, Resources.ExpandedHighlight);
-            ExpanderImageList.Images.Add(TestListGroupEntry.CollapsedImageKey, Resources.Collapsed);
-            ExpanderImageList.Images.Add(TestListGroupEntry.CollapsedHighlightImageKey, Resources.CollapsedHighlight);
+            EntryImages.Images.Add(ExpandedImageKey, Resources.Expanded);
+            EntryImages.Images.Add(ExpandedHighlightImageKey, Resources.ExpandedHighlight);
+            EntryImages.Images.Add(CollapsedImageKey, Resources.Collapsed);
+            EntryImages.Images.Add(CollapsedHighlightImageKey, Resources.CollapsedHighlight);
 
-            StatusImageList.Images.Add(TestListViewEntry.NotExecutedImageKey, Resources.Unknown);
-            StatusImageList.Images.Add(TestListViewEntry.FailureImageKey, Resources.Failure);
-            StatusImageList.Images.Add(TestListViewEntry.SuccessImageKey, Resources.Success);
+            EntryImages.Images.Add(NotExecutedImageKey, Resources.NotExecuted);
+            EntryImages.Images.Add(FailedImageKey, Resources.Failed);
+            EntryImages.Images.Add(PassedImageKey, Resources.Passed);
         }
 
-        public void SetTests(IEnumerable<Test> tests)
+        [Category("Behavior")]
+        [DefaultValue(TestListGrouping.Result)]
+        public TestListGrouping Grouping
         {
-            Groups.Clear();
-
-            foreach (var grouping in tests.GroupBy(test => test.TestCase.Name))
+            get { return GroupingField; }
+            set
             {
-                var group = new TestListGroupEntry(grouping.Key);
-                group.SelectionChanged += OnSelectionChanged;
-                group.ExpandedChanged += OnGroupExpandedChanged;
-                foreach (var test in grouping)
+                if (value != GroupingField)
                 {
-                    var entry = new TestListViewEntry(test);
-                    entry.SelectionChanged += OnSelectionChanged;
-                    entry.ResultChanged += OnTestResultChanged;
-                    group.Add(entry);
+                    GroupingField = value;
+
+                    if (value == TestListGrouping.Result)
+                        Model.Grouper = new TestResultGrouper();
+                    else if (value == TestListGrouping.TestCase)
+                        Model.Grouper = new TestCaseGrouper();
+                    else
+                        throw new NotImplementedException(string.Format(
+                            CultureInfo.InvariantCulture,
+                            "No grouper registered for grouping mode {0}", value
+                        ));
+
+                    GroupingChanged?.Invoke(this, EventArgs.Empty);
                 }
-                Groups.Add(group);
             }
+        }
 
-            FocusedEntry = null;
-            SelectionStartEntry = Groups.FirstOrDefault();
-            AutoScrollMinSize = new Size(0, Groups.Sum(group => group.Height));
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public TestCaseCollection TestCases => Model.TestCases;
 
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public IList<Test> AllTests => AllTestsInternal.ToList();
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public IList<Test> PassedTests => AllTestsInternal.Where(test => test.Status == TestStatus.Passed).ToList();
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public IList<Test> FailedTests => AllTestsInternal.Where(test => test.Status == TestStatus.Failed).ToList();
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public IList<Test> NotExecutedTests => AllTestsInternal.Where(test => test.Status == TestStatus.NotExecuted).ToList();
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public IList<Test> SelectedTests => TestEntries
+            .Where(entry => entry.IsSelected || entry.Group.IsSelected)
+            .Select(entry => entry.Test)
+            .ToList();
+
+        private IEnumerable<Test> AllTestsInternal => TestEntries.Select(entry => entry.Test);
+
+        private IEnumerable<TestListTestEntry> TestEntries => Model.Entries.OfType<TestListTestEntry>();
+
+        private void OnModelChanged(object sender, EventArgs e)
+        {
             Invalidate();
         }
 
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> AllTests => AllTestEntries.ToList();
-
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> SucceededTests => AllTestEntries.Where(entry => entry.Result != null && entry.Result.Error == null).ToList();
-
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> FailedTests => AllTestEntries.Where(entry => entry.Result?.Error != null).ToList();
-
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> NotExecutedTests => AllTestEntries.Where(entry => entry.Result == null).ToList();
-
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public List<TestListEntry> SelectedTests
+        private void OnVisibleEntriesChanged(object sender, EventArgs e)
         {
-            get
-            {
-                var result = new HashSet<TestListEntry>();
-                foreach (var group in Groups)
-                {
-                    if (group.Selected)
-                    {
-                        foreach (var entry in group.Entries)
-                            result.Add(entry);
-                    }
-                    else
-                    {
-                        foreach (var entry in group.Entries)
-                        {
-                            if (entry.Selected)
-                                result.Add(entry);
-                        }
-                    }
-                }
-                return result.ToList();
-            }
+            AutoScrollMinSize = new Size(0, Model.VisibleEntries.Count * EntryHeight);
+            Invalidate();
         }
 
-        private IEnumerable<TestListEntry> AllTestEntries => Groups.SelectMany(group => group.Entries).OfType<TestListEntry>();
-
-        private IEnumerable<TestListBaseEntry> AllEntries
+        private void OnModelSelectionChanged(object sender, EventArgs e)
         {
-            get
-            {
-                foreach (var group in Groups)
-                {
-                    yield return group;
-                    foreach (var entry in group.Entries)
-                        yield return entry;
-                }
-            }
+            Controller.HandleSelectionChanged(sender, e);
         }
 
-        private IEnumerable<TestListBaseEntry> VisibleEntries
+        private void OnControllerSelectionChanged(object sender, EventArgs e)
         {
-            get
-            {
-                foreach (var group in Groups)
-                {
-                    yield return group;
-                    if (group.IsExpanded)
-                    {
-                        foreach (var entry in group.Entries)
-                            yield return entry;
-                    }
-                }
-            }
-        }
-
-        private TestListBaseEntry FocusedEntry
-        {
-            get { return FocusedEntryField; }
-            set
-            {
-                if (value != FocusedEntryField)
-                {
-                    FocusedEntryField = value;
-                    Invalidate();
-                }
-            }
+            Invalidate();
+            SelectionChanged?.Invoke(this, EventArgs.Empty);
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
+            if (e == null)
+                return;
 
             var g = e.Graphics;
 
@@ -166,27 +159,114 @@ namespace PmlUnit
                 g.FillRectangle(brush, e.ClipRectangle);
             }
 
-            using (var options = new TestListPaintOptions(this, e.ClipRectangle, FocusedEntry, StatusImageList, ExpanderImageList))
+            using (var options = new TestListPaintOptions(this, e.ClipRectangle, Model.FocusedEntry))
             {
                 int width = ClientSize.Width;
-                int minY = e.ClipRectangle.Top;
-                int maxY = e.ClipRectangle.Bottom;
-                int y = -VerticalScroll.Value;
+                int offset = VerticalScroll.Value;
+                int startIndex = (e.ClipRectangle.Top + offset) / EntryHeight;
+                startIndex = Math.Max(0, startIndex);
+                int endIndex = (e.ClipRectangle.Bottom + offset) / EntryHeight;
+                endIndex = Math.Min(endIndex, Model.VisibleEntries.Count - 1);
 
-                foreach (var group in Groups)
+                for (int i = startIndex; i <= endIndex; i++)
                 {
-                    if (y > maxY)
-                        break;
+                    var bounds = new Rectangle(0, i * EntryHeight - offset, width, EntryHeight);
+                    var entry = Model.VisibleEntries[i];
+                    PaintEntryBackground(g, entry, bounds, options);
 
-                    int height = group.Height;
-                    if (y + height >= minY)
+                    var testEntry = entry as TestListTestEntry;
+                    if (testEntry != null)
                     {
-                        var bounds = new Rectangle(0, y, width, height);
-                        group.Paint(g, bounds, options);
+                        PaintTestEntry(g, testEntry, bounds, options);
+                        continue;
                     }
-                    y += height;
+
+                    var groupEntry = entry as TestListGroupEntry;
+                    if (groupEntry != null)
+                    {
+                        PaintGroupEntry(g, groupEntry, bounds, options);
+                        continue;
+                    }
                 }
             }
+        }
+
+        private void PaintTestEntry(Graphics g, TestListTestEntry entry, Rectangle bounds, TestListPaintOptions options)
+        {
+            int left = bounds.Left + EntryPadding + 20;
+            int right = bounds.Right - EntryPadding;
+            int y = bounds.Top + EntryPadding;
+
+            g.DrawImage(GetTestEntryImage(entry.Test.Status), left, y);
+            left += 16 + EntryPadding;
+
+            var textBrush = options.GetTextBrush(entry);
+            if (left < right && entry.Test.Result != null)
+            {
+                string duration = entry.Test.Result.Duration.Format();
+                int durationWidth = (int)Math.Ceiling(g.MeasureString(duration, options.EntryFont).Width);
+                int durationX = Math.Max(left, right - durationWidth);
+                g.DrawString(duration, options.EntryFont, textBrush, durationX, y);
+                right = durationX - EntryPadding;
+            }
+
+            if (left < right)
+            {
+                var nameBounds = new RectangleF(left, y, right - left, 16);
+                g.DrawString(entry.Test.Name, options.EntryFont, textBrush, nameBounds, options.EntryFormat);
+            }
+        }
+
+        private void PaintGroupEntry(Graphics g, TestListGroupEntry group, Rectangle bounds, TestListPaintOptions options)
+        {
+            int x = bounds.Left + EntryPadding;
+            int y = bounds.Top + EntryPadding;
+
+            var image = GetGroupEntryImage(group.IsExpanded, group == Model.HighlightedIconEntry);
+            g.DrawImage(image, x, y);
+            x += 16 + EntryPadding;
+
+            var textBrush = options.GetTextBrush(group);
+            int nameWidth = (int)Math.Ceiling(g.MeasureString(group.Name, options.HeaderFont).Width);
+            g.DrawString(group.Name, options.HeaderFont, textBrush, x, y);
+            x += nameWidth;
+
+            var count = " (" + group.Entries.Count + ")";
+            g.DrawString(count, options.EntryFont, textBrush, x, y);
+        }
+
+        private void PaintEntryBackground(Graphics g, TestListEntry entry, Rectangle bounds, TestListPaintOptions options)
+        {
+            if (entry.IsSelected)
+            {
+                g.FillRectangle(options.SelectedBackBrush, bounds);
+            }
+            else if (entry == options.FocusedEntry)
+            {
+                bounds.Width -= 1;
+                bounds.Height -= 1;
+                g.DrawRectangle(options.FocusRectanglePen, bounds);
+            }
+        }
+
+        private Image GetTestEntryImage(TestStatus status)
+        {
+            if (status == TestStatus.NotExecuted)
+                return EntryImages.Images[NotExecutedImageKey];
+            else if (status == TestStatus.Passed)
+                return EntryImages.Images[PassedImageKey];
+            else
+                return EntryImages.Images[FailedImageKey];
+        }
+
+        private Image GetGroupEntryImage(bool expanded, bool highlighted)
+        {
+            string key;
+            if (expanded)
+                key = highlighted ? ExpandedHighlightImageKey : ExpandedImageKey;
+            else
+                key = highlighted ? CollapsedHighlightImageKey : CollapsedImageKey;
+            return EntryImages.Images[key];
         }
 
         protected override void OnClientSizeChanged(EventArgs e)
@@ -232,274 +312,32 @@ namespace PmlUnit
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);
-            if (FocusedEntry == null)
-                return;
+            Controller.HandleKeyDown(e);
+        }
 
-            TestListBaseEntry target = null;
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+            Controller.HandleMouseMove(e);
+        }
 
-            if (e.KeyCode == Keys.Space)
-            {
-                if (e.Modifiers == Keys.None)
-                    FocusedEntry.Selected = true;
-                else if (e.Modifiers == Keys.Control)
-                    FocusedEntry.Selected = !FocusedEntry.Selected;
-                else if (e.Modifiers == Keys.Shift)
-                    SelectRange(FocusedEntry);
-                return;
-            }
-            else if (e.KeyCode == Keys.Up)
-            {
-                target = Groups.FirstOrDefault();
-                foreach (var entry in VisibleEntries)
-                {
-                    if (entry == FocusedEntry)
-                        break;
-                    target = entry;
-                }
-            }
-            else if (e.KeyCode == Keys.Down)
-            {
-                bool stop = false;
-                foreach (var entry in VisibleEntries)
-                {
-                    target = entry;
-                    if (stop)
-                        break;
-                    else if (entry == FocusedEntry)
-                        stop = true;
-                }
-            }
-            else if (e.KeyCode == Keys.Left)
-            {
-                var focusedGroup = FocusedEntry as TestListGroupEntry;
-                if (focusedGroup != null)
-                {
-                    focusedGroup.IsExpanded = false;
-                }
-                else
-                {
-                    foreach (var group in Groups)
-                    {
-                        foreach (var entry in group.Entries)
-                        {
-                            if (entry == FocusedEntry)
-                            {
-                                target = group;
-                                break;
-                            }
-                        }
-                        if (target == group)
-                            break;
-                    }
-                }
-            }
-            else if (e.KeyCode == Keys.Right)
-            {
-                var focusedGroup = FocusedEntry as TestListGroupEntry;
-                if (focusedGroup != null)
-                {
-                    if (focusedGroup.IsExpanded)
-                    {
-                        if (focusedGroup.Entries.Count > 0)
-                            target = focusedGroup.Entries[0];
-                    }
-                    else
-                    {
-                        focusedGroup.IsExpanded = true;
-                    }
-                }
-            }
-
-            if (target != null)
-            {
-                if (e.Modifiers == Keys.None)
-                    SelectOnly(target);
-                else if (e.Modifiers == Keys.Shift)
-                    SelectRange(target);
-                else if (e.Modifiers == Keys.Control)
-                    FocusedEntry = target;
-
-                ScrollEntryIntoView(target);
-            }
+        protected override void OnMouseLeave(EventArgs e)
+        {
+            base.OnMouseLeave(e);
+            Controller.HandleMouseLeave(e);
         }
 
         protected override void OnMouseClick(MouseEventArgs e)
         {
             base.OnMouseClick(e);
             Select();
-            OnMouseClick(e, ModifierKeys);
-        }
-
-        private void OnMouseClick(MouseEventArgs e, Keys modifierKeys)
-        {
-            var clicked = FindEntry(e.Location);
-            bool left = e.Button == MouseButtons.Left;
-            bool right = e.Button == MouseButtons.Right;
-
-            BeginUpdate();
-            try
-            {
-                if (modifierKeys == Keys.None)
-                {
-                    var group = clicked as TestListGroupEntry;
-                    var relativeClickLocation = new Point(e.X, (e.Y + VerticalScroll.Value) % EntryHeight);
-                    if (left && group != null && group.IconBounds.Contains(relativeClickLocation))
-                        group.IsExpanded = !group.IsExpanded;
-                    else if (left || right)
-                        SelectOnly(clicked);
-                }
-                else if (left && modifierKeys == Keys.Control && clicked != null)
-                {
-                    clicked.Selected = !clicked.Selected;
-                    FocusedEntry = clicked;
-                    SelectionStartEntry = clicked;
-                }
-                else if (left && modifierKeys == Keys.Shift && clicked != null)
-                {
-                    SelectRange(clicked);
-                }
-            }
-            finally
-            {
-                EndUpdate();
-            }
+            Controller.HandleMouseClick(e, ModifierKeys);
         }
 
         protected override void OnMouseDoubleClick(MouseEventArgs e)
         {
             base.OnMouseDoubleClick(e);
-
-            if (ModifierKeys == Keys.None && e.Button == MouseButtons.Left)
-            {
-                var group = FindEntry(e.Location) as TestListGroupEntry;
-                if (group != null)
-                    group.IsExpanded = !group.IsExpanded;
-            }
-        }
-
-        private TestListBaseEntry FindEntry(Point location)
-        {
-            int y = -VerticalScroll.Value;
-            int target = location.Y;
-
-            foreach (var group in Groups)
-            {
-                if (target < y)
-                    return null;
-                else if (target < y + EntryHeight)
-                    return group;
-                y += EntryHeight;
-
-                if (group.IsExpanded)
-                {
-                    int height = group.Entries.Count * EntryHeight;
-                    if (target < y + height)
-                    {
-                        int index = (target - y) / EntryHeight;
-                        return group.Entries[index];
-                    }
-                    y += height;
-                }
-            }
-            return null;
-        }
-
-        private void ScrollEntryIntoView(TestListBaseEntry entry)
-        {
-            int offset = 0;
-            foreach (var e in VisibleEntries)
-            {
-                if (e == entry)
-                {
-                    int top = VerticalScroll.Value;
-                    int bottom = VerticalScroll.Value + ClientSize.Height;
-                    int min = VerticalScroll.Minimum;
-                    int max = VerticalScroll.Maximum;
-                    if (offset < top)
-                    {
-                        AutoScrollPosition = new Point(0, Math.Max(min, Math.Min(offset, max)));
-                    }
-                    else if (offset + EntryHeight > bottom)
-                    {
-                        offset -= ClientSize.Height - EntryHeight;
-                        AutoScrollPosition = new Point(0, Math.Max(min, Math.Min(offset, max)));
-                    }
-                    return;
-                }
-                offset += EntryHeight;
-            }
-        }
-
-        private void SelectOnly(TestListBaseEntry target)
-        {
-            foreach (var entry in AllEntries)
-                entry.Selected = false;
-
-            if (target != null)
-            {
-                target.Selected = true;
-                SelectionStartEntry = target;
-                FocusedEntry = target;
-            }
-        }
-
-        private void SelectRange(TestListBaseEntry target)
-        {
-            bool selected = false;
-            foreach (var entry in AllEntries)
-            {
-                if (entry == target || entry == SelectionStartEntry)
-                {
-                    entry.Selected = true;
-                    selected = target == SelectionStartEntry ? false : !selected;
-                }
-                else
-                {
-                    entry.Selected = selected;
-                }
-            }
-
-            FocusedEntry = target;
-        }
-
-        private void OnGroupExpandedChanged(object sender, EventArgs e)
-        {
-            AutoScrollMinSize = new Size(0, Groups.Sum(group => group.Height));
-            Invalidate();
-        }
-
-        private void BeginUpdate()
-        {
-            IgnoreSelectionChanged = true;
-            IgnoredSelectionChanges = 0;
-        }
-
-        private void EndUpdate()
-        {
-            IgnoreSelectionChanged = false;
-            if (IgnoredSelectionChanges > 0)
-            {
-                IgnoredSelectionChanges = 0;
-                OnSelectionChanged(this, EventArgs.Empty);
-            }
-        }
-
-        private void OnSelectionChanged(object sender, EventArgs e)
-        {
-            if (IgnoreSelectionChanged)
-            {
-                IgnoredSelectionChanges++;
-            }
-            else
-            {
-                Invalidate();
-                SelectionChanged?.Invoke(this, EventArgs.Empty);
-            }
-        }
-
-        private void OnTestResultChanged(object sender, EventArgs e)
-        {
-            Invalidate();
+            Controller.HandleMouseDoubleClick(e, ModifierKeys);
         }
     }
 }

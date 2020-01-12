@@ -12,21 +12,43 @@ namespace PmlUnit.Tests
     [TestOf(typeof(PmlTestRunner))]
     public class PmlTestRunnerTest
     {
+        private TestCase TestCase;
+        private Test Test;
+
+        [SetUp]
+        public void Setup()
+        {
+            TestCase = new TestCase("Test");
+            Test = TestCase.Tests.Add("one");
+        }
+
         [Test]
         public void Constructor_ShouldCheckForNullArguments()
         {
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner((ObjectProxy)null));
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner((Clock)null));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(null));
+
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner((Clock)null, null));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(Mock.Of<Clock>(), null));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner((Clock)null, Mock.Of<MethodInvoker>()));
+
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner((ObjectProxy)null, null));
             Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(Mock.Of<ObjectProxy>(), null));
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(null, Mock.Of<Clock>()));
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(null, null));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner((ObjectProxy)null, Mock.Of<MethodInvoker>()));
+            
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(null, null, Mock.Of<MethodInvoker>()));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(null, Mock.Of<Clock>(), null));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(null, Mock.Of<Clock>(), Mock.Of<MethodInvoker>()));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(Mock.Of<ObjectProxy>(), null, null));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(Mock.Of<ObjectProxy>(), null, Mock.Of<MethodInvoker>()));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(Mock.Of<ObjectProxy>(), Mock.Of<Clock>(), null));
         }
 
         [Test]
         public void Dispose_ShouldDisposeTheProxy()
         {
             var proxy = new Mock<ObjectProxy>();
-            var runner = new PmlTestRunner(proxy.Object);
+            var runner = new PmlTestRunner(proxy.Object, Mock.Of<MethodInvoker>());
             runner.Dispose();
             proxy.Verify(p => p.Dispose());
         }
@@ -37,7 +59,7 @@ namespace PmlUnit.Tests
         public void Dispose_ShouldOnlyDisposeTheProxyOnce()
         {
             var proxy = new Mock<ObjectProxy>();
-            var runner = new PmlTestRunner(proxy.Object);
+            var runner = new PmlTestRunner(proxy.Object, Mock.Of<MethodInvoker>());
             runner.Dispose();
             runner.Dispose();
             proxy.Verify(p => p.Dispose(), Times.Once());
@@ -46,11 +68,10 @@ namespace PmlUnit.Tests
         [Test]
         public void Run_ShouldFailAfterBeingDisposed()
         {
-            var runner = new PmlTestRunner(Mock.Of<ObjectProxy>(), Mock.Of<Clock>());
+            var runner = new PmlTestRunner(Mock.Of<ObjectProxy>(), Mock.Of<Clock>(), Mock.Of<MethodInvoker>());
             runner.Dispose();
-            var testCase = new TestCaseBuilder("Test").AddTest("one").Build();
-            Assert.Throws<ObjectDisposedException>(() => runner.Run(testCase));
-            Assert.Throws<ObjectDisposedException>(() => runner.Run(testCase.Tests[0]));
+            Assert.Throws<ObjectDisposedException>(() => runner.Run(TestCase));
+            Assert.Throws<ObjectDisposedException>(() => runner.Run(Test));
         }
 
         [TestCase(false, false)]
@@ -59,12 +80,14 @@ namespace PmlUnit.Tests
         [TestCase(true, true)]
         public void Run_ShouldInvokeTheProxysRunMethod(bool hasSetUp, bool hasTearDown)
         {
+            // Arrange
             var proxy = new Mock<ObjectProxy>();
-            var runner = new PmlTestRunner(proxy.Object);
-            var builder = new TestCaseBuilder("Test").AddTest("one");
-            builder.HasSetUp = hasSetUp;
-            builder.HasTearDown = hasTearDown;
-            runner.Run(builder.Build().Tests[0]);
+            var runner = new PmlTestRunner(proxy.Object, Mock.Of<MethodInvoker>());
+            TestCase.HasSetUp = hasSetUp;
+            TestCase.HasTearDown = hasTearDown;
+            // Act
+            runner.Run(Test);
+            // Assert
             proxy.Verify(p => p.Invoke("run", "Test", "one", hasSetUp, hasTearDown), Times.Exactly(1));
         }
 
@@ -74,23 +97,51 @@ namespace PmlUnit.Tests
         [TestCase(true, true)]
         public void Run_ShouldInvokeTheProxyForAllTestsInTheTestCase(bool hasSetUp, bool hasTearDown)
         {
+            // Arrange
             var proxy = new Mock<ObjectProxy>();
-            var runner = new PmlTestRunner(proxy.Object);
-            var builder = new TestCaseBuilder("Test").AddTest("one").AddTest("two").AddTest("three");
-            builder.HasSetUp = hasSetUp;
-            builder.HasTearDown = hasTearDown;
-            runner.Run(builder.Build());
+            var runner = new PmlTestRunner(proxy.Object, Mock.Of<MethodInvoker>());
+            TestCase.Tests.Add("two");
+            TestCase.Tests.Add("three");
+            TestCase.HasSetUp = hasSetUp;
+            TestCase.HasTearDown = hasTearDown;
+            // Act
+            runner.Run(TestCase);
+            // Assert
             proxy.Verify(p => p.Invoke("run", "Test", "one", hasSetUp, hasTearDown), Times.Exactly(1));
             proxy.Verify(p => p.Invoke("run", "Test", "two", hasSetUp, hasTearDown), Times.Exactly(1));
             proxy.Verify(p => p.Invoke("run", "Test", "three", hasSetUp, hasTearDown), Times.Exactly(1));
+        }
+
+        public void Run_ShouldAssignTestResultToAllTestsInTheTestCase()
+        {
+            TestCase.Tests.Add("two");
+            TestCase.Tests.Add("three");
+
+            var proxy = new Mock<ObjectProxy>();
+            var oneError = new PmlException("one");
+            proxy.Setup(p => p.Invoke("run", "Test", "one", It.IsAny<bool>(), It.IsAny<bool>())).Throws(oneError);
+            var twoError = new PmlException("two");
+            proxy.Setup(p => p.Invoke("run", "Test", "two", It.IsAny<bool>(), It.IsAny<bool>())).Throws(twoError);
+            var threeError = new PmlException("three");
+            proxy.Setup(p => p.Invoke("run", "Test", "three", It.IsAny<bool>(), It.IsAny<bool>())).Throws(threeError);
+
+            var runner = new PmlTestRunner(proxy.Object, Mock.Of<MethodInvoker>());
+            runner.Run(TestCase);
+
+            Assert.NotNull(TestCase.Tests["one"].Result);
+            Assert.AreSame(oneError, TestCase.Tests["one"].Result.Error);
+            Assert.NotNull(TestCase.Tests["two"].Result);
+            Assert.AreSame(twoError, TestCase.Tests["two"].Result.Error);
+            Assert.NotNull(TestCase.Tests["three"].Result);
+            Assert.AreSame(threeError, TestCase.Tests["three"].Result.Error);
         }
 
         [Test]
         public void Run_ShouldQueryTheClock()
         {
             var clock = new Mock<Clock>();
-            var runner = new PmlTestRunner(Mock.Of<ObjectProxy>(), clock.Object);
-            runner.Run(new TestCaseBuilder("TestCase").AddTest("test").Build().Tests[0]);
+            var runner = new PmlTestRunner(Mock.Of<ObjectProxy>(), clock.Object, Mock.Of<MethodInvoker>());
+            runner.Run(Test);
             clock.VerifyGet(mock => mock.CurrentInstant, Times.Exactly(2));
         }
 
@@ -100,23 +151,28 @@ namespace PmlUnit.Tests
         [TestCase(-5)]
         [TestCase(3600)]
         [TestCase(86401)]
-        public void Run_ShouldReturnTestResultWithElapsedTime(int duration)
+        public void Run_ShouldAssignAndReturnTestResultWithElapsedTime(int duration)
         {
+            // Arrange
             int seconds = 0;
             var clock = new Mock<Clock>();
             clock.SetupGet(mock => mock.CurrentInstant)
                 .Returns(() => Instant.FromSeconds(seconds))
                 .Callback(() => seconds = duration);
-            var runner = new PmlTestRunner(Mock.Of<ObjectProxy>(), clock.Object);
-            var result = runner.Run(new TestCaseBuilder("Test").AddTest("method").Build().Tests[0]);
-            Assert.That(result.Duration, Is.EqualTo(TimeSpan.FromSeconds(duration)));
+            var runner = new PmlTestRunner(Mock.Of<ObjectProxy>(), clock.Object, Mock.Of<MethodInvoker>());
+            // Act
+            var result = runner.Run(Test);
+            // Assert
+            Assert.AreEqual(TimeSpan.FromSeconds(duration), result.Duration);
+            Assert.AreSame(result, Test.Result);
         }
 
         [TestCase(13)]
         [TestCase(123)]
         [TestCase(128937489)]
-        public void Run_ShouldReturnTestResultWithElapsedTimeWhenTestFails(int duration)
+        public void Run_ShouldAssignAndReturnTestResultWithElapsedTimeWhenTestFails(int duration)
         {
+            // Arrange
             int seconds = 0;
             var proxy = new Mock<ObjectProxy>();
             proxy.Setup(mock => mock.Invoke(It.IsAny<string>(), It.IsAny<object[]>())).Throws<PmlException>();
@@ -124,54 +180,66 @@ namespace PmlUnit.Tests
             clock.SetupGet(mock => mock.CurrentInstant)
                 .Returns(() => Instant.FromSeconds(seconds))
                 .Callback(() => seconds = duration);
-            var runner = new PmlTestRunner(proxy.Object, clock.Object);
-            var result = runner.Run(new TestCaseBuilder("Test").AddTest("method").Build().Tests[0]);
-            Assert.That(result.Duration, Is.EqualTo(TimeSpan.FromSeconds(duration)));
+            var runner = new PmlTestRunner(proxy.Object, clock.Object, Mock.Of<MethodInvoker>());
+            // Act
+            var result = runner.Run(Test);
+            // Assert
+            Assert.AreEqual(TimeSpan.FromSeconds(duration), result.Duration);
+            Assert.AreSame(result, Test.Result);
         }
 
         [Test]
-        public void Run_ShouldReturnSuccessfulResultWhenTestSucceeds()
+        public void Run_ShouldReturnPassedResultWhenTestPasses()
         {
-            var runner = new PmlTestRunner(Mock.Of<ObjectProxy>());
-            var result = runner.Run(new TestCaseBuilder("Test").AddTest("method").Build().Tests[0]);
-            Assert.That(result.Success);
+            var runner = new PmlTestRunner(Mock.Of<ObjectProxy>(), Mock.Of<MethodInvoker>());
+            var result = runner.Run(Test);
+            Assert.IsTrue(result.Passed);
         }
 
         [Test]
         public void Run_ShouldReturnFailedResultWhenTestFails()
         {
+            // Arrange
             var error = new PmlException();
             var proxy = new Mock<ObjectProxy>();
             proxy.Setup(mock => mock.Invoke(It.IsAny<string>(), It.IsAny<object[]>())).Throws(error);
-            var runner = new PmlTestRunner(proxy.Object);
-            var result = runner.Run(new TestCaseBuilder("Test").AddTest("test").Build().Tests[0]);
-            Assert.That(!result.Success);
-            Assert.That(result.Error, Is.SameAs(error));
+            var runner = new PmlTestRunner(proxy.Object, Mock.Of<MethodInvoker>());
+            // Act
+            var result = runner.Run(Test);
+            // Assert
+            Assert.IsFalse(result.Passed);
+            Assert.AreSame(error, result.Error);
         }
 
         [Test]
         public void Run_ShouldReturnFailedResultWhenTestReturnsError()
         {
+            // Arrange
             var error = new Hashtable();
             error[1.0] = "This is an error message...";
             error[2.0] = "... which spans two lines";
             var proxy = new Mock<ObjectProxy>();
             proxy.Setup(mock => mock.Invoke(It.IsAny<string>(), It.IsAny<object[]>())).Returns(error);
-            var runner = new PmlTestRunner(proxy.Object);
-            var result = runner.Run(new TestCaseBuilder("Test").AddTest("test").Build().Tests[0]);
-            Assert.That(!result.Success);
-            Assert.That(result.Error, Is.Not.Null);
-            Assert.That(result.Error.Message, Is.EqualTo("This is an error message...\r\n... which spans two lines\r\n"));
+            var runner = new PmlTestRunner(proxy.Object, Mock.Of<MethodInvoker>());
+            // Act
+            var result = runner.Run(Test);
+            // Assert
+            Assert.IsFalse(result.Passed);
+            Assert.NotNull(result.Error);
+            Assert.AreEqual("This is an error message...\r\n... which spans two lines\r\n", result.Error.Message);
         }
 
         [Test]
         public void Run_ShouldDisposeTestReturnValue()
         {
+            // Arrange
             var result = new Mock<IDisposable>();
             var proxy = new Mock<ObjectProxy>();
             proxy.Setup(mock => mock.Invoke(It.IsAny<string>(), It.IsAny<object[]>())).Returns(result.Object);
-            var runner = new PmlTestRunner(proxy.Object);
-            runner.Run(new TestCaseBuilder("Test").AddTest("test").Build().Tests[0]);
+            var runner = new PmlTestRunner(proxy.Object, Mock.Of<MethodInvoker>());
+            // Act
+            runner.Run(Test);
+            // Assert
             result.Verify(mock => mock.Dispose(), Times.Exactly(1));
         }
     }

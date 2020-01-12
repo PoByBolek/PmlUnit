@@ -65,7 +65,7 @@ namespace PmlUnit
             this.TestResultIconLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.TestResultIconLabel.AutoSize = true;
-            this.TestResultIconLabel.Image = global::PmlUnit.Properties.Resources.Unknown;
+            this.TestResultIconLabel.Image = global::PmlUnit.Properties.Resources.NotExecuted;
             this.TestResultIconLabel.Location = new System.Drawing.Point(3, 3);
             this.TestResultIconLabel.MinimumSize = new System.Drawing.Size(16, 16);
             this.TestResultIconLabel.Name = "TestResultIconLabel";

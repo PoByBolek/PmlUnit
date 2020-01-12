@@ -130,19 +130,19 @@
   <data name="ExpandedHighlight" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\ExpandedHighlight.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Failure" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Images\Failure.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="Failed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\Failed.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
-  <data name="Success" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Images\Success.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  <data name="NotExecuted" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\NotExecuted.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Passed" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Images\Passed.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="TestRunner" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\TestRunner.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="TestRunnerLarge" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Images\TestRunnerLarge.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="Unknown" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Images\Unknown.png;System.Drawing.Bitmap, System.Drawing, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

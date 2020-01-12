@@ -1,5 +1,6 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
+using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Windows.Forms;
@@ -13,7 +14,7 @@ namespace PmlUnit
             InitializeComponent();
             
             TitleLabel.Text = GetAssemblyTitle();
-            VersionLabel.Text = "Version " + GetAssemblyVersion();
+            VersionLabel.Text = GetAssemblyVersion();
             CopyrightLabel.Text = GetAssemblyCopyright();
 
             IconLicenseLabel.Links[0].LinkData = "http://www.recepkutuk.com/bitsies/"; // https seems to be broken
@@ -21,7 +22,7 @@ namespace PmlUnit
             GithubLabel.Links[0].LinkData = "https://github.com/PoByBolek/PmlUnit";
         }
 
-        private string GetAssemblyTitle()
+        private static string GetAssemblyTitle()
         {
             foreach (var attribute in Assembly.GetCustomAttributes<AssemblyTitleAttribute>(inherit: false))
             {
@@ -31,12 +32,12 @@ namespace PmlUnit
             return "PML Unit";
         }
 
-        private string GetAssemblyVersion()
+        private static string GetAssemblyVersion()
         {
-            return Assembly.GetName().Version.ToString();
+            return "Version " + Assembly.GetName().Version.ToString();
         }
 
-        private string GetAssemblyCopyright()
+        private static string GetAssemblyCopyright()
         {
             foreach (var attribute in Assembly.GetCustomAttributes<AssemblyCopyrightAttribute>(inherit: false))
             {
@@ -46,21 +47,21 @@ namespace PmlUnit
             return "Copyright © 2019 Florian Zimmermann";
         }
 
-        private Assembly Assembly => typeof(PmlUnitAddin).Assembly;
+        private static Assembly Assembly => typeof(PmlUnitAddin).Assembly;
 
         private void OnLinkLabelLinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             var url = e.Link.LinkData as string;
             if (string.IsNullOrEmpty(url))
                 return;
-            else if (url.StartsWith("http://") || url.StartsWith("https://"))
+            else if (url.StartsWith("http://", StringComparison.Ordinal) || url.StartsWith("https://", StringComparison.Ordinal))
                 Process.Start(url);
         }
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);
-            if (e.KeyCode == Keys.Escape)
+            if (e != null && e.KeyCode == Keys.Escape)
             {
                 Close();
             }

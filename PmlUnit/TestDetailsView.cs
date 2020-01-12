@@ -10,15 +10,10 @@ namespace PmlUnit
     partial class TestDetailsView : UserControl
     {
         private Test TestField;
-        private TestResult ResultField;
 
         public TestDetailsView()
         {
             InitializeComponent();
-
-            var builder = new TestCaseBuilder("Test");
-            builder.AddTest("Test");
-            Test = builder.Build().Tests[0];
         }
 
         [Browsable(false)]
@@ -28,45 +23,53 @@ namespace PmlUnit
             get { return TestField; }
             set
             {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
+                if (value == TestField)
+                    return;
+                if (TestField != null)
+                    TestField.ResultChanged -= OnTestResultChanged;
+                if (value != null)
+                    value.ResultChanged += OnTestResultChanged;
 
                 TestField = value;
-                TestNameLabel.Text = value.Name;
-            }
-        }
-
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-        public TestResult Result
-        {
-            get { return ResultField; }
-            set
-            {
-                ResultField = value;
-                if (value == null)
+                if (TestField == null)
                 {
-                    TestResultIconLabel.Image = Resources.Unknown;
+                    TestNameLabel.Text = "";
+                    TestResultIconLabel.Image = Resources.NotExecuted;
                     TestResultIconLabel.Text = "Not executed";
                     StackTraceLabel.Text = "";
                     ElapsedTimeLabel.Text = "";
                 }
                 else
                 {
-                    if (value.Error == null)
-                    {
-                        TestResultIconLabel.Image = Resources.Success;
-                        TestResultIconLabel.Text = "Successful";
-                        StackTraceLabel.Text = "";
-                    }
-                    else
-                    {
-                        TestResultIconLabel.Image = Resources.Failure;
-                        TestResultIconLabel.Text = "Failed";
-                        StackTraceLabel.Text = value.Error.Message;
-                    }
-                    ElapsedTimeLabel.Text = "Elapsed time: " + value.Duration.Format();
+                    TestNameLabel.Text = TestField.Name;
+                    OnTestResultChanged(TestField, EventArgs.Empty);
                 }
+            }
+        }
+
+        private void OnTestResultChanged(object sender, EventArgs e)
+        {
+            var status = TestField.Status;
+            if (status == TestStatus.NotExecuted)
+            {
+                TestResultIconLabel.Image = Resources.NotExecuted;
+                TestResultIconLabel.Text = "Not executed";
+                StackTraceLabel.Text = "";
+                ElapsedTimeLabel.Text = "";
+            }
+            else if (status == TestStatus.Passed)
+            {
+                TestResultIconLabel.Image = Resources.Passed;
+                TestResultIconLabel.Text = "Passed";
+                StackTraceLabel.Text = "";
+                ElapsedTimeLabel.Text = "Elapsed time: " + TestField.Result.Duration.Format();
+            }
+            else
+            {
+                TestResultIconLabel.Image = Resources.Failed;
+                TestResultIconLabel.Text = "Failed";
+                StackTraceLabel.Text = TestField.Result.Error.Message;
+                ElapsedTimeLabel.Text = "Elapsed time: " + TestField.Result.Duration.Format();
             }
         }
     }

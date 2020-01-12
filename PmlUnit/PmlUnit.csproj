@@ -106,6 +106,7 @@
     <Compile Include="ColorizedProgressBar.Designer.cs">
       <DependentUpon>ColorizedProgressBar.cs</DependentUpon>
     </Compile>
+    <Compile Include="ControlMethodInvoker.cs" />
     <Compile Include="EnvironmentVariableTestCaseProvider.cs" />
     <Compile Include="IconLabel.cs">
       <SubType>UserControl</SubType>
@@ -114,6 +115,7 @@
       <DependentUpon>IconLabel.cs</DependentUpon>
     </Compile>
     <Compile Include="IndexFileTestCaseProvider.cs" />
+    <Compile Include="MethodInvoker.cs" />
     <Compile Include="ObjectProxy.cs" />
     <Compile Include="ParserException.cs" />
     <Compile Include="PmlException.cs" />
@@ -131,7 +133,8 @@
     <Compile Include="ShowTestRunnerCommand.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="TestCase.cs" />
-    <Compile Include="TestCaseBuilder.cs" />
+    <Compile Include="TestCaseCollection.cs" />
+    <Compile Include="TestCaseGrouper.cs" />
     <Compile Include="TestCaseParser.cs" />
     <Compile Include="TestCaseProvider.cs" />
     <Compile Include="TestDetailsView.cs">
@@ -140,17 +143,25 @@
     <Compile Include="TestDetailsView.Designer.cs">
       <DependentUpon>TestDetailsView.cs</DependentUpon>
     </Compile>
+    <Compile Include="TestGrouper.cs" />
     <Compile Include="TestListEntry.cs" />
+    <Compile Include="TestListEntryCollection.cs" />
     <Compile Include="TestListGroupEntry.cs" />
+    <Compile Include="TestListGrouping.cs" />
     <Compile Include="TestListPaintOptions.cs" />
+    <Compile Include="TestListSelectedEntryCollection.cs" />
+    <Compile Include="TestListTestEntry.cs" />
+    <Compile Include="TestListTestEntryCollection.cs" />
     <Compile Include="TestListView.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="TestListView.Designer.cs">
       <DependentUpon>TestListView.cs</DependentUpon>
     </Compile>
-    <Compile Include="TestListViewEntry.cs" />
+    <Compile Include="TestListViewController.cs" />
+    <Compile Include="TestListViewModel.cs" />
     <Compile Include="TestResult.cs" />
+    <Compile Include="TestResultGrouper.cs" />
     <Compile Include="TestRunner.cs" />
     <Compile Include="TestRunnerControl.cs">
       <SubType>UserControl</SubType>
@@ -189,6 +200,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="TestRunnerControl.resx">
       <DependentUpon>TestRunnerControl.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
@@ -201,11 +213,11 @@
     <None Include="Images\CollapsedHighlight.png" />
     <None Include="Images\Expanded.png" />
     <None Include="Images\ExpandedHighlight.png" />
-    <None Include="Images\Failure.png" />
-    <None Include="Images\Success.png" />
+    <None Include="Images\Failed.png" />
+    <None Include="Images\NotExecuted.png" />
+    <None Include="Images\Passed.png" />
     <None Include="Images\TestRunner.png" />
     <None Include="Images\TestRunnerLarge.png" />
-    <None Include="Images\Unknown.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

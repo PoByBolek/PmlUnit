@@ -3,8 +3,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using System.Reflection;
+
 using Moq;
+
 using NUnit.Framework;
 
 namespace PmlUnit.Tests
@@ -18,13 +21,13 @@ namespace PmlUnit.Tests
         {
             Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, null));
             Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(Mock.Of<TestCaseProvider>(), null));
-            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, Mock.Of<TestRunner>()));
+            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, Mock.Of<AsyncTestRunner>()));
         }
 
         [Test]
         public void Dispose_DisposesTestRunner()
         {
-            var runnerMock = new Mock<TestRunner>();
+            var runnerMock = new Mock<AsyncTestRunner>();
             var control = new TestRunnerControl(Mock.Of<TestCaseProvider>(), runnerMock.Object);
             // Act
             control.Dispose();
@@ -47,13 +50,20 @@ namespace PmlUnit.Tests
         public void Setup()
         {
             TestCases = new List<TestCase>();
-            TestCases.Add(new TestCaseBuilder("Foo").AddTest("testOne").AddTest("testTwo").Build());
-            TestCases.Add(new TestCaseBuilder("Bar").AddTest("testThree").AddTest("testFour").AddTest("testFive").Build());
+            var first = new TestCase("Foo");
+            first.Tests.Add("one");
+            first.Tests.Add("two");
+            TestCases.Add(first);
+            var second = new TestCase("Bar");
+            second.Tests.Add("three");
+            second.Tests.Add("four");
+            second.Tests.Add("five");
+            TestCases.Add(second);
 
             ProviderMock = new Mock<TestCaseProvider>();
             ProviderMock.Setup(provider => provider.GetTestCases()).Returns(TestCases);
 
-            RunnerControl = new TestRunnerControl(ProviderMock.Object, Mock.Of<TestRunner>());
+            RunnerControl = new TestRunnerControl(ProviderMock.Object, Mock.Of<AsyncTestRunner>());
             TestList = RunnerControl.FindControl<TestListView>("TestList");
         }
 
@@ -79,12 +89,7 @@ namespace PmlUnit.Tests
             RunnerControl.LoadTests();
             // Assert
             var allTests = TestList.AllTests;
-            Assert.AreEqual(5, allTests.Count);
-            Assert.AreEqual("testOne", allTests[0].Test.Name);
-            Assert.AreEqual("testTwo", allTests[1].Test.Name);
-            Assert.AreEqual("testThree", allTests[2].Test.Name);
-            Assert.AreEqual("testFour", allTests[3].Test.Name);
-            Assert.AreEqual("testFive", allTests[4].Test.Name);
+            Assert.That(allTests, Is.EquivalentTo(TestCases[0].Tests.Concat(TestCases[1].Tests)));
         }
     }
 
@@ -94,31 +99,40 @@ namespace PmlUnit.Tests
     public class TestRunnerControlRunTest
     {
         private TestCase TestCase;
-        private Mock<TestRunner> RunnerMock;
+        private Mock<AsyncTestRunner> RunnerMock;
         private TestRunnerControl RunnerControl;
         private TestListView TestList;
+        private TestListViewModel Model;
         private TestSummaryView TestSummary;
+        private IEnumerable<Test> Tests;
 
         [SetUp]
         public void Setup()
         {
-            TestCase = new TestCaseBuilder("TestCase").AddTest("one").AddTest("two").AddTest("three").AddTest("four").Build();
+            TestCase = new TestCase("TestCase");
+            TestCase.Tests.Add("one").Result = new TestResult(TimeSpan.FromSeconds(1));
+            TestCase.Tests.Add("two").Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("error"));
+            TestCase.Tests.Add("three").Result = new TestResult(TimeSpan.FromSeconds(1));
+            TestCase.Tests.Add("four");
 
-            RunnerMock = new Mock<TestRunner>();
-            RunnerMock.Setup(runner => runner.Run(It.IsAny<Test>())).Returns(new TestResult(TimeSpan.FromSeconds(1)));
+            RunnerMock = new Mock<AsyncTestRunner>();
+            RunnerMock
+                .Setup(runner => runner.RunAsync(It.IsAny<IEnumerable<Test>>()))
+                .Callback((IEnumerable<Test> tests) => Tests = tests);
 
             RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), RunnerMock.Object);
             TestSummary = RunnerControl.FindControl<TestSummaryView>("TestSummary");
             TestList = RunnerControl.FindControl<TestListView>("TestList");
-            TestList.SetTests(TestCase.Tests);
+            TestList.TestCases.Add(TestCase);
 
-            var tests = TestList.AllTests;
-            tests[0].Result = new TestResult(TimeSpan.FromSeconds(1));
-            tests[1].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("error"));
-            tests[2].Result = new TestResult(TimeSpan.FromSeconds(1));
+            Model = TestList.GetModel();
 
-            tests[1].Selected = true;
-            tests[3].Selected = true;
+            foreach (var entry in Model.Entries)
+            {
+                var testEntry = entry as TestListTestEntry;
+                if (testEntry != null)
+                    testEntry.IsSelected = testEntry.Test.Name == "two" || testEntry.Test.Name == "four";
+            }
         }
 
         [TearDown]
@@ -133,82 +147,48 @@ namespace PmlUnit.Tests
             // Act
             RunEventHandler("OnRunAllLinkClick");
             // Assert
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[0]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[1]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[2]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[3]), Times.Once());
+            RunnerMock.Verify(runner => runner.RunAsync(It.IsAny<IEnumerable<Test>>()), Times.Once());
+            Assert.That(Tests, Is.EquivalentTo(TestCase.Tests));
         }
 
         [Test]
-        public void RunSucceededLinkClick_RunsSucceededTests()
+        public void RunPassedLinkClick_OnlyRunsPassedTests()
         {
             // Act
-            RunEventHandler("OnRunSucceededTestsMenuItemClick");
+            RunEventHandler("OnRunPassedTestsMenuItemClick");
             // Assert
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[0]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[1]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[2]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[3]), Times.Never());
+            RunnerMock.Verify(runner => runner.RunAsync(It.IsAny<IEnumerable<Test>>()), Times.Once());
+            Assert.That(Tests, Is.EquivalentTo(new List<Test>() { TestCase.Tests["one"], TestCase.Tests["three"] }));
         }
 
         [Test]
-        public void RunFailedLinkClick_RunsFailedTests()
+        public void RunFailedLinkClick_OnlyRunsFailedTests()
         {
             // Act
             RunEventHandler("OnRunFailedTestsMenuItemClick");
             // Assert
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[0]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[1]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[2]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[3]), Times.Never());
+            RunnerMock.Verify(runner => runner.RunAsync(It.IsAny<IEnumerable<Test>>()), Times.Once());
+            Assert.That(Tests, Is.EquivalentTo(new List<Test>() { TestCase.Tests["two"] }));
         }
 
         [Test]
-        public void RunNotExecutedLinkClick_RunsNotExecutedTests()
+        public void RunNotExecutedLinkClick_OnlyRunsNotExecutedTests()
         {
             // Act
             RunEventHandler("OnRunNotExecutedTestsMenuItemClick");
             // Assert
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[0]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[1]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[2]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[3]), Times.Once());
+            RunnerMock.Verify(runner => runner.RunAsync(It.IsAny<IEnumerable<Test>>()), Times.Once());
+            Assert.That(Tests, Is.EquivalentTo(new List<Test>() { TestCase.Tests["four"] }));
         }
 
         [Test]
-        public void RunSelectedLinkClick_RunsSelectedTests()
+        public void RunSelectedLinkClick_OnlyRunsSelectedTests()
         {
             // Act
             RunEventHandler("OnRunSelectedTestsMenuItemClick");
             // Assert
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[0]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[1]), Times.Once());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[2]), Times.Never());
-            RunnerMock.Verify(runner => runner.Run(TestCase.Tests[3]), Times.Once());
-        }
-
-        [Test]
-        public void Run_AssignsTestResultsToListEntries()
-        {
-            // Arrange
-            var results = new List<TestResult> {
-                new TestResult(TimeSpan.FromSeconds(1), new PmlException("error")), null,
-                new TestResult(TimeSpan.FromSeconds(3)), new TestResult(TimeSpan.FromSeconds(4))
-            };
-            RunnerMock.Reset();
-            for (int i = 0; i < results.Count; i++)
-                SetupTestResult(TestCase.Tests[i], results[i]);
-            // Act
-            RunEventHandler("OnRunAllLinkClick");
-            // Assert
-            var tests = TestList.AllTests;
-            for (int i = 0; i < results.Count; i++)
-                Assert.AreSame(results[i], tests[i].Result);
-        }
-
-        private void SetupTestResult(Test test, TestResult result)
-        {
-            RunnerMock.Setup(runner => runner.Run(test)).Returns(result);
+            RunnerMock.Verify(runner => runner.RunAsync(It.IsAny<IEnumerable<Test>>()), Times.Once());
+            Assert.That(Tests, Is.EquivalentTo(new List<Test>() { TestCase.Tests["two"], TestCase.Tests["four"] }));
         }
 
         private void RunEventHandler(string handler)
@@ -235,18 +215,23 @@ namespace PmlUnit.Tests
         private TestCase TestCase;
         private TestRunnerControl RunnerControl;
         private TestListView TestList;
+        private TestListViewModel Model;
         private TestSummaryView TestSummary;
         private TestDetailsView TestDetails;
 
         [SetUp]
         public void Setup()
         {
-            TestCase = new TestCaseBuilder("Test").AddTest("one").AddTest("two").AddTest("three").Build();
-            RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), Mock.Of<TestRunner>());
+            TestCase = new TestCase("Test");
+            TestCase.Tests.Add("one");
+            TestCase.Tests.Add("two");
+            TestCase.Tests.Add("three");
+            RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), Mock.Of<AsyncTestRunner>());
             TestSummary = RunnerControl.FindControl<TestSummaryView>("TestSummary");
             TestDetails = RunnerControl.FindControl<TestDetailsView>("TestDetails");
             TestList = RunnerControl.FindControl<TestListView>("TestList");
-            TestList.SetTests(TestCase.Tests);
+            TestList.TestCases.Add(TestCase);
+            Model = TestList.GetModel();
         }
 
         [TearDown]
@@ -258,70 +243,61 @@ namespace PmlUnit.Tests
         [Test]
         public void SelectionChanged_AssignsTestOfSingleSelectedEntryToTestDetails()
         {
-            // Arrange
-            var entries = TestList.AllTests;
-            // Act & Assert
-            for (int i = 0; i < entries.Count; i++)
+            foreach (var entry in Model.Entries)
             {
-                entries[i].Selected = true;
-                Assert.AreSame(TestDetails.Test, entries[i].Test, "Should assign test {0}.", i);
-                entries[i].Selected = false;
-            }
-        }
-
-        [Test]
-        public void SelectionChanged_AssignsResultOfSingleSelectedEntryToTestDetails()
-        {
-            // Arrange
-            var entries = TestList.AllTests;
-            entries[0].Result = new TestResult(TimeSpan.FromTicks(0));
-            entries[1].Result = new TestResult(TimeSpan.FromTicks(0), new Exception());
-            entries[2].Result = null;
-            // Act & Assert
-            for (int i = 0; i < entries.Count; i++)
-            {
-                entries[i].Selected = true;
-                Assert.AreSame(TestDetails.Result, entries[i].Result, "Should assign test result {0}.", i);
-                entries[i].Selected = false;
+                var testEntry = entry as TestListTestEntry;
+                if (testEntry != null)
+                {
+                    testEntry.IsSelected = true;
+                    Assert.AreSame(testEntry.Test, TestDetails.Test, "Should assign test {0}.", testEntry.Test);
+                    testEntry.IsSelected = false;
+                }
             }
         }
 
         [Test]
         public void SelectionChanged_ShowsTestDetailsIfExactlyOneEntryIsSelected()
         {
-            // Arrange
-            var entries = TestList.AllTests;
-            // Act & Assert
-            for (int i = 0; i < entries.Count; i++)
+            foreach (var entry in Model.Entries)
             {
-                entries[i].Selected = true;
-                Assert.IsTrue(TestDetails.Visible, "Should show test details for test {0}", i);
-                Assert.IsFalse(TestSummary.Visible, "Should not show test summary for test {0}", i);
-                entries[i].Selected = false;
+                var testEntry = entry as TestListTestEntry;
+                if (testEntry != null)
+                {
+                    testEntry.IsSelected = true;
+                    Assert.IsTrue(TestDetails.Visible, "Should show test details for test {0}", testEntry.Test);
+                    Assert.IsFalse(TestSummary.Visible, "Should not show test summary for test {0}", testEntry.Test);
+                    testEntry.IsSelected = false;
+                }
             }
         }
 
         [Test]
         public void SelectionChanged_ShowsTestSummaryUnlessExactlyOneEntryIsSelected()
         {
-            // Arrange
-            var entries = TestList.AllTests;
             // Act & Assert
             Assert.IsFalse(TestDetails.Visible);
             Assert.IsTrue(TestSummary.Visible);
 
-            entries[0].Selected = true;
-            entries[1].Selected = true;
-            entries[2].Selected = true;
+            foreach (var entry in Model.Entries)
+            {
+                var testEntry = entry as TestListTestEntry;
+                if (testEntry != null)
+                    entry.IsSelected = true;
+            }
+
             Assert.IsFalse(TestDetails.Visible);
             Assert.IsTrue(TestSummary.Visible);
 
-            for (int i = 0; i < entries.Count; i++)
+            foreach (var entry in Model.Entries)
             {
-                entries[i].Selected = false;
-                Assert.IsFalse(TestDetails.Visible, "Should not show test details for test {0}", i);
-                Assert.True(TestSummary.Visible, "Should show test summary for test {0}", i);
-                entries[i].Selected = true;
+                var testEntry = entry as TestListTestEntry;
+                if (testEntry != null)
+                {
+                    testEntry.IsSelected = false;
+                    Assert.IsFalse(TestDetails.Visible, "Should not show test details for test {0}", testEntry.Test);
+                    Assert.True(TestSummary.Visible, "Should show test summary for test {0}", testEntry.Test);
+                    testEntry.IsSelected = true;
+                }
             }
         }
     }

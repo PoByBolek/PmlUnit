@@ -10,10 +10,12 @@ namespace PmlUnit
 {
     partial class TestRunnerControl : UserControl
     {
-        private readonly TestCaseProvider Provider;
-        private readonly TestRunner Runner;
+        private delegate void RunDelegate(IList<Test> tests, int index);
 
-        public TestRunnerControl(TestCaseProvider provider, TestRunner runner)
+        private readonly TestCaseProvider Provider;
+        private readonly AsyncTestRunner Runner;
+
+        public TestRunnerControl(TestCaseProvider provider, AsyncTestRunner runner)
         {
             if (provider == null)
                 throw new ArgumentNullException(nameof(provider));
@@ -22,20 +24,17 @@ namespace PmlUnit
 
             Provider = provider;
             Runner = runner;
+            Runner.TestCompleted += OnTestCompleted;
+            Runner.RunCompleted += OnRunCompleted;
             InitializeComponent();
             ResetSplitContainerOrientation();
         }
 
         public void LoadTests()
         {
-            SetTests(Provider.GetTestCases());
-        }
-
-        private void SetTests(IEnumerable<TestCase> testCases)
-        {
-            TestList.SetTests(testCases.SelectMany(testCase => testCase.Tests));
+            TestList.TestCases.Clear();
+            TestList.TestCases.AddRange(Provider.GetTestCases());
             TestSummary.UpdateSummary(TestList.AllTests);
-            ResetTestDetails(TestList.SelectedTests.FirstOrDefault());
         }
 
         protected override void Dispose(bool disposing)
@@ -53,7 +52,7 @@ namespace PmlUnit
             Run(TestList.AllTests);
         }
 
-        private void OnRunLinkClicked(object sender, EventArgs e)
+        private void OnRunLinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             RunContextMenu.Show(RunLinkLabel, new Point(0, RunLinkLabel.Height));
         }
@@ -68,9 +67,9 @@ namespace PmlUnit
             Run(TestList.NotExecutedTests);
         }
 
-        private void OnRunSucceededTestsMenuItemClick(object sender, EventArgs e)
+        private void OnRunPassedTestsMenuItemClick(object sender, EventArgs e)
         {
-            Run(TestList.SucceededTests);
+            Run(TestList.PassedTests);
         }
 
         private void OnRunSelectedTestsMenuItemClick(object sender, EventArgs e)
@@ -78,42 +77,75 @@ namespace PmlUnit
             Run(TestList.SelectedTests);
         }
 
-        private void Run(ICollection<TestListEntry> entries)
+        private void Run(IList<Test> tests)
         {
             Enabled = false;
+
+            ExecutionProgressBar.Value = 0;
+            ExecutionProgressBar.Maximum = tests.Count;
+            ExecutionProgressBar.Color = Color.Green;
+
             try
             {
-                RunInternal(entries);
+                Runner.RunAsync(tests);
             }
-            finally
+            catch (Exception error)
             {
                 Enabled = true;
-                TestSummary.UpdateSummary(entries);
-                ResetTestDetails(entries.FirstOrDefault());
+                MessageBox.Show(error.ToString(), "Test run failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void RunInternal(ICollection<TestListEntry> entries)
+        private void OnTestCompleted(object sender, TestCompletedEventArgs e)
         {
-            ExecutionProgressBar.Value = 0;
-            ExecutionProgressBar.Maximum = entries.Count;
-            ExecutionProgressBar.Color = Color.Green;
+            ExecutionProgressBar.Increment(1);
+            if (e.Test.Status == TestStatus.Failed)
+                ExecutionProgressBar.Color = Color.Red;
 
-            foreach (var entry in entries)
+            Update();
+        }
+
+        private void OnRunCompleted(object sender, TestRunCompletedEventArgs e)
+        {
+            Enabled = true;
+            TestSummary.UpdateSummary(e.Tests.ToList());
+            if (e.Error != null)
+                MessageBox.Show(e.Error.ToString(), "Test run failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private void RunInternal(IList<Test> tests, int index)
+        {
+            if (index < tests.Count)
             {
-                entry.Result = Runner.Run(entry.Test);
-                ExecutionProgressBar.Increment(1);
-                if (entry.Result != null && !entry.Result.Success)
-                    ExecutionProgressBar.Color = Color.Red;
-
-                Application.DoEvents();
+                try
+                {
+                    var test = tests[index];
+                    Runner.Run(test);
+                    ExecutionProgressBar.Increment(1);
+                    if (test.Status == TestStatus.Failed)
+                        ExecutionProgressBar.Color = Color.Red;
+                    
+                    Update();
+                    BeginInvoke(new RunDelegate(RunInternal), tests, index + 1);
+                }
+                catch
+                {
+                    Enabled = true;
+                    throw;
+                }
+            }
+            else
+            {
+                Enabled = true;
+                TestSummary.UpdateSummary(tests);
             }
         }
 
         private void OnRefreshLinkClick(object sender, EventArgs e)
         {
             Runner.RefreshIndex();
-            SetTests(Provider.GetTestCases().Select(testCase => Reload(testCase)));
+            TestList.TestCases.Clear();
+            TestList.TestCases.AddRange(Provider.GetTestCases().Select(Reload));
         }
 
         private TestCase Reload(TestCase testCase)
@@ -131,21 +163,33 @@ namespace PmlUnit
             return testCase;
         }
 
+        private void OnGroupByLinkLabelLinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            GroupByMenu.Show(GroupByLinkLabel, new Point(0, GroupByLinkLabel.Height));
+        }
+
+        private void OnGroupByTestResultMenuItemClick(object sender, EventArgs e)
+        {
+            TestList.Grouping = TestListGrouping.Result;
+        }
+
+        private void OnGroupByTestCaseNameMenuItemClick(object sender, EventArgs e)
+        {
+            TestList.Grouping = TestListGrouping.TestCase;
+        }
+
+        private void OnTestListGroupingChanged(object sender, EventArgs e)
+        {
+            GroupByTestResultToolStripMenuItem.Checked = TestList.Grouping == TestListGrouping.Result;
+            GroupByTestCaseNameToolStripMenuItem.Checked = TestList.Grouping == TestListGrouping.TestCase;
+        }
+
         private void OnTestListSelectionChanged(object sender, EventArgs e)
         {
             var selected = TestList.SelectedTests;
-            ResetTestDetails(selected.FirstOrDefault());
+            TestDetails.Test = selected.FirstOrDefault();
             TestSummary.Visible = selected.Count != 1;
             TestDetails.Visible = selected.Count == 1;
-        }
-
-        private void ResetTestDetails(TestListEntry selected)
-        {
-            if (selected == null)
-                return;
-
-            TestDetails.Test = selected.Test;
-            TestDetails.Result = selected.Result;
         }
 
         private void OnSplitContainerSizeChanged(object sender, EventArgs e)

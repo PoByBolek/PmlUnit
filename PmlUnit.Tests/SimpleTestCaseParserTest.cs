@@ -82,7 +82,7 @@ endobject
 define method .testMethodA(!assert is PmlAssert)
 endmethod");
             Assert.That(testCase.Tests.Count, Is.EqualTo(1));
-            Assert.That(testCase.Tests[0].Name, Is.EqualTo("testMethodA"));
+            Assert.That(testCase.Tests.Contains("testMethodA"));
         }
 
         [Test]
@@ -132,11 +132,11 @@ endobject
 define method .testMethod(!somethingNotNamedAssert is PmlAssert)
 endmethod");
             Assert.AreEqual(1, testCase.Tests.Count);
-            Assert.AreEqual("testMethod", testCase.Tests[0].Name);
+            Assert.IsTrue(testCase.Tests.Contains("testMethod"));
         }
 
         [Test]
-        public void Parse_ShouldFindMultipleTestCases()
+        public void Parse_ShouldFindMultipleTestMethods()
         {
             var testCase = Parse(@"
 define object TestSuite
@@ -148,8 +148,8 @@ endmethod
 define method .testMethodB(!assert is PmlAssert)
 endmethod");
             Assert.That(testCase.Tests.Count, Is.EqualTo(2));
-            Assert.That(testCase.Tests[0].Name, Is.EqualTo("testMethodA"));
-            Assert.That(testCase.Tests[1].Name, Is.EqualTo("testMethodB"));
+            Assert.That(testCase.Tests.Contains("testMethodA"));
+            Assert.That(testCase.Tests.Contains("testMethodB"));
         }
 
         [Test]

@@ -2,7 +2,6 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 using System.Windows.Forms;
 using Aveva.ApplicationFramework.Presentation;
 using Moq;
@@ -22,7 +21,7 @@ namespace PmlUnit.Tests
     {
         private Mock<ICommandManager> CommandManagerMock;
         private Mock<ServiceProvider> ServiceProviderMock;
-        private Mock<TestRunner> TestRunnerMock;
+        private Mock<AsyncTestRunner> TestRunnerMock;
         private Mock<TestCaseProvider> TestCaseProviderMock;
         private PmlUnitAddin Addin;
 
@@ -46,7 +45,7 @@ namespace PmlUnit.Tests
             TestCaseProviderMock = new Mock<TestCaseProvider>();
             TestCaseProviderMock.Setup(provider => provider.GetTestCases())
                 .Returns(new List<TestCase>());
-            TestRunnerMock = new Mock<TestRunner>();
+            TestRunnerMock = new Mock<AsyncTestRunner>();
             Addin = new PmlUnitAddin(TestCaseProviderMock.Object, TestRunnerMock.Object);
         }
 
@@ -93,10 +92,7 @@ namespace PmlUnit.Tests
             // Act
             Addin.Stop();
             // Assert
-            var control = Addin.GetType()
-                .GetField("TestRunnerControl", BindingFlags.Instance | BindingFlags.NonPublic)
-                .GetValue(Addin) as Control;
-            Assert.IsFalse(control.IsDisposed);
+            Assert.IsFalse(Addin.GetField<Control>("TestRunnerControl").IsDisposed);
         }
     }
 }
