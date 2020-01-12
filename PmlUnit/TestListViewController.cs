@@ -50,13 +50,17 @@ namespace PmlUnit
         {
             if (Model.VisibleEntries.Count == 0)
                 return;
-            
+
             if (e.KeyCode == Keys.Space)
                 ToggleSelectionOfFocusedEntry(e.Modifiers);
+            else if (e.KeyCode == Keys.Home)
+                MoveFocus(-Model.VisibleEntries.Count, e.Modifiers);
             else if (e.KeyCode == Keys.Up)
                 MoveFocus(-1, e.Modifiers);
             else if (e.KeyCode == Keys.Down)
                 MoveFocus(+1, e.Modifiers);
+            else if (e.KeyCode == Keys.End)
+                MoveFocus(Model.VisibleEntries.Count, e.Modifiers);
             else if (e.KeyCode == Keys.Left)
                 CollapseFocusedGroup(e.Modifiers);
             else if (e.KeyCode == Keys.Right)

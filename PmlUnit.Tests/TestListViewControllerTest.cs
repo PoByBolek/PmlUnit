@@ -312,6 +312,87 @@ namespace PmlUnit.Tests
         }
 
         [Test]
+        public void HomeEnd_MovesSelection()
+        {
+            PerformKeyPress(Keys.Home);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(0)));
+            PerformKeyPress(Keys.Home);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(0)));
+
+            PerformKeyPress(Keys.Down);
+            PerformKeyPress(Keys.Down);
+            PerformKeyPress(Keys.Down);
+            PerformKeyPress(Keys.Home);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(0)));
+
+            PerformKeyPress(Keys.End);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(-1)));
+            PerformKeyPress(Keys.End);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(-1)));
+
+            PerformKeyPress(Keys.Up);
+            PerformKeyPress(Keys.Up);
+            PerformKeyPress(Keys.Up);
+            PerformKeyPress(Keys.End);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(-1)));
+        }
+
+        [Test]
+        public void CtrlHomeEnd_MovesFocusButKeepsSelection()
+        {
+            PerformMouseClick(30, 50);
+
+            PerformKeyPress(Keys.Home | Keys.Control);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(2)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[0]));
+            PerformKeyPress(Keys.Home | Keys.Control);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(2)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[0]));
+
+            PerformKeyPress(Keys.End | Keys.Control);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(2)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[VisibleEntries.Count - 1]));
+            PerformKeyPress(Keys.End | Keys.Control);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(2)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[VisibleEntries.Count - 1]));
+        }
+
+        [Test]
+        public void CtrlHomeEnd_MovesFocusWithoutSelection()
+        {
+            PerformKeyPress(Keys.End | Keys.Control);
+            Assert.That(SelectedEntries, Is.Empty);
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[VisibleEntries.Count - 1]));
+            PerformKeyPress(Keys.End | Keys.Control);
+            Assert.That(SelectedEntries, Is.Empty);
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[VisibleEntries.Count - 1]));
+            
+            PerformKeyPress(Keys.Home | Keys.Control);
+            Assert.That(SelectedEntries, Is.Empty);
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[0]));
+            PerformKeyPress(Keys.Home | Keys.Control);
+            Assert.That(SelectedEntries, Is.Empty);
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[0]));
+        }
+
+        [Test]
+        public void ShiftHomeEnd_ExtendsSelectionFromLastClick()
+        {
+            PerformMouseClick(30, 50);
+
+            PerformKeyPress(Keys.Home | Keys.Shift);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(0, 2)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[0]));
+
+            PerformKeyPress(Keys.End | Keys.Shift);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(2, VisibleEntries.Count - 1)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[VisibleEntries.Count - 1]));
+            PerformKeyPress(Keys.End | Keys.Shift);
+            Assert.That(SelectedEntries, Is.EquivalentTo(Slice(2, VisibleEntries.Count - 1)));
+            Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[VisibleEntries.Count - 1]));
+        }
+
+        [Test]
         public void Space_AddsFocusedEntryToSelection()
         {
             PerformKeyPress(Keys.Space);
@@ -489,6 +570,11 @@ namespace PmlUnit.Tests
 
         private IEnumerable<TestListEntry> Slice(int start, int end)
         {
+            if (start < 0)
+                start += VisibleEntries.Count;
+            if (end < 0)
+                end += VisibleEntries.Count;
+
             var result = new List<TestListEntry>();
             for (int i = start; i <= end; i++)
                 result.Add(VisibleEntries[i]);
