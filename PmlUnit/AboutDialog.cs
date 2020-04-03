@@ -9,10 +9,14 @@ namespace PmlUnit
 {
     partial class AboutDialog : Form
     {
+        private DateTime TooltipShown;
+
         public AboutDialog()
         {
             InitializeComponent();
-            
+
+            TooltipShown = DateTime.MinValue;
+
             TitleLabel.Text = GetAssemblyTitle();
             VersionLabel.Text = GetAssemblyVersion();
             CopyrightLabel.Text = GetAssemblyCopyright();
@@ -65,6 +69,28 @@ namespace PmlUnit
             {
                 Close();
             }
+        }
+        
+
+        private void OnLinkHover(object sender, LinkHoverEventArgs e)
+        {
+            var url = e.Link.LinkData as string;
+            if (string.IsNullOrEmpty(url))
+            {
+                return;
+            }
+            else if (url.StartsWith("http://", StringComparison.Ordinal) || url.StartsWith("https://", StringComparison.Ordinal))
+            {
+                LinkToolTip.Show(url, this, PointToClient(MousePosition));
+                TooltipShown = DateTime.Now;
+            }
+        }
+
+        private void OnLinkLabelMouseMove(object sender, MouseEventArgs e)
+        {
+            var delay = TimeSpan.FromMilliseconds(LinkToolTip.InitialDelay);
+            if (DateTime.Now > TooltipShown + delay)
+                LinkToolTip.Hide(this);
         }
     }
 }

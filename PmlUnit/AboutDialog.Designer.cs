@@ -32,14 +32,16 @@ namespace PmlUnit
         [GeneratedCode("Windows Form Designer generated code", "1.0")]
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.Label licenseLabel;
             System.Windows.Forms.PictureBox iconPicuteBox;
-            this.IconLicenseLabel = new System.Windows.Forms.LinkLabel();
-            this.StatusIconLicenseLabel = new System.Windows.Forms.LinkLabel();
-            this.GithubLabel = new System.Windows.Forms.LinkLabel();
+            this.IconLicenseLabel = new PmlUnit.CustomLinkLabel();
+            this.StatusIconLicenseLabel = new PmlUnit.CustomLinkLabel();
+            this.GithubLabel = new PmlUnit.CustomLinkLabel();
             this.TitleLabel = new System.Windows.Forms.Label();
             this.VersionLabel = new System.Windows.Forms.Label();
             this.CopyrightLabel = new System.Windows.Forms.Label();
+            this.LinkToolTip = new System.Windows.Forms.ToolTip(this.components);
             licenseLabel = new System.Windows.Forms.Label();
             iconPicuteBox = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(iconPicuteBox)).BeginInit();
@@ -79,6 +81,8 @@ namespace PmlUnit
     "ial use.";
             this.IconLicenseLabel.UseCompatibleTextRendering = true;
             this.IconLicenseLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnLinkLabelLinkClicked);
+            this.IconLicenseLabel.LinkHover += new System.EventHandler<PmlUnit.LinkHoverEventArgs>(this.OnLinkHover);
+            this.IconLicenseLabel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.OnLinkLabelMouseMove);
             // 
             // StatusIconLicenseLabel
             // 
@@ -94,6 +98,8 @@ namespace PmlUnit
     "r the MIT license.";
             this.StatusIconLicenseLabel.UseCompatibleTextRendering = true;
             this.StatusIconLicenseLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnLinkLabelLinkClicked);
+            this.StatusIconLicenseLabel.LinkHover += new System.EventHandler<PmlUnit.LinkHoverEventArgs>(this.OnLinkHover);
+            this.StatusIconLicenseLabel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.OnLinkLabelMouseMove);
             // 
             // GithubLabel
             // 
@@ -109,6 +115,8 @@ namespace PmlUnit
             this.GithubLabel.TextAlign = System.Drawing.ContentAlignment.TopCenter;
             this.GithubLabel.UseCompatibleTextRendering = true;
             this.GithubLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnLinkLabelLinkClicked);
+            this.GithubLabel.LinkHover += new System.EventHandler<PmlUnit.LinkHoverEventArgs>(this.OnLinkHover);
+            this.GithubLabel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.OnLinkLabelMouseMove);
             // 
             // TitleLabel
             // 
@@ -174,8 +182,9 @@ namespace PmlUnit
         private System.Windows.Forms.Label TitleLabel;
         private System.Windows.Forms.Label VersionLabel;
         private System.Windows.Forms.Label CopyrightLabel;
-        private System.Windows.Forms.LinkLabel IconLicenseLabel;
-        private System.Windows.Forms.LinkLabel StatusIconLicenseLabel;
-        private System.Windows.Forms.LinkLabel GithubLabel;
+        private PmlUnit.CustomLinkLabel IconLicenseLabel;
+        private PmlUnit.CustomLinkLabel StatusIconLicenseLabel;
+        private PmlUnit.CustomLinkLabel GithubLabel;
+        private System.Windows.Forms.ToolTip LinkToolTip;
     }
 }
