@@ -13,6 +13,14 @@ namespace PmlUnit.Tests
     [TestOf(typeof(IndexFileTestCaseProvider))]
     public class IndexFileTestCaseProviderTest
     {
+        private TestCase TestCase;
+
+        [SetUp]
+        public void Setup()
+        {
+            TestCase = new TestCase("dummy", "dummy.pmlobj");
+        }
+
         [Test]
         public void Constructor_ShouldCheckForNullArguments()
         {
@@ -55,9 +63,8 @@ namespace PmlUnit.Tests
         [Test]
         public void GetTestCases_ShouldCallTestCaseParserWithObjectName()
         {
-            var dummy = new TestCase("dummy");
             var parser = new Mock<TestCaseParser>();
-            parser.Setup(mock => mock.Parse(It.IsAny<string>())).Returns(dummy);
+            parser.Setup(mock => mock.Parse(It.IsAny<string>())).Returns(TestCase);
 
             var indexFile = @"/path/to/some/tests/
 pmlrandomtest.pmlobj";
@@ -66,7 +73,7 @@ pmlrandomtest.pmlobj";
                 var provider = new IndexFileTestCaseProvider(@"C:\testing", reader, parser.Object);
                 var result = provider.GetTestCases();
                 Assert.That(result.Count, Is.EqualTo(1));
-                Assert.That(result, Contains.Item(dummy));
+                Assert.That(result, Contains.Item(TestCase));
             }
 
             parser.Verify(mock => mock.Parse(@"C:\testing\path\to\some\tests\pmlrandomtest.pmlobj"));
@@ -75,10 +82,9 @@ pmlrandomtest.pmlobj";
         [Test]
         public void GetTestCases_ShouldIgnoreTestFilesThatCannotBeParsed()
         {
-            var dummy = new TestCase("dummy");
             var parser = new Mock<TestCaseParser>();
             parser.Setup(mock => mock.Parse(@"C:\testing\path\to\tests\pmlfirsttest.pmlobj")).Throws<ParserException>();
-            parser.Setup(mock => mock.Parse(@"C:\testing\path\to\tests\pmlsecondtest.pmlobj")).Returns(dummy);
+            parser.Setup(mock => mock.Parse(@"C:\testing\path\to\tests\pmlsecondtest.pmlobj")).Returns(TestCase);
             parser.Setup(mock => mock.Parse(@"C:\testing\path\to\tests\pmlthirdtest.pmlobj")).Throws<FileNotFoundException>();
 
             var indexFile = @"
@@ -91,18 +97,17 @@ pmlthirdtest.pmlobj";
                 var prodivder = new IndexFileTestCaseProvider(@"C:\testing", reader, parser.Object);
                 var result = prodivder.GetTestCases();
                 Assert.That(result.Count, Is.EqualTo(1));
-                Assert.That(result, Contains.Item(dummy));
+                Assert.That(result, Contains.Item(TestCase));
             }
         }
 
         [Test]
         public void GetTestCases_ShouldOnlyAttemptToParseObjectFiles()
         {
-            var dummy = new TestCase("dummy");
             var parser = new Mock<TestCaseParser>(MockBehavior.Strict);
-            parser.Setup(mock => mock.Parse(@"C:\some\other\testing\path\pmltest.pmlobj")).Returns(dummy);
-            parser.Setup(mock => mock.Parse(@"C:\some\other\testing\path\PmlDuplicateTest.PmlObj")).Returns(dummy);
-            parser.Setup(mock => mock.Parse(@"C:\some\other\testing\path\PMLOTHERTEST.PMLOBJ")).Returns(dummy);
+            parser.Setup(mock => mock.Parse(@"C:\some\other\testing\path\pmltest.pmlobj")).Returns(TestCase);
+            parser.Setup(mock => mock.Parse(@"C:\some\other\testing\path\PmlDuplicateTest.PmlObj")).Returns(TestCase);
+            parser.Setup(mock => mock.Parse(@"C:\some\other\testing\path\PMLOTHERTEST.PMLOBJ")).Returns(TestCase);
 
             var indexFile = @"
 /testing/path/
@@ -126,11 +131,10 @@ somethingelse.txt";
         [Test]
         public void GetTestCases_ShouldOnlyAttemptToParseObjectFilesThatEndInTest()
         {
-            var dummy = new TestCase("dummy");
             var parser = new Mock<TestCaseParser>(MockBehavior.Strict);
-            parser.Setup(mock => mock.Parse(@"C:\some\other\testing\path\OTHERTEST.PMLOBJ")).Returns(dummy);
-            parser.Setup(mock => mock.Parse(@"C:\some\other\testing\path\randomtest.pmlobj")).Returns(dummy);
-            parser.Setup(mock => mock.Parse(@"C:\some\other\testing\path\FoOtEsT.PmLoBj")).Returns(dummy);
+            parser.Setup(mock => mock.Parse(@"C:\some\other\testing\path\OTHERTEST.PMLOBJ")).Returns(TestCase);
+            parser.Setup(mock => mock.Parse(@"C:\some\other\testing\path\randomtest.pmlobj")).Returns(TestCase);
+            parser.Setup(mock => mock.Parse(@"C:\some\other\testing\path\FoOtEsT.PmLoBj")).Returns(TestCase);
 
             var indexFile = @"
 /testing/path/
@@ -149,12 +153,11 @@ FoOtEsT.PmLoBj";
         [Test]
         public void GetTestCases_ShouldTryToParseFilesFromDifferentDirectories()
         {
-            var dummy = new TestCase("dummy");
             var parser = new Mock<TestCaseParser>();
-            parser.Setup(mock => mock.Parse(@"C:\full\path\to\the\tests\firsttest.pmlobj")).Returns(dummy);
-            parser.Setup(mock => mock.Parse(@"C:\full\path\to\some\other\tests\secondtest.pmlobj")).Returns(dummy);
-            parser.Setup(mock => mock.Parse(@"C:\full\path\to\some\other\tests\thirdtest.pmlobj")).Returns(dummy);
-            parser.Setup(mock => mock.Parse(@"C:\full\path\to\the\tests\fourthtest.pmlobj")).Returns(dummy);
+            parser.Setup(mock => mock.Parse(@"C:\full\path\to\the\tests\firsttest.pmlobj")).Returns(TestCase);
+            parser.Setup(mock => mock.Parse(@"C:\full\path\to\some\other\tests\secondtest.pmlobj")).Returns(TestCase);
+            parser.Setup(mock => mock.Parse(@"C:\full\path\to\some\other\tests\thirdtest.pmlobj")).Returns(TestCase);
+            parser.Setup(mock => mock.Parse(@"C:\full\path\to\the\tests\fourthtest.pmlobj")).Returns(TestCase);
 
             var indexFile = @"
 /the/tests/

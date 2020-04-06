@@ -21,11 +21,11 @@ namespace PmlUnit.Tests
         [SetUp]
         public void Setup()
         {
-            First = new TestCase("TestCaseOne");
+            First = new TestCase("TestCaseOne", "one.pmlobj");
             First.Tests.Add("one");
             First.Tests.Add("two");
             First.Tests.Add("three");
-            Second = new TestCase("TestCaseTwo");
+            Second = new TestCase("TestCaseTwo", "two.pmlobj");
             Second.Tests.Add("four");
             Second.Tests.Add("five");
             TestList = new TestListView();

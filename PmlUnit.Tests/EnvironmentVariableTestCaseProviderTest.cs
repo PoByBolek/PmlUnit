@@ -150,8 +150,8 @@ namespace PmlUnit.Tests
             var env = "PMLUNIT_TEST_VAR_7";
             Environment.SetEnvironmentVariable(env, @"C:\path\to\pmllib");
             var expected = new List<TestCase>();
-            expected.Add(new TestCase("first"));
-            expected.Add(new TestCase("second"));
+            expected.Add(new TestCase("first", "first.pmlobj"));
+            expected.Add(new TestCase("second", "second.pmlobj"));
             var mock = new Mock<TestCaseProvider>();
             mock.Setup(p => p.GetTestCases()).Returns(expected);
             var provider = new EnvironmentVariableTestCaseProvider(env, path => mock.Object);

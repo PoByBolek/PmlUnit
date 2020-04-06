@@ -18,7 +18,7 @@ namespace PmlUnit.Tests
         [SetUp]
         public void Setup()
         {
-            TestCase = new TestCase("Test");
+            TestCase = new TestCase("Test", "test.pmlobj");
             Test = TestCase.Tests.Add("one");
         }
 

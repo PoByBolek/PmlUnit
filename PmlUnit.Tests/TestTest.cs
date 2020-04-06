@@ -7,14 +7,21 @@ namespace PmlUnit.Tests
     [TestOf(typeof(Test))]
     public class TestTest
     {
+        private TestCase TestCase;
+
+        [SetUp]
+        public void Setup()
+        {
+            TestCase = new TestCase("foo", "foo.pmlobj");
+        }
+
         [Test]
         public void Constructor_ChecksForNullArguments()
         {
-            var testCase = new TestCase("Foo");
             Assert.Throws<ArgumentNullException>(() => new Test(null, null));
             Assert.Throws<ArgumentNullException>(() => new Test(null, ""));
-            Assert.Throws<ArgumentNullException>(() => new Test(testCase, null));
-            Assert.Throws<ArgumentNullException>(() => new Test(testCase, ""));
+            Assert.Throws<ArgumentNullException>(() => new Test(TestCase, null));
+            Assert.Throws<ArgumentNullException>(() => new Test(TestCase, ""));
         }
 
         [TestCase("hello world")]
@@ -24,37 +31,35 @@ namespace PmlUnit.Tests
         [TestCase("bar()")]
         public void Constructor_ChecksForNonAlphaNumericCharacters(string name)
         {
-            var testCase = new TestCase("Foo");
-            Assert.Throws<ArgumentException>(() => new Test(testCase, name), "Should raise ArgumentException for \"{0}\".", name);
+            Assert.Throws<ArgumentException>(() => new Test(TestCase, name), "Should raise ArgumentException for \"{0}\".", name);
         }
 
         [TestCase("Test")]
         [TestCase("SomethingElse")]
         public void Constructor_SetsNameProperty(string name)
         {
-            var test = new Test(new TestCase("Foo"), name);
+            var test = new Test(TestCase, name);
             Assert.AreEqual(name, test.Name);
         }
 
         [Test]
         public void Constructor_SetsTestCaseProperty()
         {
-            var testCase = new TestCase("Foo");
-            var test = new Test(testCase, "bar");
-            Assert.AreSame(testCase, test.TestCase);
+            var test = new Test(TestCase, "bar");
+            Assert.AreSame(TestCase, test.TestCase);
         }
 
         [Test]
         public void Result_DefaultsToNull()
         {
-            var test = new Test(new TestCase("foo"), "bar");
+            var test = new Test(TestCase, "bar");
             Assert.AreEqual(null, test.Result);
         }
 
         [Test]
         public void Result_RaisesResultChanged()
         {
-            var test = new Test(new TestCase("foo"), "bar");
+            var test = new Test(TestCase, "bar");
             TestResult expected = null;
             bool eventRaised;
 
@@ -99,7 +104,7 @@ namespace PmlUnit.Tests
         [Test]
         public void Status_IsNotExecutedWhenResultIsNull()
         {
-            var test = new Test(new TestCase("foo"), "bar");
+            var test = new Test(TestCase, "bar");
             test.Result = null;
             Assert.AreEqual(TestStatus.NotExecuted, test.Status);
         }
@@ -107,7 +112,7 @@ namespace PmlUnit.Tests
         [Test]
         public void Status_IsPassedWhenResultHasNoError()
         {
-            var test = new Test(new TestCase("foo"), "bar");
+            var test = new Test(TestCase, "bar");
             test.Result = new TestResult(TimeSpan.FromSeconds(1));
             Assert.AreEqual(TestStatus.Passed, test.Status);
         }
@@ -115,9 +120,16 @@ namespace PmlUnit.Tests
         [Test]
         public void Status_IsFailedWhenResultHasError()
         {
-            var test = new Test(new TestCase("foo"), "bar");
+            var test = new Test(TestCase, "bar");
             test.Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException());
             Assert.AreEqual(TestStatus.Failed, test.Status);
+        }
+
+        [Test]
+        public void FileName_UsesTestCasesFileName()
+        {
+            var test = new Test(new TestCase("foo", "C:\\random\\stuff.pmlobj"), "bar");
+            Assert.AreEqual("C:\\random\\stuff.pmlobj", test.FileName);
         }
     }
 }

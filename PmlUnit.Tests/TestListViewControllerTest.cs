@@ -32,12 +32,12 @@ namespace PmlUnit.Tests
             SelectedEntries = Model.SelectedEntries;
             Controller = TestList.GetController();
 
-            First = new TestCase("First");
+            First = new TestCase("First", "first.pmlobj");
             First.Tests.Add("a1");
             First.Tests.Add("a2");
             First.Tests.Add("a3");
             TestList.TestCases.Add(First);
-            Second = new TestCase("Second");
+            Second = new TestCase("Second", "second.pmlobj");
             Second.Tests.Add("b1");
             Second.Tests.Add("b2");
             Second.Tests.Add("b3");
@@ -111,6 +111,20 @@ namespace PmlUnit.Tests
             PerformMouseClick(x, y, button);
             // Assert
             Assert.That(Model.FocusedEntry, Is.SameAs(VisibleEntries[index]));
+        }
+
+        [Test]
+        public void EntryDoubleClick_RaisesTestActivateEvent()
+        {
+            // Arrange
+            var test = (VisibleEntries[2] as TestListTestEntry).Test;
+            Test activated = null;
+            Controller.TestActivate += (sender, e) => activated = e.Test;
+            // Act
+            PerformDoubleClick(30, 50);
+            // Assert
+            Assert.That(activated, Is.Not.Null);
+            Assert.That(activated, Is.SameAs(test));
         }
 
         [TestCase(MouseButtons.Left)]
@@ -644,6 +658,20 @@ namespace PmlUnit.Tests
             Assert.That(group.IsExpanded);
             PerformKeyPress(Keys.Right | modifierKeys);
             Assert.That(group.IsExpanded);
+        }
+
+        [Test]
+        public void Enter_RaisesTestActivateEvent()
+        {
+            var entry = VisibleEntries[2] as TestListTestEntry;
+            Model.FocusedEntry = entry;
+            Test activated = null;
+            Controller.TestActivate += (sender, e) => activated = e.Test;
+
+            PerformKeyPress(Keys.Enter);
+
+            Assert.That(activated, Is.Not.Null);
+            Assert.That(activated, Is.SameAs(entry.Test));
         }
 
         private IEnumerable<TestListEntry> Slice(int index)

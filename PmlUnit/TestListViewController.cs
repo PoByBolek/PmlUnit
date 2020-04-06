@@ -10,6 +10,7 @@ namespace PmlUnit
     class TestListViewController
     {
         public event EventHandler SelectionChanged;
+        public event EventHandler<TestEventArgs> TestActivate;
 
         private readonly TestListViewModel Model;
         private readonly TestListView View;
@@ -69,6 +70,8 @@ namespace PmlUnit
                 CollapseFocusedGroup(e.Modifiers);
             else if (e.KeyCode == Keys.Right)
                 ExpandFocusedGroup(e.Modifiers);
+            else if (e.KeyCode == Keys.Enter && e.Modifiers == Keys.None)
+                ActivateFocusedEntry();
         }
 
         private void ToggleSelectionOfFocusedEntry(Keys modifierKeys)
@@ -153,6 +156,16 @@ namespace PmlUnit
             }
         }
 
+        private void ActivateFocusedEntry()
+        {
+            if (Model.FocusedEntry == null)
+                return;
+
+            var testEntry = Model.FocusedEntry as TestListTestEntry;
+            if (testEntry != null)
+                TestActivate?.Invoke(this, new TestEventArgs(testEntry.Test));
+        }
+
         private TestListEntry GetEntryRelativeToFocus(int offset)
         {
             int index = 0;
@@ -228,9 +241,14 @@ namespace PmlUnit
         {
             if (modifierKeys == Keys.None && e.Button == MouseButtons.Left)
             {
-                var group = FindEntry(e.Location) as TestListGroupEntry;
-                if (group != null)
-                    group.IsExpanded = !group.IsExpanded;
+                var entry = FindEntry(e.Location);
+                var groupEntry = entry as TestListGroupEntry;
+                if (groupEntry != null)
+                    groupEntry.IsExpanded = !groupEntry.IsExpanded;
+
+                var testEntry = entry as TestListTestEntry;
+                if (testEntry != null)
+                    TestActivate?.Invoke(this, new TestEventArgs(testEntry.Test));
             }
         }
 

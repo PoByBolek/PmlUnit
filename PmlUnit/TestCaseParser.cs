@@ -11,7 +11,7 @@ namespace PmlUnit
     interface TestCaseParser
     {
         TestCase Parse(string fileName);
-        TestCase Parse(TextReader reader);
+        TestCase Parse(string fileName, TextReader reader);
     }
 
     class SimpleTestCaseParser : TestCaseParser
@@ -25,20 +25,25 @@ namespace PmlUnit
 
             using (var reader = new StreamReader(fileName, Encoding.UTF8))
             {
-                return Parse(reader);
+                return Parse(fileName, reader);
             }
         }
 
-        public TestCase Parse(TextReader reader)
+        public TestCase Parse(string fileName, TextReader reader)
         {
+            if (string.IsNullOrEmpty(fileName))
+                throw new ArgumentNullException(nameof(fileName));
             if (reader == null)
                 throw new ArgumentNullException(nameof(reader));
 
+            fileName = Path.GetFullPath(fileName);
             bool inComment = false;
             TestCase result = null;
+            int lineNumber = 0;
 
             foreach (string line in reader.ReadAllLines())
             {
+                ++lineNumber;
                 string sanitized = WhitespaceRegex.Replace(line, " ").Trim();
                 if (inComment)
                 {
@@ -55,7 +60,7 @@ namespace PmlUnit
                 {
                     if (result != null)
                         throw new ParserException();
-                    result = new TestCase(sanitized.Substring(14));
+                    result = new TestCase(sanitized.Substring(14), fileName);
                 }
                 else if (sanitized.StartsWith("define method .", StringComparison.OrdinalIgnoreCase))
                 {
@@ -64,7 +69,7 @@ namespace PmlUnit
                     var signature = sanitized.Substring(15);
                     string testCaseName;
                     if (IsTestCaseMethod(signature, out testCaseName))
-                        result.Tests.Add(testCaseName);
+                        result.Tests.Add(testCaseName, lineNumber);
                     else if (IsSetupMethod(signature))
                         result.HasSetUp = true;
                     else if (IsTearDownMethod(signature))

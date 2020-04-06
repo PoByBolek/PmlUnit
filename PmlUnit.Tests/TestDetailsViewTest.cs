@@ -22,7 +22,7 @@ namespace PmlUnit.Tests
         public void Setup()
         {
             TestDetails = new TestDetailsView();
-            TestDetails.Test = new Test(new TestCase("Foo"), "bar");
+            TestDetails.Test = new Test(new TestCase("Foo", "foo.pmlobj"), "bar");
             TestNameLabel = TestDetails.FindControl<Label>("TestNameLabel");
             StatusLabel = TestDetails.FindControl<IconLabel>("TestResultIconLabel");
             ElapsedTimeLabel = TestDetails.FindControl<Label>("ElapsedTimeLabel");
@@ -35,7 +35,7 @@ namespace PmlUnit.Tests
         public void Test_AssignsTestNameToLabel(string testName)
         {
             // Arrange
-            var test = new Test(new TestCase("Foo"), testName);
+            var test = new Test(new TestCase("Foo", "foo.pmlobj"), testName);
             // Act
             TestDetails.Test = test;
             // Assert

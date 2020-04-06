@@ -2,8 +2,10 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 
 namespace PmlUnit
@@ -190,6 +192,16 @@ namespace PmlUnit
             TestDetails.Test = selected.FirstOrDefault();
             TestSummary.Visible = selected.Count != 1;
             TestDetails.Visible = selected.Count == 1;
+        }
+
+        private void OnTestListTestActivate(object sender, TestEventArgs e)
+        {
+            var fileName = e.Test.FileName.Replace('\\', '/');
+            var url = new StringBuilder("vscode://file/");
+            url.Append(e.Test.FileName.Replace('\\', '/'));
+            if (e.Test.LineNumber > 0)
+                url.Append(':').Append(e.Test.LineNumber);
+            Process.Start(url.ToString());
         }
 
         private void OnSplitContainerSizeChanged(object sender, EventArgs e)

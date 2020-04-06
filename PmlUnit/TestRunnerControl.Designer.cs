@@ -149,6 +149,7 @@ namespace PmlUnit
             this.TestList.TabIndex = 0;
             this.TestList.GroupingChanged += new System.EventHandler(this.OnTestListGroupingChanged);
             this.TestList.SelectionChanged += new System.EventHandler(this.OnTestListSelectionChanged);
+            this.TestList.TestActivate += new System.EventHandler<PmlUnit.TestEventArgs>(this.OnTestListTestActivate);
             // 
             // TestDetails
             // 

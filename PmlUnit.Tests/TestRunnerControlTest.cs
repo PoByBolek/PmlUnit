@@ -50,11 +50,11 @@ namespace PmlUnit.Tests
         public void Setup()
         {
             TestCases = new List<TestCase>();
-            var first = new TestCase("Foo");
+            var first = new TestCase("Foo", "foo.pmlobj");
             first.Tests.Add("one");
             first.Tests.Add("two");
             TestCases.Add(first);
-            var second = new TestCase("Bar");
+            var second = new TestCase("Bar", "bar.pmlobj");
             second.Tests.Add("three");
             second.Tests.Add("four");
             second.Tests.Add("five");
@@ -109,7 +109,7 @@ namespace PmlUnit.Tests
         [SetUp]
         public void Setup()
         {
-            TestCase = new TestCase("TestCase");
+            TestCase = new TestCase("TestCase", "testcase.pmlobj");
             TestCase.Tests.Add("one").Result = new TestResult(TimeSpan.FromSeconds(1));
             TestCase.Tests.Add("two").Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("error"));
             TestCase.Tests.Add("three").Result = new TestResult(TimeSpan.FromSeconds(1));
@@ -222,7 +222,7 @@ namespace PmlUnit.Tests
         [SetUp]
         public void Setup()
         {
-            TestCase = new TestCase("Test");
+            TestCase = new TestCase("Test", "test.pmlobj");
             TestCase.Tests.Add("one");
             TestCase.Tests.Add("two");
             TestCase.Tests.Add("three");
