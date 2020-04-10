@@ -88,7 +88,9 @@ namespace PmlUnit
 
         public void RefreshIndex()
         {
-            InvokePmlMethod("refreshIndex");
+            var error = InvokePmlMethod("refreshIndex");
+            if (error != null)
+                throw new PmlException("refreshIndex method failed");
         }
 
         public void Reload(TestCase testCase)
@@ -96,7 +98,9 @@ namespace PmlUnit
             if (testCase == null)
                 throw new ArgumentNullException(nameof(testCase));
 
-            InvokePmlMethod("reload", testCase.Name);
+            var error = InvokePmlMethod("reload", testCase.Name);
+            if (error != null)
+                throw new PmlException("reload method failed");
         }
 
         public void Run(TestCase testCase)
@@ -228,40 +232,25 @@ namespace PmlUnit
         private void RunInternal(Test test)
         {
             var start = Clock.CurrentInstant;
-            try
-            {
-                var testCase = test.TestCase;
-                var result = RunnerProxy.Invoke(
-                    "run", testCase.Name, test.Name, testCase.HasSetUp, testCase.HasTearDown
-                );
-                var elapsed = Clock.CurrentInstant - start;
-                test.Result = new TestResult(elapsed, UnmarshalException(result));
-            }
-            catch (PmlException error)
-            {
-                var elapsed = Clock.CurrentInstant - start;
-                test.Result = new TestResult(elapsed, error);
-            }
+            var testCase = test.TestCase;
+            var error = InvokePmlMethod(
+                "run", testCase.Name, test.Name, testCase.HasSetUp, testCase.HasTearDown
+            );
+            var elapsed = Clock.CurrentInstant - start;
+            test.Result = new TestResult(elapsed, error);
 
             TestCompleted?.Invoke(this, new TestCompletedEventArgs(test));
         }
 
-        private void InvokePmlMethod(string method, params object[] arguments)
+        private PmlError InvokePmlMethod(string method, params object[] arguments)
         {
             if (RunnerProxy == null)
                 throw new ObjectDisposedException(nameof(PmlTestRunner));
 
             var result = RunnerProxy.Invoke(method, arguments);
-            var exception = UnmarshalException(result);
-            if (exception != null)
-                throw exception;
-        }
-
-        private static PmlException UnmarshalException(object result)
-        {
             var stackTrace = result as Hashtable;
-            if (stackTrace != null && stackTrace.Count > 0)
-                return new PmlException(stackTrace);
+            if (stackTrace != null)
+                return PmlError.FromHashTable(stackTrace);
 
             var disposable = result as IDisposable;
             if (disposable != null)

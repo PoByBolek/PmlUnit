@@ -45,7 +45,15 @@ namespace PmlUnit
 
             arguments = arguments ?? new object[0];
             object result = null;
-            Object.invokeMethod(method, arguments, arguments.Length, ref result);
+
+            try
+            {
+                Object.invokeMethod(method, arguments, arguments.Length, ref result);
+            }
+            catch (Exception e)
+            {
+                throw new PmlException("Failed to invoke method: " + method, e);
+            }
 
             var any = result as PMLNetAny;
             if (any == null)

@@ -111,7 +111,7 @@ namespace PmlUnit.Tests
         {
             TestCase = new TestCase("TestCase", "testcase.pmlobj");
             TestCase.Tests.Add("one").Result = new TestResult(TimeSpan.FromSeconds(1));
-            TestCase.Tests.Add("two").Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("error"));
+            TestCase.Tests.Add("two").Result = new TestResult(TimeSpan.FromSeconds(1), new PmlError("error"));
             TestCase.Tests.Add("three").Result = new TestResult(TimeSpan.FromSeconds(1));
             TestCase.Tests.Add("four");
 

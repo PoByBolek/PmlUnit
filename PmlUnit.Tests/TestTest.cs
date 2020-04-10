@@ -121,7 +121,7 @@ namespace PmlUnit.Tests
         public void Status_IsFailedWhenResultHasError()
         {
             var test = new Test(TestCase, "bar");
-            test.Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException());
+            test.Result = new TestResult(TimeSpan.FromSeconds(1), new PmlError("error"));
             Assert.AreEqual(TestStatus.Failed, test.Status);
         }
 

@@ -65,11 +65,11 @@ namespace PmlUnit.Tests
         {
             // Arrange
             var first = First.Tests["one"];
-            first.Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("foo"));
+            first.Result = new TestResult(TimeSpan.FromSeconds(1), new PmlError("error"));
             var second = First.Tests["three"];
-            second.Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("bar"));
+            second.Result = new TestResult(TimeSpan.FromSeconds(1), new PmlError("error"));
             var third = Second.Tests["four"];
-            third.Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("baz"));
+            third.Result = new TestResult(TimeSpan.FromSeconds(1), new PmlError("error"));
             // Assert
             var expected = new List<Test>() { first, second, third };
             Assert.That(TestList.FailedTests, Is.EquivalentTo(expected));
@@ -80,7 +80,7 @@ namespace PmlUnit.Tests
         {
             // Arrange
             First.Tests["two"].Result = new TestResult(TimeSpan.FromSeconds(1));
-            Second.Tests["four"].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("error"));
+            Second.Tests["four"].Result = new TestResult(TimeSpan.FromSeconds(1), new PmlError("error"));
             // Act
             var tests = TestList.NotExecutedTests;
             // Assert

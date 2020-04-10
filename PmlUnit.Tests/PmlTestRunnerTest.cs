@@ -14,12 +14,17 @@ namespace PmlUnit.Tests
     {
         private TestCase TestCase;
         private Test Test;
+        private Hashtable StackTrace;
 
         [SetUp]
         public void Setup()
         {
             TestCase = new TestCase("Test", "test.pmlobj");
             Test = TestCase.Tests.Add("one");
+            StackTrace = new Hashtable();
+            StackTrace[1.0] = "(61,123)   FM: Form FOOBAR not found";
+            StackTrace[2.0] = " *** Error Line not available";
+            StackTrace[3.0] = " *** Error Command not available";
         }
 
         [Test]
@@ -175,7 +180,7 @@ namespace PmlUnit.Tests
             // Arrange
             int seconds = 0;
             var proxy = new Mock<ObjectProxy>();
-            proxy.Setup(mock => mock.Invoke(It.IsAny<string>(), It.IsAny<object[]>())).Throws<PmlException>();
+            proxy.Setup(mock => mock.Invoke(It.IsAny<string>(), It.IsAny<object[]>())).Returns(StackTrace);
             var clock = new Mock<Clock>();
             clock.SetupGet(mock => mock.CurrentInstant)
                 .Returns(() => Instant.FromSeconds(seconds))
@@ -197,36 +202,18 @@ namespace PmlUnit.Tests
         }
 
         [Test]
-        public void Run_ShouldReturnFailedResultWhenTestFails()
-        {
-            // Arrange
-            var error = new PmlException();
-            var proxy = new Mock<ObjectProxy>();
-            proxy.Setup(mock => mock.Invoke(It.IsAny<string>(), It.IsAny<object[]>())).Throws(error);
-            var runner = new PmlTestRunner(proxy.Object, Mock.Of<MethodInvoker>());
-            // Act
-            var result = runner.Run(Test);
-            // Assert
-            Assert.IsFalse(result.Passed);
-            Assert.AreSame(error, result.Error);
-        }
-
-        [Test]
         public void Run_ShouldReturnFailedResultWhenTestReturnsError()
         {
             // Arrange
-            var error = new Hashtable();
-            error[1.0] = "This is an error message...";
-            error[2.0] = "... which spans two lines";
             var proxy = new Mock<ObjectProxy>();
-            proxy.Setup(mock => mock.Invoke(It.IsAny<string>(), It.IsAny<object[]>())).Returns(error);
+            proxy.Setup(mock => mock.Invoke(It.IsAny<string>(), It.IsAny<object[]>())).Returns(StackTrace);
             var runner = new PmlTestRunner(proxy.Object, Mock.Of<MethodInvoker>());
             // Act
             var result = runner.Run(Test);
             // Assert
             Assert.IsFalse(result.Passed);
             Assert.NotNull(result.Error);
-            Assert.AreEqual("This is an error message...\r\n... which spans two lines\r\n", result.Error.Message);
+            Assert.AreEqual(StackTrace[1.0], result.Error.Message);
         }
 
         [Test]

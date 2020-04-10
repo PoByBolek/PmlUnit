@@ -6,7 +6,7 @@ namespace PmlUnit
 {
     class TestResult
     {
-        public Exception Error { get; }
+        public PmlError Error { get; }
         public TimeSpan Duration { get; }
 
         public TestResult(TimeSpan duration)
@@ -14,7 +14,7 @@ namespace PmlUnit
         {
         }
 
-        public TestResult(TimeSpan duration, Exception error)
+        public TestResult(TimeSpan duration, PmlError error)
         {
             Error = error;
             Duration = duration;
