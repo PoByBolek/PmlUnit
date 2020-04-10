@@ -90,7 +90,7 @@ namespace PmlUnit
         {
             var error = InvokePmlMethod("refreshIndex");
             if (error != null)
-                throw new PmlException("refreshIndex method failed");
+                throw new PmlException("Failed to refresh index", error);
         }
 
         public void Reload(TestCase testCase)
@@ -100,7 +100,7 @@ namespace PmlUnit
 
             var error = InvokePmlMethod("reload", testCase.Name);
             if (error != null)
-                throw new PmlException("reload method failed");
+                throw new PmlException("Failed to reload test case " + testCase.Name, error);
         }
 
         public void Run(TestCase testCase)

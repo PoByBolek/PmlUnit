@@ -5,12 +5,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace PmlUnit
 {
-
-    class StackTrace : ICollection<StackFrame>
+    public sealed class StackTrace : ICollection<StackFrame>
     {
         private readonly List<StackFrame> Frames;
 
@@ -69,7 +69,7 @@ namespace PmlUnit
         }
     }
 
-    class StackFrame
+    public sealed class StackFrame
     {
         public static bool operator ==(StackFrame left, StackFrame right)
         {
@@ -88,6 +88,7 @@ namespace PmlUnit
 
         public int LineNumber { get; }
         public int ColumnNumber { get; }
+        public string LineInformation { get; }
         public string CallSite { get; }
 
         public StackFrame(string lineInformation, string callSite)
@@ -101,6 +102,7 @@ namespace PmlUnit
             if (!match.Success)
                 throw new FormatException("Line information has an invalid format");
 
+            LineInformation = lineInformation;
             LineNumber = int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
             int column = callSite.IndexOf("^^", StringComparison.Ordinal);
             if (column >= 0)
@@ -137,6 +139,23 @@ namespace PmlUnit
             return LineNumber.GetHashCode()
                 ^ ColumnNumber.GetHashCode()
                 ^ CallSite.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            var builder = new StringBuilder();
+            builder.AppendLine(LineInformation);
+            if (ColumnNumber > 0)
+            {
+                builder.Append(CallSite.Substring(0, ColumnNumber));
+                builder.Append("^^");
+                builder.Append(CallSite.Substring(ColumnNumber));
+            }
+            else
+            {
+                builder.Append(CallSite);
+            }
+            return builder.ToString();
         }
     }
 }

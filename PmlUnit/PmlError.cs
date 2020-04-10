@@ -4,11 +4,21 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace PmlUnit
 {
-    class PmlError
+    public sealed class PmlError
     {
+        public static PmlError FromString(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+
+            var lines = value.Trim().Split('\n');
+            return FromList(lines.Where(line => string.IsNullOrWhiteSpace(line)).ToList());
+        }
+
         public static PmlError FromHashTable(Hashtable stackTrace)
         {
             if (stackTrace == null || stackTrace.Count == 0)
@@ -68,6 +78,15 @@ namespace PmlUnit
 
             Message = message;
             StackTrace = stackTrace ?? new StackTrace();
+        }
+
+        public override string ToString()
+        {
+            var builder = new StringBuilder();
+            builder.AppendLine(Message);
+            foreach (var frame in StackTrace)
+                builder.AppendLine(frame.ToString());
+            return builder.ToString();
         }
     }
 }

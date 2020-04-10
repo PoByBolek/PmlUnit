@@ -1,28 +1,28 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
-using System.Collections;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 
 namespace PmlUnit
 {
     [Serializable]
     public class PmlException : Exception
     {
-        public PmlException()
-        {
-        }
+        public PmlError Error { get; }
 
-        public PmlException(Hashtable stackTrace)
-            : base(BuildMessage(stackTrace))
+        public PmlException()
         {
         }
 
         public PmlException(string message)
             : base(message)
         {
+        }
+
+        public PmlException(string message, PmlError error)
+            : base(message)
+        {
+            Error = error;
         }
 
         public PmlException(string message, Exception innerException)
@@ -33,18 +33,19 @@ namespace PmlUnit
         protected PmlException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
+            if (info == null)
+                throw new ArgumentNullException(nameof(info));
+
+            Error = PmlError.FromString(info.GetString("PmlException.Error"));
         }
 
-        private static string BuildMessage(Hashtable stackTrace)
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            if (stackTrace == null || stackTrace.Count == 0)
-                return "An error occurred";
+            if (info == null)
+                throw new ArgumentNullException(nameof(info));
 
-            var message = new StringBuilder();
-            foreach (var key in stackTrace.Keys.OfType<double>().OrderBy(x => x))
-                message.AppendLine(stackTrace[key].ToString());
-
-            return message.ToString();
+            base.GetObjectData(info, context);
+            info.AddValue("PmlException.Error", Error == null ? "" : Error.ToString());
         }
     }
 }
