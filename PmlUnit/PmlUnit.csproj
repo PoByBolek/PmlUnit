@@ -121,6 +121,7 @@
     <Compile Include="MethodInvoker.cs" />
     <Compile Include="ObjectProxy.cs" />
     <Compile Include="ParserException.cs" />
+    <Compile Include="PmlError.cs" />
     <Compile Include="PmlException.cs" />
     <Compile Include="PmlObjectProxy.cs" />
     <Compile Include="PmlTestRunner.cs" />
@@ -134,6 +135,7 @@
     <Compile Include="ServiceProvider.cs" />
     <Compile Include="ShowAboutDialogCommand.cs" />
     <Compile Include="ShowTestRunnerCommand.cs" />
+    <Compile Include="StackTrace.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="TestCase.cs" />
     <Compile Include="TestCaseCollection.cs" />
