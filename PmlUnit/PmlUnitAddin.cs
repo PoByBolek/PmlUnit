@@ -27,7 +27,7 @@ namespace PmlUnit
             try
             {
                 TestRunner = new PmlTestRunner(new ControlMethodInvoker(() => TestRunnerControl));
-                TestCaseProvider = new EnvironmentVariableTestCaseProvider();
+                TestCaseProvider = new IndexFileTestCaseProvider(IndexFile.FromEnvironmentVariable());
                 TestRunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner);
                 AboutDialog = new AboutDialog();
             }

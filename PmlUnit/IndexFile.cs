@@ -13,6 +13,51 @@ namespace PmlUnit
     {
         public const string DefaultName = "pml.index";
 
+        public static IndexFile FromEnvironmentVariable()
+        {
+            return FromEnvironmentVariable("PMLLIB");
+        }
+
+        public static IndexFile FromEnvironmentVariable(string variableName)
+        {
+            if (string.IsNullOrEmpty(variableName))
+                throw new ArgumentNullException(nameof(variableName));
+
+            var result = new IndexFile();
+            var pmllib = Environment.GetEnvironmentVariable(variableName);
+            if (string.IsNullOrEmpty(pmllib))
+                return result;
+
+            string[] paths;
+            if (pmllib.IndexOf(Path.PathSeparator) >= 0)
+                paths = pmllib.Split(Path.PathSeparator);
+            else if (Directory.Exists(pmllib))
+                paths = new string[] { pmllib };
+            else
+                paths = pmllib.Split(' ');
+
+            foreach (var path in paths)
+            {
+                if (!Path.IsPathRooted(path))
+                    continue;
+
+                IndexFile index;
+                try
+                {
+                    index = FromDirectory(path);
+                }
+                catch (FileNotFoundException)
+                {
+                    continue;
+                }
+
+                foreach (var fileName in index.Files)
+                    result.Files[Path.GetFileName(fileName)] = fileName;
+            }
+
+            return result;
+        }
+
         public static IndexFile FromDirectory(string directoryName)
         {
             if (string.IsNullOrEmpty(directoryName))
