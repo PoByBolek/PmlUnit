@@ -119,6 +119,7 @@
     <Compile Include="IconLabel.Designer.cs">
       <DependentUpon>IconLabel.cs</DependentUpon>
     </Compile>
+    <Compile Include="IndexFile.cs" />
     <Compile Include="IndexFileTestCaseProvider.cs" />
     <Compile Include="MethodInvoker.cs" />
     <Compile Include="ObjectProxy.cs" />

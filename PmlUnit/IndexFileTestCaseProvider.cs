@@ -2,107 +2,48 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Text;
 
 namespace PmlUnit
 {
     class IndexFileTestCaseProvider : TestCaseProvider
     {
+        private readonly IndexFile Index;
         private readonly TestCaseParser Parser;
-        private readonly HashSet<string> PotentialTestCaseNames;
-
-        public IndexFileTestCaseProvider(string directoryName)
-            : this(directoryName, new SimpleTestCaseParser())
+        
+        public IndexFileTestCaseProvider(IndexFile index)
+            : this(index, new SimpleTestCaseParser())
         {
         }
 
-
-        [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
-            Justification = "The private constructor closes the TextReader returned from CreateIndexFileReader().")]
-        public IndexFileTestCaseProvider(string directoryName, TestCaseParser parser)
-            : this(directoryName, CreateIndexFileReader(directoryName), parser, closeReader: true)
+        public IndexFileTestCaseProvider(IndexFile index, TestCaseParser parser)
         {
-        }
+            if (index == null)
+                throw new ArgumentNullException(nameof(index));
+            if (parser == null)
+                throw new ArgumentNullException(nameof(parser));
 
-        public IndexFileTestCaseProvider(string directoryName, TextReader reader)
-            : this(directoryName, reader, new SimpleTestCaseParser(), closeReader: false)
-        {
-        }
-
-        public IndexFileTestCaseProvider(string directoryName, TextReader reader, TestCaseParser parser)
-            : this(directoryName, reader, parser, closeReader: false)
-        {
-        }
-
-        private IndexFileTestCaseProvider(string directoryName, TextReader reader, TestCaseParser parser, bool closeReader)
-        {
-            try
-            {
-                if (string.IsNullOrEmpty(directoryName))
-                    throw new ArgumentNullException(nameof(directoryName));
-                if (reader == null)
-                    throw new ArgumentNullException(nameof(reader));
-                if (parser == null)
-                    throw new ArgumentNullException(nameof(parser));
-
-                Parser = parser;
-                PotentialTestCaseNames = FindPotentialTestCases(directoryName, reader);
-            }
-            finally
-            {
-                if (closeReader && reader != null)
-                    reader.Close();
-            }
-        }
-
-        private static TextReader CreateIndexFileReader(string directoryName)
-        {
-            if (string.IsNullOrEmpty(directoryName))
-                throw new ArgumentNullException(nameof(directoryName));
-
-            string path = Path.Combine(directoryName, "pml.index");
-            return new StreamReader(path, Encoding.UTF8);
-        }
-
-        private static HashSet<string> FindPotentialTestCases(string directoryName, TextReader reader)
-        {
-            var result = new HashSet<string>();
-            string directory = null;
-
-            foreach (string line in reader.ReadAllLines())
-            {
-                var trimmed = line.Trim();
-                if (trimmed.StartsWith("/", StringComparison.Ordinal))
-                {
-                    // TODO: what happens when PDMS encounters "/../../" ?
-                    directory = Path.Combine(directoryName, trimmed.Substring(1));
-                    directory = directory.Replace('/', Path.DirectorySeparatorChar);
-                }
-                else if (directory != null && trimmed.EndsWith("test.pmlobj", StringComparison.OrdinalIgnoreCase))
-                {
-                    result.Add(Path.Combine(directory, trimmed));
-                }
-            }
-
-            return result;
+            Index = index;
+            Parser = parser;
         }
 
         public ICollection<TestCase> GetTestCases()
         {
             var result = new List<TestCase>();
-            foreach (string path in PotentialTestCaseNames)
+            foreach (string path in Index.Files)
             {
-                try
+                if (path.EndsWith("test.pmlobj", StringComparison.OrdinalIgnoreCase))
                 {
-                    result.Add(Parser.Parse(path));
-                }
-                catch (ParserException)
-                {
-                }
-                catch (FileNotFoundException)
-                {
+                    try
+                    {
+                        result.Add(Parser.Parse(path));
+                    }
+                    catch (ParserException)
+                    {
+                    }
+                    catch (FileNotFoundException)
+                    {
+                    }
                 }
             }
             return result;

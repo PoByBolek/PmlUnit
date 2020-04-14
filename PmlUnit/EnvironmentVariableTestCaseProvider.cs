@@ -42,7 +42,7 @@ namespace PmlUnit
 
         private static TestCaseProvider CreateTestCaseProvider(string directoryName)
         {
-            return new IndexFileTestCaseProvider(directoryName);
+            return new IndexFileTestCaseProvider(IndexFile.FromDirectory(directoryName));
         }
 
         public ICollection<TestCase> GetTestCases()

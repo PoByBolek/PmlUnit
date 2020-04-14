@@ -112,6 +112,7 @@
   <ItemGroup>
     <Compile Include="ControlExtensions.cs" />
     <Compile Include="EnvironmentVariableTestCaseProviderTest.cs" />
+    <Compile Include="IndexFileTest.cs" />
     <Compile Include="IndexFileTestCaseProviderTest.cs" />
     <Compile Include="InstantTest.cs" />
     <Compile Include="PmlErrorTest.cs" />

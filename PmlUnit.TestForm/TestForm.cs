@@ -72,22 +72,42 @@ namespace PmlUnit
 
         private class MutablePathTestCaseProvider : TestCaseProvider
         {
-            public string Path { get; set; }
-
             private TestCaseProvider Provider;
+            private string PathField;
 
             public MutablePathTestCaseProvider(string path)
             {
                 Path = path;
-                Provider = null;
             }
+
+            public string Path
+            {
+                get { return PathField; }
+                set
+                {
+                    if (value != PathField)
+                    {
+                        PathField = value;
+                        Provider = new IndexFileTestCaseProvider(GetIndexFile(value));
+                    }
+                }
+            }
+
+            private static IndexFile GetIndexFile(string directory)
+            {
+                if (string.IsNullOrEmpty(directory))
+                    return new IndexFile();
+
+                string fileName = System.IO.Path.Combine(directory, "pml.index");
+                if (File.Exists(fileName))
+                    return new IndexFile(fileName);
+                else
+                    return new IndexFile();
+            }
+
 
             public ICollection<TestCase> GetTestCases()
             {
-                if (string.IsNullOrEmpty(Path) || !File.Exists(System.IO.Path.Combine(Path, "pml.index")))
-                    return new List<TestCase>();
-                if (Provider == null)
-                    Provider = new IndexFileTestCaseProvider(Path);
                 return Provider.GetTestCases();
             }
         }
