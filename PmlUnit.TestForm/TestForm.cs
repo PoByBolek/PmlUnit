@@ -25,7 +25,7 @@ namespace PmlUnit
             {
                 Provider = new MutablePathTestCaseProvider(Path.GetFullPath("..\\..\\..\\..\\pmllib-tests"));
                 proxy = new StubObjectProxy();
-                runner = new PmlTestRunner(proxy, new StubClock(), new ControlMethodInvoker(this));
+                runner = new PmlTestRunner(proxy, new ControlMethodInvoker(this), new StubClock());
                 proxy = null;
                 control = new TestRunnerControl(Provider, runner);
                 RunnerControl = control;

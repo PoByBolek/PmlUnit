@@ -30,23 +30,68 @@ namespace PmlUnit.Tests
         [Test]
         public void Constructor_ShouldCheckForNullArguments()
         {
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(null));
+            Clock clock = Mock.Of<Clock>();
+            Clock noClock = null;
+            MethodInvoker invoker = Mock.Of<MethodInvoker>();
+            MethodInvoker noInvoker = null;
+            EntryPointResolver resolver = Mock.Of<EntryPointResolver>();
+            EntryPointResolver noResolver = null;
+            ObjectProxy proxy = Mock.Of<ObjectProxy>();
+            ObjectProxy noProxy = null;
 
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner((Clock)null, null));
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(Mock.Of<Clock>(), null));
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner((Clock)null, Mock.Of<MethodInvoker>()));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noInvoker));
 
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner((ObjectProxy)null, null));
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(Mock.Of<ObjectProxy>(), null));
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner((ObjectProxy)null, Mock.Of<MethodInvoker>()));
-            
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(null, null, null));
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(null, null, Mock.Of<MethodInvoker>()));
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(null, Mock.Of<Clock>(), null));
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(null, Mock.Of<Clock>(), Mock.Of<MethodInvoker>()));
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(Mock.Of<ObjectProxy>(), null, null));
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(Mock.Of<ObjectProxy>(), null, Mock.Of<MethodInvoker>()));
-            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(Mock.Of<ObjectProxy>(), Mock.Of<Clock>(), null));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noInvoker, noClock));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noInvoker, clock));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(invoker, noClock));
+
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noInvoker, noResolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(invoker, noResolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noInvoker, resolver));
+
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noInvoker, noClock, noResolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noInvoker, noClock, resolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noInvoker, clock, noResolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noInvoker, clock, resolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(invoker, noClock, noResolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(invoker, noClock, resolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(invoker, clock, noResolver));
+
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noProxy, noInvoker));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noProxy, invoker));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(proxy, noInvoker));
+
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noProxy, noInvoker, noClock));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noProxy, noInvoker, clock));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noProxy, invoker, noClock));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noProxy, invoker, clock));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(proxy, noInvoker, noClock));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(proxy, noInvoker, clock));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(proxy, invoker, noClock));
+
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noProxy, noInvoker, noResolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noProxy, noInvoker, resolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noProxy, invoker, noResolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noProxy, invoker, resolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(proxy, noInvoker, noResolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(proxy, noInvoker, resolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(proxy, invoker, noResolver));
+
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noProxy, noInvoker, noClock, noResolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noProxy, noInvoker, noClock, resolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noProxy, noInvoker, clock, noResolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noProxy, noInvoker, clock, resolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noProxy, invoker, noClock, noResolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noProxy, invoker, noClock, resolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noProxy, invoker, clock, noResolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(noProxy, invoker, clock, resolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(proxy, noInvoker, noClock, noResolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(proxy, noInvoker, noClock, resolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(proxy, noInvoker, clock, noResolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(proxy, noInvoker, clock, resolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(proxy, invoker, noClock, noResolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(proxy, invoker, noClock, resolver));
+            Assert.Throws<ArgumentNullException>(() => new PmlTestRunner(proxy, invoker, clock, noResolver));
         }
 
         [Test]
@@ -73,7 +118,7 @@ namespace PmlUnit.Tests
         [Test]
         public void Run_ShouldFailAfterBeingDisposed()
         {
-            var runner = new PmlTestRunner(Mock.Of<ObjectProxy>(), Mock.Of<Clock>(), Mock.Of<MethodInvoker>());
+            var runner = new PmlTestRunner(Mock.Of<ObjectProxy>(), Mock.Of<MethodInvoker>(), Mock.Of<Clock>());
             runner.Dispose();
             Assert.Throws<ObjectDisposedException>(() => runner.Run(TestCase));
             Assert.Throws<ObjectDisposedException>(() => runner.Run(Test));
@@ -145,7 +190,7 @@ namespace PmlUnit.Tests
         public void Run_ShouldQueryTheClock()
         {
             var clock = new Mock<Clock>();
-            var runner = new PmlTestRunner(Mock.Of<ObjectProxy>(), clock.Object, Mock.Of<MethodInvoker>());
+            var runner = new PmlTestRunner(Mock.Of<ObjectProxy>(), Mock.Of<MethodInvoker>(), clock.Object);
             runner.Run(Test);
             clock.VerifyGet(mock => mock.CurrentInstant, Times.Exactly(2));
         }
@@ -164,7 +209,7 @@ namespace PmlUnit.Tests
             clock.SetupGet(mock => mock.CurrentInstant)
                 .Returns(() => Instant.FromSeconds(seconds))
                 .Callback(() => seconds = duration);
-            var runner = new PmlTestRunner(Mock.Of<ObjectProxy>(), clock.Object, Mock.Of<MethodInvoker>());
+            var runner = new PmlTestRunner(Mock.Of<ObjectProxy>(), Mock.Of<MethodInvoker>(), clock.Object);
             // Act
             var result = runner.Run(Test);
             // Assert
@@ -185,7 +230,7 @@ namespace PmlUnit.Tests
             clock.SetupGet(mock => mock.CurrentInstant)
                 .Returns(() => Instant.FromSeconds(seconds))
                 .Callback(() => seconds = duration);
-            var runner = new PmlTestRunner(proxy.Object, clock.Object, Mock.Of<MethodInvoker>());
+            var runner = new PmlTestRunner(proxy.Object, Mock.Of<MethodInvoker>(), clock.Object);
             // Act
             var result = runner.Run(Test);
             // Assert

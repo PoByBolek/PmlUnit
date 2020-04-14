@@ -19,48 +19,68 @@ namespace PmlUnit
 
         private readonly MethodInvoker Invoker;
         private readonly Clock Clock;
+        private readonly EntryPointResolver Resolver;
         private ObjectProxy RunnerProxy;
 
         public PmlTestRunner(MethodInvoker invoker)
-            : this(new SystemClock(), invoker)
+            : this(invoker, new SystemClock())
         {
         }
 
-        public PmlTestRunner(Clock clock, MethodInvoker invoker)
+        public PmlTestRunner(MethodInvoker invoker, EntryPointResolver resolver)
+            : this(invoker, new SystemClock(), resolver)
         {
-            if (clock == null)
-                throw new ArgumentNullException(nameof(clock));
+        }
+
+        public PmlTestRunner(MethodInvoker invoker, Clock clock)
+            : this(invoker, clock, new SimpleEntryPointResolver())
+        {
+        }
+
+        public PmlTestRunner(MethodInvoker invoker, Clock clock, EntryPointResolver resolver)
+        {
             if (invoker == null)
                 throw new ArgumentNullException(nameof(invoker));
+            if (clock == null)
+                throw new ArgumentNullException(nameof(clock));
+            if (resolver == null)
+                throw new ArgumentNullException(nameof(resolver));
 
             Invoker = invoker;
             Clock = clock;
+            Resolver = resolver;
             RunnerProxy = new PmlObjectProxy("PmlTestRunner");
         }
 
         public PmlTestRunner(ObjectProxy proxy, MethodInvoker invoker)
+            : this(proxy, invoker, new SystemClock())
         {
-            if (proxy == null)
-                throw new ArgumentNullException(nameof(proxy));
-            if (invoker == null)
-                throw new ArgumentNullException(nameof(invoker));
-
-            Invoker = invoker;
-            Clock = new SystemClock();
-            RunnerProxy = proxy;
         }
 
-        public PmlTestRunner(ObjectProxy proxy, Clock clock, MethodInvoker invoker)
+        public PmlTestRunner(ObjectProxy proxy, MethodInvoker invoker, EntryPointResolver resolver)
+            : this(proxy, invoker, new SystemClock(), resolver)
+        {
+        }
+
+        public PmlTestRunner(ObjectProxy proxy, MethodInvoker invoker, Clock clock)
+            : this(proxy, invoker, clock, new SimpleEntryPointResolver())
+        {
+        }
+
+        public PmlTestRunner(ObjectProxy proxy, MethodInvoker invoker, Clock clock, EntryPointResolver resolver)
         {
             if (proxy == null)
                 throw new ArgumentNullException(nameof(proxy));
-            if (clock == null)
-                throw new ArgumentNullException(nameof(clock));
             if (invoker == null)
                 throw new ArgumentNullException(nameof(invoker));
+            if (clock == null)
+                throw new ArgumentNullException(nameof(clock));
+            if (resolver == null)
+                throw new ArgumentNullException(nameof(resolver));
 
-            Invoker = invoker;
             Clock = clock;
+            Invoker = invoker;
+            Resolver = resolver;
             RunnerProxy = proxy;
         }
 
@@ -253,7 +273,7 @@ namespace PmlUnit
             var result = RunnerProxy.Invoke(method, arguments);
             var stackTrace = result as Hashtable;
             if (stackTrace != null)
-                return PmlError.FromHashTable(stackTrace, new SimpleEntryPointResolver());
+                return PmlError.FromHashTable(stackTrace, Resolver);
 
             var disposable = result as IDisposable;
             if (disposable != null)
