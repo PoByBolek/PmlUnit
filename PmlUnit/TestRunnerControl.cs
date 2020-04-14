@@ -115,34 +115,6 @@ namespace PmlUnit
                 MessageBox.Show(e.Error.ToString(), "Test run failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
-        private void RunInternal(IList<Test> tests, int index)
-        {
-            if (index < tests.Count)
-            {
-                try
-                {
-                    var test = tests[index];
-                    Runner.Run(test);
-                    ExecutionProgressBar.Increment(1);
-                    if (test.Status == TestStatus.Failed)
-                        ExecutionProgressBar.Color = Color.Red;
-                    
-                    Update();
-                    BeginInvoke(new RunDelegate(RunInternal), tests, index + 1);
-                }
-                catch
-                {
-                    Enabled = true;
-                    throw;
-                }
-            }
-            else
-            {
-                Enabled = true;
-                TestSummary.UpdateSummary(tests);
-            }
-        }
-
         private void OnRefreshLinkClick(object sender, EventArgs e)
         {
             Runner.RefreshIndex();
