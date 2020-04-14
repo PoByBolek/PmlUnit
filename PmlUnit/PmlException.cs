@@ -36,7 +36,9 @@ namespace PmlUnit
             if (info == null)
                 throw new ArgumentNullException(nameof(info));
 
-            Error = PmlError.FromString(info.GetString("PmlException.Error"));
+            Error = PmlError.FromString(
+                info.GetString("PmlException.Error"), new SimpleEntryPointResolver()
+            );
         }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)

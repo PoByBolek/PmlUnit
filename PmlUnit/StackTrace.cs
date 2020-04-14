@@ -93,12 +93,14 @@ namespace PmlUnit
 
         private string LineInformation { get; }
 
-        public StackFrame(string lineInformation, string callSite)
+        public StackFrame(string lineInformation, string callSite, EntryPointResolver resolver)
         {
             if (string.IsNullOrEmpty(lineInformation))
                 throw new ArgumentNullException(nameof(lineInformation));
             if (string.IsNullOrEmpty(callSite))
                 throw new ArgumentNullException(nameof(callSite));
+            if (resolver == null)
+                throw new ArgumentNullException(nameof(resolver));
 
             var match = Regex.Match(lineInformation, @"^(?:In|Called from) line (\d+) of (.+)$");
             if (!match.Success)
@@ -106,7 +108,7 @@ namespace PmlUnit
 
             LineInformation = lineInformation;
             LineNumber = int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
-            EntryPoint = new EntryPoint(match.Groups[2].Value);
+            EntryPoint = resolver.Resolve(match.Groups[2].Value);
 
             int column = callSite.IndexOf("^^", StringComparison.Ordinal);
             if (column >= 0)
@@ -161,41 +163,5 @@ namespace PmlUnit
             }
             return builder.ToString();
         }
-    }
-
-    public class EntryPoint
-    {
-        public EntryPointKind Kind { get; }
-        public string Name { get; }
-
-        public EntryPoint(string value)
-        {
-            if (value.StartsWith("Macro ", StringComparison.OrdinalIgnoreCase))
-            {
-                Kind = EntryPointKind.Macro;
-                Name = value.Substring(6);
-            }
-            else if (value.StartsWith("PML function ", StringComparison.OrdinalIgnoreCase))
-            {
-                if (value.IndexOf(".", StringComparison.Ordinal) >= 0)
-                    Kind = EntryPointKind.Method;
-                else
-                    Kind = EntryPointKind.Function;
-                Name = value.Substring(13);
-            }
-            else
-            {
-                Kind = EntryPointKind.Unknown;
-                Name = value;
-            }
-        }
-    }
-
-    public enum EntryPointKind
-    {
-        Unknown,
-        Macro,
-        Function,
-        Method,
     }
 }

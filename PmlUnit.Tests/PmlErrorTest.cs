@@ -4,6 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
+using Moq;
+
 using NUnit.Framework;
 
 namespace PmlUnit.Tests
@@ -15,10 +17,12 @@ namespace PmlUnit.Tests
         private List<string> Lines;
         private List<string> MissingStackTrace;
         private List<StackFrame> ExpectedStackTrace;
+        private EntryPointResolver Resolver;
 
         [SetUp]
         public void Setup()
         {
+            Resolver = new SimpleEntryPointResolver();
             Lines = new List<string>()
             {
                 "(44,33)   FNF:File not found",
@@ -43,23 +47,28 @@ namespace PmlUnit.Tests
             {
                 new StackFrame(
                     @"In line 44 of Macro C:\Aveva\Plant\E3D21~1.0\PMLLIB\common\functions\runsynonym.pmlmac",
-                    "^^$M \"/%PMLUI%/CLIB/FILES/UELEMSEL\" =1/1"
+                    "^^$M \"/%PMLUI%/CLIB/FILES/UELEMSEL\" =1/1",
+                    Resolver
                 ),
                 new StackFrame(
                     "Called from line 34 of PML function runsynonym",
-                    "  $m \"$!<macro>\" $<$!<action>$>"
+                    "  $m \"$!<macro>\" $<$!<action>$>",
+                    Resolver
                 ),
                 new StackFrame(
                     "Called from line 62 of PML function pmlasserttest.TESTEQUALWITHUNEQUALVALUES",
-                    "    !!runSynonym('CALLIB UELEMSEL =1/1')"
+                    "    !!runSynonym('CALLIB UELEMSEL =1/1')",
+                    Resolver
                 ),
                 new StackFrame(
                     "Called from line 53 of PML function pmltestrunner.RUNINTERNAL",
-                    "    !testCase.$!<testName>(object PmlAssert())"
+                    "    !testCase.$!<testName>(object PmlAssert())",
+                    Resolver
                 ),
                 new StackFrame(
                     "Called from line 37 of PML function pmltestrunner.RUN",
-                    "    !this.runInternal(!testCaseName, !testName, !hasSetup, !hasTearDown)"
+                    "    !this.runInternal(!testCaseName, !testName, !hasSetup, !hasTearDown)",
+                    Resolver
                 )
             };
         }
@@ -67,27 +76,29 @@ namespace PmlUnit.Tests
         [Test]
         public void EmptyHashTableReturnsNoError()
         {
-            Assert.That(PmlError.FromHashTable(null), Is.Null);
-            Assert.That(PmlError.FromHashTable(new Hashtable()), Is.Null);
+            var resolver = Mock.Of<EntryPointResolver>();
+            Assert.That(PmlError.FromHashTable(null, resolver), Is.Null);
+            Assert.That(PmlError.FromHashTable(new Hashtable(), resolver), Is.Null);
         }
 
         [Test]
         public void EmptyListReturnsNoError()
         {
-            Assert.That(PmlError.FromList(null), Is.Null);
-            Assert.That(PmlError.FromList(new List<string>()), Is.Null);
+            var resolver = Mock.Of<EntryPointResolver>();
+            Assert.That(PmlError.FromList(null, resolver), Is.Null);
+            Assert.That(PmlError.FromList(new List<string>(), resolver), Is.Null);
         }
 
         [Test]
         public void ParseFromHashTable()
         {
             var message = Lines[0];
-            var error = PmlError.FromHashTable(ToHashTable(Lines));
+            var error = PmlError.FromHashTable(ToHashTable(Lines), Resolver);
             Assert.That(error.Message, Is.EqualTo(message));
             Assert.That(error.StackTrace, Is.EquivalentTo(ExpectedStackTrace));
 
             message = MissingStackTrace[0];
-            error = PmlError.FromHashTable(ToHashTable(MissingStackTrace));
+            error = PmlError.FromHashTable(ToHashTable(MissingStackTrace), Resolver);
             Assert.That(error.Message, Is.EqualTo(message));
             Assert.That(error.StackTrace, Is.Empty);
         }
@@ -96,12 +107,12 @@ namespace PmlUnit.Tests
         public void ParseFromList()
         {
             var message = Lines[0];
-            var error = PmlError.FromList(Lines);
+            var error = PmlError.FromList(Lines, Resolver);
             Assert.That(error.Message, Is.EqualTo(message));
             Assert.That(error.StackTrace, Is.EquivalentTo(ExpectedStackTrace));
 
             message = MissingStackTrace[0];
-            error = PmlError.FromList(MissingStackTrace);
+            error = PmlError.FromList(MissingStackTrace, Resolver);
             Assert.That(error.Message, Is.EqualTo(message));
             Assert.That(error.StackTrace, Is.Empty);
         }
@@ -110,12 +121,12 @@ namespace PmlUnit.Tests
         public void ParseFromString()
         {
             var message = Lines[0];
-            var error = PmlError.FromString(ToString(Lines));
+            var error = PmlError.FromString(ToString(Lines), Resolver);
             Assert.That(error.Message, Is.EqualTo(message));
             Assert.That(error.StackTrace, Is.EquivalentTo(ExpectedStackTrace));
 
             message = MissingStackTrace[0];
-            error = PmlError.FromString(ToString(MissingStackTrace));
+            error = PmlError.FromString(ToString(MissingStackTrace), Resolver);
             Assert.That(error.Message, Is.EqualTo(message));
             Assert.That(error.StackTrace, Is.Empty);
         }

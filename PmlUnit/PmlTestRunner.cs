@@ -253,7 +253,7 @@ namespace PmlUnit
             var result = RunnerProxy.Invoke(method, arguments);
             var stackTrace = result as Hashtable;
             if (stackTrace != null)
-                return PmlError.FromHashTable(stackTrace);
+                return PmlError.FromHashTable(stackTrace, new SimpleEntryPointResolver());
 
             var disposable = result as IDisposable;
             if (disposable != null)

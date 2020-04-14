@@ -2,6 +2,9 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Globalization;
+
+using Moq;
+
 using NUnit.Framework;
 
 namespace PmlUnit.Tests
@@ -13,15 +16,27 @@ namespace PmlUnit.Tests
         [Test]
         public void ValidatesNullArguments()
         {
-            Assert.Throws<ArgumentNullException>(() => new StackFrame(null, null));
-            Assert.Throws<ArgumentNullException>(() => new StackFrame(null, ""));
-            Assert.Throws<ArgumentNullException>(() => new StackFrame("", null));
-            Assert.Throws<ArgumentNullException>(() => new StackFrame("", ""));
+            Assert.Throws<ArgumentNullException>(() => new StackFrame(null, null, null));
+            Assert.Throws<ArgumentNullException>(() => new StackFrame(null, "", null));
+            Assert.Throws<ArgumentNullException>(() => new StackFrame("", null, null));
+            Assert.Throws<ArgumentNullException>(() => new StackFrame("", "", null));
 
-            Assert.Throws<ArgumentNullException>(() => new StackFrame(null, "foo"));
-            Assert.Throws<ArgumentNullException>(() => new StackFrame("", "foo"));
-            Assert.Throws<ArgumentNullException>(() => new StackFrame("foo", null));
-            Assert.Throws<ArgumentNullException>(() => new StackFrame("foo", ""));
+            Assert.Throws<ArgumentNullException>(() => new StackFrame(null, null, Mock.Of<EntryPointResolver>()));
+            Assert.Throws<ArgumentNullException>(() => new StackFrame(null, "", Mock.Of<EntryPointResolver>()));
+            Assert.Throws<ArgumentNullException>(() => new StackFrame("", null, Mock.Of<EntryPointResolver>()));
+            Assert.Throws<ArgumentNullException>(() => new StackFrame("", "", Mock.Of<EntryPointResolver>()));
+
+            Assert.Throws<ArgumentNullException>(() => new StackFrame(null, "foo", null));
+            Assert.Throws<ArgumentNullException>(() => new StackFrame("", "foo", null));
+            Assert.Throws<ArgumentNullException>(() => new StackFrame("foo", null, null));
+            Assert.Throws<ArgumentNullException>(() => new StackFrame("foo", "", null));
+
+            Assert.Throws<ArgumentNullException>(() => new StackFrame(null, "foo", Mock.Of<EntryPointResolver>()));
+            Assert.Throws<ArgumentNullException>(() => new StackFrame("", "foo", Mock.Of<EntryPointResolver>()));
+            Assert.Throws<ArgumentNullException>(() => new StackFrame("foo", null, Mock.Of<EntryPointResolver>()));
+            Assert.Throws<ArgumentNullException>(() => new StackFrame("foo", "", Mock.Of<EntryPointResolver>()));
+
+            Assert.Throws<ArgumentNullException>(() => new StackFrame("foo", "bar", null));
         }
 
         [TestCase(0)]
@@ -32,11 +47,11 @@ namespace PmlUnit.Tests
         public void ParsesLineNumber(int lineNumber)
         {
             var inLine = string.Format(CultureInfo.InvariantCulture, "In line {0} of PML function foo", lineNumber);
-            var frame = new StackFrame(inLine, "!!foo()");
+            var frame = new StackFrame(inLine, "!!foo()", Mock.Of<EntryPointResolver>());
             Assert.That(frame.LineNumber, Is.EqualTo(lineNumber));
 
             var calledFrom = string.Format(CultureInfo.InvariantCulture, "Called from line {0} of PML function foo", lineNumber);
-            frame = new StackFrame(calledFrom, "!!foo()");
+            frame = new StackFrame(calledFrom, "!!foo()", Mock.Of<EntryPointResolver>());
             Assert.That(frame.LineNumber, Is.EqualTo(lineNumber));
         }
 
@@ -48,7 +63,7 @@ namespace PmlUnit.Tests
         [TestCase("!!^^foo()", 2)]
         public void ParsesColumnNumber(string callSite, int expectedColumn)
         {
-            var frame = new StackFrame("Called from line 1 of PML function foo", callSite);
+            var frame = new StackFrame("Called from line 1 of PML function foo", callSite, Mock.Of<EntryPointResolver>());
             Assert.That(frame.ColumnNumber, Is.EqualTo(expectedColumn));
         }
 
@@ -62,34 +77,31 @@ namespace PmlUnit.Tests
         [TestCase(" random stu^^ff ", " random stuff ")]
         public void RemovesCaretFromCallSite(string callSiteArg, string expectedCallSite)
         {
-            var frame = new StackFrame("Called from line 1 of PML function foo", callSiteArg);
+            var frame = new StackFrame("Called from line 1 of PML function foo", callSiteArg, Mock.Of<EntryPointResolver>());
             Assert.That(frame.CallSite, Is.EqualTo(expectedCallSite));
         }
 
-        [TestCase("PML function foo", EntryPointKind.Function, "foo")]
-        [TestCase("pml function foo", EntryPointKind.Function, "foo")]
-        [TestCase("PML FUNCTION foo", EntryPointKind.Function, "foo")]
-        [TestCase("pml FUNCTION foo", EntryPointKind.Function, "foo")]
-        [TestCase("PML function foo.BAR", EntryPointKind.Method, "foo.BAR")]
-        [TestCase("pml function foo.BAR", EntryPointKind.Method, "foo.BAR")]
-        [TestCase("pml FUNCTION foo.BAR", EntryPointKind.Method, "foo.BAR")]
-        [TestCase("PML FUNCTION foo.BAR", EntryPointKind.Method, "foo.BAR")]
-        [TestCase("Macro C:\\foo\\bar\\macro.pmlmac", EntryPointKind.Macro, "C:\\foo\\bar\\macro.pmlmac")]
-        [TestCase("macro C:\\foo\\bar\\macro.pmlmac", EntryPointKind.Macro, "C:\\foo\\bar\\macro.pmlmac")]
-        [TestCase("MACRO C:\\foo\\bar\\macro.pmlmac", EntryPointKind.Macro, "C:\\foo\\bar\\macro.pmlmac")]
-        [TestCase("MaCrO C:\\foo\\bar\\macro.pmlmac", EntryPointKind.Macro, "C:\\foo\\bar\\macro.pmlmac")]
-        [TestCase("PML functionality test", EntryPointKind.Unknown, "PML functionality test")]
-        [TestCase("Macroscopic command", EntryPointKind.Unknown, "Macroscopic command")]
-        [TestCase("something else", EntryPointKind.Unknown, "something else")]
-        public void DeterminesEntryPoint(string entryPoint, EntryPointKind expectedKind, string expectedName)
+        [TestCase("PML function foo")]
+        [TestCase("PML FUNCTION bar")]
+        [TestCase("pml function foo.BAR")]
+        [TestCase("PmL FuNcTiOn FoO.bAr")]
+        [TestCase("Macro C:\\foo\\bar\\macro.pmlmac")]
+        [TestCase("Something else")]
+        public void PassesEntryPointToResolver(string entryPoint)
         {
-            var frame = new StackFrame("In line 123 of " + entryPoint, "!!foo()");
-            Assert.That(frame.EntryPoint.Kind, Is.EqualTo(expectedKind));
-            Assert.That(frame.EntryPoint.Name, Is.EqualTo(expectedName));
+            var result = new EntryPoint(EntryPointKind.Unknown, "foo");
+            var mock = new Mock<EntryPointResolver>();
+            mock.Setup(resolver => resolver.Resolve(entryPoint)).Returns(result);
+            var frame = new StackFrame("In line 123 of " + entryPoint, "!!foo()", mock.Object);
+            mock.Verify();
+            Assert.That(frame.EntryPoint, Is.SameAs(result));
 
-            frame = new StackFrame("Called from line 123 of " + entryPoint, "!!foo()");
-            Assert.That(frame.EntryPoint.Kind, Is.EqualTo(expectedKind));
-            Assert.That(frame.EntryPoint.Name, Is.EqualTo(expectedName));
+            result = new EntryPoint(EntryPointKind.Unknown, "bar");
+            mock = new Mock<EntryPointResolver>();
+            mock.Setup(resolver => resolver.Resolve(entryPoint)).Returns(result);
+            frame = new StackFrame("Called from line 123 of " + entryPoint, "!!foo()", mock.Object);
+            mock.Verify();
+            Assert.That(frame.EntryPoint, Is.SameAs(result));
         }
     }
 }

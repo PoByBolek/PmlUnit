@@ -110,6 +110,8 @@
     <Compile Include="CustomLinkLabel.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="EntryPoint.cs" />
+    <Compile Include="EntryPointResolver.cs" />
     <Compile Include="EnvironmentVariableTestCaseProvider.cs" />
     <Compile Include="IconLabel.cs">
       <SubType>UserControl</SubType>

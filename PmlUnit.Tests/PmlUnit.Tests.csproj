@@ -119,6 +119,7 @@
     <Compile Include="PmlUnitAddinTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShowTestRunnerCommandTest.cs" />
+    <Compile Include="SimpleEntryPointResolverTest.cs" />
     <Compile Include="SimpleTestCaseParserTest.cs" />
     <Compile Include="StackFrameTest.cs" />
     <Compile Include="TestCaseCollectionTest.cs" />
