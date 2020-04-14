@@ -88,8 +88,10 @@ namespace PmlUnit
 
         public int LineNumber { get; }
         public int ColumnNumber { get; }
-        public string LineInformation { get; }
+        public EntryPoint EntryPoint { get; }
         public string CallSite { get; }
+
+        private string LineInformation { get; }
 
         public StackFrame(string lineInformation, string callSite)
         {
@@ -98,12 +100,14 @@ namespace PmlUnit
             if (string.IsNullOrEmpty(callSite))
                 throw new ArgumentNullException(nameof(callSite));
 
-            var match = Regex.Match(lineInformation, @"^(?:In|Called from) line (\d+) of .+$");
+            var match = Regex.Match(lineInformation, @"^(?:In|Called from) line (\d+) of (.+)$");
             if (!match.Success)
                 throw new FormatException("Line information has an invalid format");
 
             LineInformation = lineInformation;
             LineNumber = int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
+            EntryPoint = new EntryPoint(match.Groups[2].Value);
+
             int column = callSite.IndexOf("^^", StringComparison.Ordinal);
             if (column >= 0)
             {
@@ -157,5 +161,41 @@ namespace PmlUnit
             }
             return builder.ToString();
         }
+    }
+
+    public class EntryPoint
+    {
+        public EntryPointKind Kind { get; }
+        public string Name { get; }
+
+        public EntryPoint(string value)
+        {
+            if (value.StartsWith("Macro ", StringComparison.OrdinalIgnoreCase))
+            {
+                Kind = EntryPointKind.Macro;
+                Name = value.Substring(6);
+            }
+            else if (value.StartsWith("PML function ", StringComparison.OrdinalIgnoreCase))
+            {
+                if (value.IndexOf(".", StringComparison.Ordinal) >= 0)
+                    Kind = EntryPointKind.Method;
+                else
+                    Kind = EntryPointKind.Function;
+                Name = value.Substring(13);
+            }
+            else
+            {
+                Kind = EntryPointKind.Unknown;
+                Name = value;
+            }
+        }
+    }
+
+    public enum EntryPointKind
+    {
+        Unknown,
+        Macro,
+        Function,
+        Method,
     }
 }

@@ -65,5 +65,31 @@ namespace PmlUnit.Tests
             var frame = new StackFrame("Called from line 1 of PML function foo", callSiteArg);
             Assert.That(frame.CallSite, Is.EqualTo(expectedCallSite));
         }
+
+        [TestCase("PML function foo", EntryPointKind.Function, "foo")]
+        [TestCase("pml function foo", EntryPointKind.Function, "foo")]
+        [TestCase("PML FUNCTION foo", EntryPointKind.Function, "foo")]
+        [TestCase("pml FUNCTION foo", EntryPointKind.Function, "foo")]
+        [TestCase("PML function foo.BAR", EntryPointKind.Method, "foo.BAR")]
+        [TestCase("pml function foo.BAR", EntryPointKind.Method, "foo.BAR")]
+        [TestCase("pml FUNCTION foo.BAR", EntryPointKind.Method, "foo.BAR")]
+        [TestCase("PML FUNCTION foo.BAR", EntryPointKind.Method, "foo.BAR")]
+        [TestCase("Macro C:\\foo\\bar\\macro.pmlmac", EntryPointKind.Macro, "C:\\foo\\bar\\macro.pmlmac")]
+        [TestCase("macro C:\\foo\\bar\\macro.pmlmac", EntryPointKind.Macro, "C:\\foo\\bar\\macro.pmlmac")]
+        [TestCase("MACRO C:\\foo\\bar\\macro.pmlmac", EntryPointKind.Macro, "C:\\foo\\bar\\macro.pmlmac")]
+        [TestCase("MaCrO C:\\foo\\bar\\macro.pmlmac", EntryPointKind.Macro, "C:\\foo\\bar\\macro.pmlmac")]
+        [TestCase("PML functionality test", EntryPointKind.Unknown, "PML functionality test")]
+        [TestCase("Macroscopic command", EntryPointKind.Unknown, "Macroscopic command")]
+        [TestCase("something else", EntryPointKind.Unknown, "something else")]
+        public void DeterminesEntryPoint(string entryPoint, EntryPointKind expectedKind, string expectedName)
+        {
+            var frame = new StackFrame("In line 123 of " + entryPoint, "!!foo()");
+            Assert.That(frame.EntryPoint.Kind, Is.EqualTo(expectedKind));
+            Assert.That(frame.EntryPoint.Name, Is.EqualTo(expectedName));
+
+            frame = new StackFrame("Called from line 123 of " + entryPoint, "!!foo()");
+            Assert.That(frame.EntryPoint.Kind, Is.EqualTo(expectedKind));
+            Assert.That(frame.EntryPoint.Name, Is.EqualTo(expectedName));
+        }
     }
 }
