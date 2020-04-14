@@ -142,6 +142,7 @@ namespace PmlUnit
             finally
             {
                 IsBusy = false;
+                CancellationPending = false;
             }
 
             OnTestRunCompleted(tests, null);
@@ -169,6 +170,7 @@ namespace PmlUnit
             catch
             {
                 IsBusy = false;
+                CancellationPending = false;
                 throw;
             }
         }
@@ -218,6 +220,7 @@ namespace PmlUnit
         private void OnTestRunCompleted(IEnumerable<Test> tests, Exception error)
         {
             IsBusy = false;
+            CancellationPending = false;
             RunCompleted?.Invoke(this, new TestRunCompletedEventArgs(tests, error));
         }
 
