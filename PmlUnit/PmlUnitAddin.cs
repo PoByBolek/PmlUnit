@@ -26,8 +26,12 @@ namespace PmlUnit
         {
             try
             {
-                TestRunner = new PmlTestRunner(new ControlMethodInvoker(() => TestRunnerControl));
-                TestCaseProvider = new IndexFileTestCaseProvider(IndexFile.FromEnvironmentVariable());
+                var index = IndexFile.FromEnvironmentVariable();
+                TestRunner = new PmlTestRunner(
+                    new ControlMethodInvoker(() => TestRunnerControl),
+                    new IndexFileEntryPointResolver(index)
+                );
+                TestCaseProvider = new IndexFileTestCaseProvider(index);
                 TestRunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner);
                 AboutDialog = new AboutDialog();
             }

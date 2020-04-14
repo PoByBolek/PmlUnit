@@ -8,14 +8,21 @@ namespace PmlUnit
     {
         public EntryPointKind Kind { get; }
         public string Name { get; }
+        public string FileName { get; }
 
         public EntryPoint(EntryPointKind kind, string name)
+            : this(kind, name, "")
+        {
+        }
+
+        public EntryPoint(EntryPointKind kind, string name, string fileName)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
 
             Kind = kind;
             Name = name;
+            FileName = fileName ?? "";
         }
     }
 
