@@ -15,8 +15,11 @@ namespace PmlUnit
             if (string.IsNullOrWhiteSpace(value))
                 return null;
 
-            var lines = value.Trim().Split('\n');
-            return FromList(lines.Where(line => string.IsNullOrWhiteSpace(line)).ToList());
+            var lines = value.Trim().Split('\n')
+                .Where(line => !string.IsNullOrWhiteSpace(line))
+                .Select(line => line.TrimEnd('\r'))
+                .ToList();
+            return FromList(lines);
         }
 
         public static PmlError FromHashTable(Hashtable stackTrace)

@@ -2,6 +2,7 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 
 using NUnit.Framework;
 
@@ -11,24 +12,15 @@ namespace PmlUnit.Tests
     [TestOf(typeof(PmlError))]
     public class PmlErrorTest
     {
-        [Test]
-        public void EmptyHashTableReturnsNoError()
-        {
-            Assert.That(PmlError.FromHashTable(null), Is.Null);
-            Assert.That(PmlError.FromHashTable(new Hashtable()), Is.Null);
-        }
+        private List<string> Lines;
+        private List<string> MissingStackTrace;
+        private List<StackFrame> ExpectedStackTrace;
 
-        [Test]
-        public void EmptyListReturnsNoError()
+        [SetUp]
+        public void Setup()
         {
-            Assert.That(PmlError.FromList(null), Is.Null);
-            Assert.That(PmlError.FromList(new List<string>()), Is.Null);
-        }
-
-        [Test]
-        public void FromHashTable_ReconstructsStackFrames()
-        {
-            var error = Parse(
+            Lines = new List<string>()
+            {
                 "(44,33)   FNF:File not found",
                 @"In line 44 of Macro C:\Aveva\Plant\E3D21~1.0\PMLLIB\common\functions\runsynonym.pmlmac",
                 "^^$M \"/%PMLUI%/CLIB/FILES/UELEMSEL\" =1/1",
@@ -40,9 +32,14 @@ namespace PmlUnit.Tests
                 "    !testCase.$!<testName>(object PmlAssert())",
                 "Called from line 37 of PML function pmltestrunner.RUN",
                 "    !this.runInternal(!testCaseName, !testName, !hasSetup, !hasTearDown)"
-            );
-            Assert.That(error.Message, Is.EqualTo("(44,33)   FNF:File not found"));
-            Assert.That(error.StackTrace, Is.EquivalentTo(new List<StackFrame>()
+            };
+            MissingStackTrace = new List<string>()
+            {
+                "(61,123)   FM: Form FOOBAR not found",
+                " *** Error Line not available",
+                " *** Error Command not available"
+            };
+            ExpectedStackTrace = new List<StackFrame>()
             {
                 new StackFrame(
                     @"In line 44 of Macro C:\Aveva\Plant\E3D21~1.0\PMLLIB\common\functions\runsynonym.pmlmac",
@@ -64,27 +61,80 @@ namespace PmlUnit.Tests
                     "Called from line 37 of PML function pmltestrunner.RUN",
                     "    !this.runInternal(!testCaseName, !testName, !hasSetup, !hasTearDown)"
                 )
-            }));
+            };
         }
 
         [Test]
-        public void FromHashTable_IgnoresMissingStackTrace()
+        public void EmptyHashTableReturnsNoError()
         {
-            var error = Parse(
-                "(61,123)   FM: Form FOOBAR not found",
-                " *** Error Line not available",
-                " *** Error Command not available"
-            );
-            Assert.That(error.Message, Is.EqualTo("(61,123)   FM: Form FOOBAR not found"));
+            Assert.That(PmlError.FromHashTable(null), Is.Null);
+            Assert.That(PmlError.FromHashTable(new Hashtable()), Is.Null);
+        }
+
+        [Test]
+        public void EmptyListReturnsNoError()
+        {
+            Assert.That(PmlError.FromList(null), Is.Null);
+            Assert.That(PmlError.FromList(new List<string>()), Is.Null);
+        }
+
+        [Test]
+        public void ParseFromHashTable()
+        {
+            var message = Lines[0];
+            var error = PmlError.FromHashTable(ToHashTable(Lines));
+            Assert.That(error.Message, Is.EqualTo(message));
+            Assert.That(error.StackTrace, Is.EquivalentTo(ExpectedStackTrace));
+
+            message = MissingStackTrace[0];
+            error = PmlError.FromHashTable(ToHashTable(MissingStackTrace));
+            Assert.That(error.Message, Is.EqualTo(message));
             Assert.That(error.StackTrace, Is.Empty);
         }
 
-        private static PmlError Parse(params string[] lines)
+        [Test]
+        public void ParseFromList()
         {
-            var result = new Hashtable(lines.Length);
-            for (int i = 0; i < lines.Length; i++)
-                result[(double)(i + 1)] = lines[i];
-            return PmlError.FromHashTable(result);
+            var message = Lines[0];
+            var error = PmlError.FromList(Lines);
+            Assert.That(error.Message, Is.EqualTo(message));
+            Assert.That(error.StackTrace, Is.EquivalentTo(ExpectedStackTrace));
+
+            message = MissingStackTrace[0];
+            error = PmlError.FromList(MissingStackTrace);
+            Assert.That(error.Message, Is.EqualTo(message));
+            Assert.That(error.StackTrace, Is.Empty);
+        }
+
+        [Test]
+        public void ParseFromString()
+        {
+            var message = Lines[0];
+            var error = PmlError.FromString(ToString(Lines));
+            Assert.That(error.Message, Is.EqualTo(message));
+            Assert.That(error.StackTrace, Is.EquivalentTo(ExpectedStackTrace));
+
+            message = MissingStackTrace[0];
+            error = PmlError.FromString(ToString(MissingStackTrace));
+            Assert.That(error.Message, Is.EqualTo(message));
+            Assert.That(error.StackTrace, Is.Empty);
+        }
+
+        private static Hashtable ToHashTable(IEnumerable<string> lines)
+        {
+            var result = new Hashtable();
+            double key = 1.0;
+            foreach (var line in lines)
+                result[key++] = line;
+            return result;
+        }
+
+        private static string ToString(IEnumerable<string> lines)
+        {
+            var builder = new StringBuilder();
+            foreach (var line in lines)
+                builder.AppendLine(line);
+            return builder.ToString();
         }
     }
 }
