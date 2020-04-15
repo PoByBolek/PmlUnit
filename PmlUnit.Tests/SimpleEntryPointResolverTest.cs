@@ -26,7 +26,7 @@ namespace PmlUnit.Tests
         public void ResolvesBasicEntryPoints(string entryPoint, EntryPointKind expectedKind, string expectedName)
         {
             var resolver = new SimpleEntryPointResolver();
-            var result = resolver.Resolve(entryPoint);
+            var result = resolver.Resolve(entryPoint, 0);
             Assert.That(result, Is.Not.Null);
             Assert.That(result.Kind, Is.EqualTo(expectedKind));
             Assert.That(result.Name, Is.EqualTo(expectedName));

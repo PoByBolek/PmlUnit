@@ -101,7 +101,7 @@ namespace PmlUnit
                 if (string.IsNullOrEmpty(directory))
                     return new IndexFile();
 
-                string fileName = System.IO.Path.Combine(directory, "pml.index");
+                string fileName = System.IO.Path.Combine(directory, IndexFile.DefaultName);
                 if (File.Exists(fileName))
                     return new IndexFile(fileName);
                 else
@@ -113,9 +113,9 @@ namespace PmlUnit
                 return Provider.GetTestCases();
             }
 
-            public EntryPoint Resolve(string value)
+            public EntryPoint Resolve(string value, int line)
             {
-                return Resolver.Resolve(value);
+                return Resolver.Resolve(value, line);
             }
         }
 
@@ -142,7 +142,7 @@ namespace PmlUnit
                     result[3.0] = "^^$M \"/%PMLUI%/CLIB/FILES/UELEMSEL\" =1/1";
                     result[4.0] = "Called from line 34 of PML function runsynonym";
                     result[5.0] = "  $m \"$!<macro>\" $<$!<action>$>";
-                    result[6.0] = "Called from line 62 of PML function pmlasserttest.TESTEQUALWITHUNEQUALVALUES";
+                    result[6.0] = "Called from line 60 of PML function pmlasserttest.TESTEQUALWITHUNEQUALVALUES";
                     result[7.0] = "    !!runSynonym('CALLIB UELEMSEL =1/1')";
                     result[8.0] = "Called from line 53 of PML function pmltestrunner.RUNINTERNAL";
                     result[9.0] = "    !testCase.$!<testName>(object PmlAssert())";

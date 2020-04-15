@@ -108,7 +108,7 @@ namespace PmlUnit
 
             LineInformation = lineInformation;
             LineNumber = int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);
-            EntryPoint = resolver.Resolve(match.Groups[2].Value);
+            EntryPoint = resolver.Resolve(match.Groups[2].Value, LineNumber);
 
             int column = callSite.IndexOf("^^", StringComparison.Ordinal);
             if (column >= 0)

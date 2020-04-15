@@ -91,14 +91,14 @@ namespace PmlUnit.Tests
         {
             var result = new EntryPoint(EntryPointKind.Unknown, "foo");
             var mock = new Mock<EntryPointResolver>();
-            mock.Setup(resolver => resolver.Resolve(entryPoint)).Returns(result);
+            mock.Setup(resolver => resolver.Resolve(entryPoint, 123)).Returns(result);
             var frame = new StackFrame("In line 123 of " + entryPoint, "!!foo()", mock.Object);
             mock.Verify();
             Assert.That(frame.EntryPoint, Is.SameAs(result));
 
             result = new EntryPoint(EntryPointKind.Unknown, "bar");
             mock = new Mock<EntryPointResolver>();
-            mock.Setup(resolver => resolver.Resolve(entryPoint)).Returns(result);
+            mock.Setup(resolver => resolver.Resolve(entryPoint, 123)).Returns(result);
             frame = new StackFrame("Called from line 123 of " + entryPoint, "!!foo()", mock.Object);
             mock.Verify();
             Assert.That(frame.EntryPoint, Is.SameAs(result));
