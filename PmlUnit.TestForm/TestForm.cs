@@ -12,7 +12,7 @@ namespace PmlUnit
     partial class TestForm : Form
     {
         private readonly TestRunnerControl RunnerControl;
-        private readonly MutablePathTestCaseProvider Provider;
+        private readonly MutablePathIndex Index;
 
         [SuppressMessage("Microsoft.Reliability", "CA2000:Dispose objects before losing scope",
             Justification="proxy, runner, and control are all disposed if an Exception occurs")]
@@ -23,19 +23,19 @@ namespace PmlUnit
             TestRunnerControl control = null;
             try
             {
-                Provider = new MutablePathTestCaseProvider(Path.GetFullPath("..\\..\\..\\..\\pmllib-tests"));
+                Index = new MutablePathIndex(Path.GetFullPath("..\\..\\..\\..\\pmllib-tests"));
                 proxy = new StubObjectProxy();
-                runner = new PmlTestRunner(proxy, new ControlMethodInvoker(this), new StubClock());
+                runner = new PmlTestRunner(proxy, new ControlMethodInvoker(this), new StubClock(), Index);
                 proxy = null;
-                control = new TestRunnerControl(Provider, runner);
+                control = new TestRunnerControl(Index, runner);
                 RunnerControl = control;
                 runner = null;
                 control.Dock = DockStyle.Fill;
 
                 InitializeComponent();
 
-                PathComboBox.Text = Provider.Path;
-                FolderBrowser.SelectedPath = Provider.Path;
+                PathComboBox.Text = Index.Path;
+                FolderBrowser.SelectedPath = Index.Path;
 
                 ControlPanel.Controls.Add(control);
                 
@@ -57,7 +57,7 @@ namespace PmlUnit
             var result = FolderBrowser.ShowDialog(this);
             if (result == DialogResult.OK)
             {
-                Provider.Path = FolderBrowser.SelectedPath;
+                Index.Path = FolderBrowser.SelectedPath;
                 PathComboBox.Text = FolderBrowser.SelectedPath;
                 RunnerControl.LoadTests();
             }
@@ -65,17 +65,18 @@ namespace PmlUnit
 
         private void OnPathComboBoxTextChanged(object sender, EventArgs e)
         {
-            Provider.Path = PathComboBox.Text;
+            Index.Path = PathComboBox.Text;
             FolderBrowser.SelectedPath = PathComboBox.Text;
             RunnerControl.LoadTests();
         }
 
-        private class MutablePathTestCaseProvider : TestCaseProvider
+        private class MutablePathIndex : TestCaseProvider, EntryPointResolver
         {
             private TestCaseProvider Provider;
+            private EntryPointResolver Resolver;
             private string PathField;
 
-            public MutablePathTestCaseProvider(string path)
+            public MutablePathIndex(string path)
             {
                 Path = path;
             }
@@ -88,7 +89,9 @@ namespace PmlUnit
                     if (value != PathField)
                     {
                         PathField = value;
-                        Provider = new IndexFileTestCaseProvider(GetIndexFile(value));
+                        var index = GetIndexFile(value);
+                        Provider = new IndexFileTestCaseProvider(index);
+                        Resolver = new IndexFileEntryPointResolver(index);
                     }
                 }
             }
@@ -105,10 +108,14 @@ namespace PmlUnit
                     return new IndexFile();
             }
 
-
             public ICollection<TestCase> GetTestCases()
             {
                 return Provider.GetTestCases();
+            }
+
+            public EntryPoint Resolve(string value)
+            {
+                return Resolver.Resolve(value);
             }
         }
 
@@ -130,7 +137,17 @@ namespace PmlUnit
                 var result = new Hashtable();
                 if (RNG.NextDouble() > 0.8)
                 {
-                    result[1.0] = "Fail";
+                    result[1.0] = "(44,33)   FNF:File not found";
+                    result[2.0] = @"In line 44 of Macro C:\Aveva\Plant\E3D21~1.0\PMLLIB\common\functions\runsynonym.pmlmac";
+                    result[3.0] = "^^$M \"/%PMLUI%/CLIB/FILES/UELEMSEL\" =1/1";
+                    result[4.0] = "Called from line 34 of PML function runsynonym";
+                    result[5.0] = "  $m \"$!<macro>\" $<$!<action>$>";
+                    result[6.0] = "Called from line 62 of PML function pmlasserttest.TESTEQUALWITHUNEQUALVALUES";
+                    result[7.0] = "    !!runSynonym('CALLIB UELEMSEL =1/1')";
+                    result[8.0] = "Called from line 53 of PML function pmltestrunner.RUNINTERNAL";
+                    result[9.0] = "    !testCase.$!<testName>(object PmlAssert())";
+                    result[10.0] = "Called from line 37 of PML function pmltestrunner.RUN";
+                    result[11.0] = "    !this.runInternal(!testCaseName, !testName, !hasSetup, !hasTearDown)";
                 }
                 return result;
             }
