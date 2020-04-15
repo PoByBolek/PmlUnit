@@ -162,28 +162,18 @@ namespace PmlUnit.Tests
             proxy.Verify(p => p.Invoke("run", "Test", "three", hasSetUp, hasTearDown), Times.Exactly(1));
         }
 
+        [Test]
         public void Run_ShouldAssignTestResultToAllTestsInTheTestCase()
         {
             TestCase.Tests.Add("two");
             TestCase.Tests.Add("three");
 
-            var proxy = new Mock<ObjectProxy>();
-            var oneError = new PmlException("one");
-            proxy.Setup(p => p.Invoke("run", "Test", "one", It.IsAny<bool>(), It.IsAny<bool>())).Throws(oneError);
-            var twoError = new PmlException("two");
-            proxy.Setup(p => p.Invoke("run", "Test", "two", It.IsAny<bool>(), It.IsAny<bool>())).Throws(twoError);
-            var threeError = new PmlException("three");
-            proxy.Setup(p => p.Invoke("run", "Test", "three", It.IsAny<bool>(), It.IsAny<bool>())).Throws(threeError);
-
-            var runner = new PmlTestRunner(proxy.Object, Mock.Of<MethodInvoker>());
+            var runner = new PmlTestRunner(Mock.Of<ObjectProxy>(), Mock.Of<MethodInvoker>());
             runner.Run(TestCase);
 
             Assert.NotNull(TestCase.Tests["one"].Result);
-            Assert.AreSame(oneError, TestCase.Tests["one"].Result.Error);
             Assert.NotNull(TestCase.Tests["two"].Result);
-            Assert.AreSame(twoError, TestCase.Tests["two"].Result.Error);
             Assert.NotNull(TestCase.Tests["three"].Result);
-            Assert.AreSame(threeError, TestCase.Tests["three"].Result.Error);
         }
 
         [Test]
