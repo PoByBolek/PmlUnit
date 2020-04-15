@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -168,12 +169,24 @@ namespace PmlUnit
 
         private void OnTestListTestActivate(object sender, TestEventArgs e)
         {
-            var fileName = e.Test.FileName.Replace('\\', '/');
-            var url = new StringBuilder("vscode://file/");
-            url.Append(e.Test.FileName.Replace('\\', '/'));
-            if (e.Test.LineNumber > 0)
-                url.Append(':').Append(e.Test.LineNumber);
-            Process.Start(url.ToString());
+            OpenFile(e.Test.FileName, e.Test.LineNumber);
+        }
+
+        private void OnTestDetailsFileActivate(object sender, FileEventArgs e)
+        {
+            OpenFile(e.FileName, e.LineNumber);
+        }
+
+        private void OpenFile(string fileName, int lineNumber)
+        {
+            if (!string.IsNullOrEmpty(fileName) && File.Exists(fileName))
+            {
+                var url = new StringBuilder("vscode://file/");
+                url.Append(Uri.EscapeUriString(fileName.Replace('\\', '/')));
+                if (lineNumber > 0)
+                    url.Append(':').Append(lineNumber);
+                Process.Start(url.ToString());
+            }
         }
 
         private void OnSplitContainerSizeChanged(object sender, EventArgs e)

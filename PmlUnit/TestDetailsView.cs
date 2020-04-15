@@ -12,6 +12,9 @@ namespace PmlUnit
 {
     partial class TestDetailsView : UserControl
     {
+        [Category("Behavior")]
+        public event EventHandler<FileEventArgs> FileActivate;
+
         private Test TestField;
         private List<LinkLabel> StackTraceLabels;
 
@@ -179,8 +182,25 @@ namespace PmlUnit
             var frame = e.Link.LinkData as StackFrame;
             if (frame != null && !string.IsNullOrEmpty(frame.EntryPoint.FileName))
             {
-                Console.WriteLine(frame.EntryPoint.FileName);
+                FileActivate?.Invoke(this, new FileEventArgs(frame.EntryPoint.FileName, frame.LineNumber));
             }
+        }
+    }
+
+    class FileEventArgs : EventArgs
+    {
+        public string FileName { get; }
+        public int LineNumber { get; }
+
+        public FileEventArgs(string fileName, int lineNumber)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                throw new ArgumentNullException(nameof(fileName));
+            if (lineNumber < 0)
+                throw new ArgumentOutOfRangeException(nameof(lineNumber));
+
+            FileName = fileName;
+            LineNumber = lineNumber;
         }
     }
 }

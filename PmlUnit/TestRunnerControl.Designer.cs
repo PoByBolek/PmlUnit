@@ -161,6 +161,7 @@ namespace PmlUnit
             this.TestDetails.TabIndex = 1;
             this.TestDetails.TabStop = false;
             this.TestDetails.Visible = false;
+            this.TestDetails.FileActivate += new System.EventHandler<PmlUnit.FileEventArgs>(this.OnTestDetailsFileActivate);
             // 
             // TestSummary
             // 
