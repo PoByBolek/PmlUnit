@@ -92,5 +92,10 @@ namespace PmlUnit
             if (DateTime.Now > TooltipShown + delay)
                 LinkToolTip.Hide(this);
         }
+
+        private void OnLinkLabelMouseLeave(object sender, EventArgs e)
+        {
+            LinkToolTip.Hide(this);
+        }
     }
 }

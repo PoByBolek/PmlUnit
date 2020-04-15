@@ -82,6 +82,7 @@ namespace PmlUnit
             this.IconLicenseLabel.UseCompatibleTextRendering = true;
             this.IconLicenseLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnLinkLabelLinkClicked);
             this.IconLicenseLabel.LinkHover += new System.EventHandler<PmlUnit.LinkHoverEventArgs>(this.OnLinkHover);
+            this.IconLicenseLabel.MouseLeave += new System.EventHandler(this.OnLinkLabelMouseLeave);
             this.IconLicenseLabel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.OnLinkLabelMouseMove);
             // 
             // StatusIconLicenseLabel
@@ -99,6 +100,7 @@ namespace PmlUnit
             this.StatusIconLicenseLabel.UseCompatibleTextRendering = true;
             this.StatusIconLicenseLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnLinkLabelLinkClicked);
             this.StatusIconLicenseLabel.LinkHover += new System.EventHandler<PmlUnit.LinkHoverEventArgs>(this.OnLinkHover);
+            this.StatusIconLicenseLabel.MouseLeave += new System.EventHandler(this.OnLinkLabelMouseLeave);
             this.StatusIconLicenseLabel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.OnLinkLabelMouseMove);
             // 
             // GithubLabel
@@ -116,6 +118,7 @@ namespace PmlUnit
             this.GithubLabel.UseCompatibleTextRendering = true;
             this.GithubLabel.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.OnLinkLabelLinkClicked);
             this.GithubLabel.LinkHover += new System.EventHandler<PmlUnit.LinkHoverEventArgs>(this.OnLinkHover);
+            this.GithubLabel.MouseLeave += new System.EventHandler(this.OnLinkLabelMouseLeave);
             this.GithubLabel.MouseMove += new System.Windows.Forms.MouseEventHandler(this.OnLinkLabelMouseMove);
             // 
             // TitleLabel
