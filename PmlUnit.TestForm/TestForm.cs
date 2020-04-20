@@ -89,9 +89,9 @@ namespace PmlUnit
                     if (value != PathField)
                     {
                         PathField = value;
-                        var index = GetIndexFile(value);
-                        Provider = new IndexFileTestCaseProvider(index);
-                        Resolver = new IndexFileEntryPointResolver(index);
+                        var index = new FileIndex(GetIndexFile(value));
+                        Provider = new FileIndexTestCaseProvider(index);
+                        Resolver = new FileIndexEntryPointResolver(index);
                     }
                 }
             }

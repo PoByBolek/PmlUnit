@@ -6,17 +6,22 @@ using System.IO;
 
 namespace PmlUnit
 {
-    class IndexFileTestCaseProvider : TestCaseProvider
+    class FileIndexTestCaseProvider : TestCaseProvider
     {
-        private readonly IndexFile Index;
+        private readonly FileIndex Index;
         private readonly TestCaseParser Parser;
+
+        public FileIndexTestCaseProvider()
+            : this(new FileIndex())
+        {
+        }
         
-        public IndexFileTestCaseProvider(IndexFile index)
+        public FileIndexTestCaseProvider(FileIndex index)
             : this(index, new SimpleTestCaseParser())
         {
         }
 
-        public IndexFileTestCaseProvider(IndexFile index, TestCaseParser parser)
+        public FileIndexTestCaseProvider(FileIndex index, TestCaseParser parser)
         {
             if (index == null)
                 throw new ArgumentNullException(nameof(index));
@@ -30,7 +35,7 @@ namespace PmlUnit
         public ICollection<TestCase> GetTestCases()
         {
             var result = new List<TestCase>();
-            foreach (string path in Index.Files)
+            foreach (string path in Index)
             {
                 if (path.EndsWith("test.pmlobj", StringComparison.OrdinalIgnoreCase))
                 {

@@ -10,8 +10,8 @@ using NUnit.Framework;
 namespace PmlUnit.Tests
 {
     [TestFixture]
-    [TestOf(typeof(IndexFileTestCaseProvider))]
-    public class IndexFileTestCaseProviderTest
+    [TestOf(typeof(FileIndexTestCaseProvider))]
+    public class FileIndexTestCaseProviderTest
     {
         private TestCase TestCase;
 
@@ -24,19 +24,20 @@ namespace PmlUnit.Tests
         [Test]
         public void ValidatesArguments()
         {
-            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(null));
+            Assert.Throws<ArgumentNullException>(() => new FileIndexTestCaseProvider(null));
 
-            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(null, null));
-            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(null, Mock.Of<TestCaseParser>()));
-            Assert.Throws<ArgumentNullException>(() => new IndexFileTestCaseProvider(new IndexFile(), null));
+            Assert.Throws<ArgumentNullException>(() => new FileIndexTestCaseProvider(null, null));
+            Assert.Throws<ArgumentNullException>(() => new FileIndexTestCaseProvider(null, Mock.Of<TestCaseParser>()));
+            Assert.Throws<ArgumentNullException>(() => new FileIndexTestCaseProvider(new FileIndex(), null));
 
-            new IndexFileTestCaseProvider(new IndexFile(), Mock.Of<TestCaseParser>());
+            new FileIndexTestCaseProvider(new FileIndex(), Mock.Of<TestCaseParser>());
         }
 
         [Test]
         public void ReturnsEmptyCollectionFromEmptyIndexFile()
         {
-            var provider = new IndexFileTestCaseProvider(new IndexFile());
+            var index = new FileIndex(Enumerable.Empty<IndexFile>());
+            var provider = new FileIndexTestCaseProvider(index);
             var result = provider.GetTestCases();
             Assert.That(result, Is.Empty);
         }
@@ -47,10 +48,11 @@ namespace PmlUnit.Tests
             var parser = new Mock<TestCaseParser>(MockBehavior.Strict);
             parser.Setup(mock => mock.Parse(@"C:\testing\path\to\some\tests\pmlrandomtest.pmlobj")).Returns(TestCase);
 
-            var index = new IndexFile();
-            index.Files.Add(@"C:\testing\path\to\some\tests\pmlrandomtest.pmlobj");
+            var indexFile = new IndexFile();
+            indexFile.Files.Add(@"C:\testing\path\to\some\tests\pmlrandomtest.pmlobj");
+            var index = new FileIndex(indexFile);
 
-            var provider = new IndexFileTestCaseProvider(index, parser.Object);
+            var provider = new FileIndexTestCaseProvider(index, parser.Object);
             var result = provider.GetTestCases();
             Assert.That(result, Is.EquivalentTo(Enumerable.Repeat(TestCase, 1)));
 
@@ -65,12 +67,13 @@ namespace PmlUnit.Tests
             parser.Setup(mock => mock.Parse(@"C:\testing\path\to\tests\pmlsecondtest.pmlobj")).Returns(TestCase);
             parser.Setup(mock => mock.Parse(@"C:\testing\path\to\tests\pmlthirdtest.pmlobj")).Throws<FileNotFoundException>();
 
-            var index = new IndexFile();
-            index.Files.Add(@"C:\testing\path\to\tests\pmlfirsttest.pmlobj");
-            index.Files.Add(@"C:\testing\path\to\tests\pmlsecondtest.pmlobj");
-            index.Files.Add(@"C:\testing\path\to\tests\pmlthirdtest.pmlobj");
-            
-            var prodivder = new IndexFileTestCaseProvider(index, parser.Object);
+            var indexFile = new IndexFile();
+            indexFile.Files.Add(@"C:\testing\path\to\tests\pmlfirsttest.pmlobj");
+            indexFile.Files.Add(@"C:\testing\path\to\tests\pmlsecondtest.pmlobj");
+            indexFile.Files.Add(@"C:\testing\path\to\tests\pmlthirdtest.pmlobj");
+            var index = new FileIndex(indexFile);
+
+            var prodivder = new FileIndexTestCaseProvider(index, parser.Object);
             var result = prodivder.GetTestCases();
             Assert.That(result, Is.EquivalentTo(Enumerable.Repeat(TestCase, 1)));
 
@@ -86,20 +89,21 @@ namespace PmlUnit.Tests
             parser.Setup(mock => mock.Parse(@"C:\some\other\testing\path\nested\PMLOTHERTEST.PMLOBJ")).Returns(TestCase);
             parser.Setup(mock => mock.Parse(@"C:\some\other\testing\path\finaltest.PmLObJ")).Returns(TestCase);
 
-            var index = new IndexFile();
-            index.Files.Add(@"C:\some\other\testing\path\somefunc.pmlfnc");
-            index.Files.Add(@"C:\some\other\testing\path\anyform.pmlfrm");
-            index.Files.Add(@"C:\some\other\testing\path\pmltest.pmlobj");
-            index.Files.Add(@"C:\some\other\testing\path\nested\PmlCamelTest.PmlObj");
-            index.Files.Add(@"C:\some\other\testing\path\nested\PMLOTHERTEST.PMLOBJ");
-            index.Files.Add(@"C:\some\other\testing\path\nested\somecommand.pmlcmd");
-            index.Files.Add(@"C:\some\other\testing\path\nested\otherobject.pmlobj");
-            index.Files.Add(@"C:\some\other\testing\path\image.png");
-            index.Files.Add(@"C:\some\other\testing\path\somethingelse.txt");
-            index.Files.Add(@"C:\some\other\testing\path\finaltest.PmLObJ");
-            index.Files.Add(@"C:\some\other\testing\path\IGNORED.PMLOBJ");
+            var indexFile = new IndexFile();
+            indexFile.Files.Add(@"C:\some\other\testing\path\somefunc.pmlfnc");
+            indexFile.Files.Add(@"C:\some\other\testing\path\anyform.pmlfrm");
+            indexFile.Files.Add(@"C:\some\other\testing\path\pmltest.pmlobj");
+            indexFile.Files.Add(@"C:\some\other\testing\path\nested\PmlCamelTest.PmlObj");
+            indexFile.Files.Add(@"C:\some\other\testing\path\nested\PMLOTHERTEST.PMLOBJ");
+            indexFile.Files.Add(@"C:\some\other\testing\path\nested\somecommand.pmlcmd");
+            indexFile.Files.Add(@"C:\some\other\testing\path\nested\otherobject.pmlobj");
+            indexFile.Files.Add(@"C:\some\other\testing\path\image.png");
+            indexFile.Files.Add(@"C:\some\other\testing\path\somethingelse.txt");
+            indexFile.Files.Add(@"C:\some\other\testing\path\finaltest.PmLObJ");
+            indexFile.Files.Add(@"C:\some\other\testing\path\IGNORED.PMLOBJ");
+            var index = new FileIndex(indexFile);
 
-            var provider = new IndexFileTestCaseProvider(index, parser.Object);
+            var provider = new FileIndexTestCaseProvider(index, parser.Object);
             var result = provider.GetTestCases();
             Assert.That(result, Is.EquivalentTo(Enumerable.Repeat(TestCase, 4)));
 

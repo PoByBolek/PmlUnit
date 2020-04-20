@@ -25,7 +25,7 @@ namespace PmlUnit
                 proxy = new StubObjectProxy();
                 runner = new PmlTestRunner(proxy, new StubMethodInvoker());
                 proxy = null;
-                var provider = new IndexFileTestCaseProvider(IndexFile.FromEnvironmentVariable());
+                var provider = new FileIndexTestCaseProvider();
                 control = new TestRunnerControl(provider, runner);
                 runner = null;
             }

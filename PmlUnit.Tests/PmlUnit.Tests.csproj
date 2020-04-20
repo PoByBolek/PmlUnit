@@ -111,8 +111,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ControlExtensions.cs" />
+    <Compile Include="FileIndexTest.cs" />
     <Compile Include="IndexFileTest.cs" />
-    <Compile Include="IndexFileTestCaseProviderTest.cs" />
+    <Compile Include="FileIndexTestCaseProviderTest.cs" />
     <Compile Include="InstantTest.cs" />
     <Compile Include="PmlErrorTest.cs" />
     <Compile Include="PmlTestRunnerTest.cs" />

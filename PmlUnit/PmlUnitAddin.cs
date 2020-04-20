@@ -26,12 +26,12 @@ namespace PmlUnit
         {
             try
             {
-                var index = IndexFile.FromEnvironmentVariable();
+                var index = new FileIndex();
                 TestRunner = new PmlTestRunner(
                     new ControlMethodInvoker(() => TestRunnerControl),
-                    new IndexFileEntryPointResolver(index)
+                    new FileIndexEntryPointResolver(index)
                 );
-                TestCaseProvider = new IndexFileTestCaseProvider(index);
+                TestCaseProvider = new FileIndexTestCaseProvider(index);
                 TestRunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner);
                 AboutDialog = new AboutDialog();
             }

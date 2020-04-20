@@ -40,11 +40,16 @@ namespace PmlUnit
         }
     }
 
-    class IndexFileEntryPointResolver : EntryPointResolver
+    class FileIndexEntryPointResolver : EntryPointResolver
     {
-        private readonly IndexFile Index;
+        private readonly FileIndex Index;
 
-        public IndexFileEntryPointResolver(IndexFile index)
+        public FileIndexEntryPointResolver()
+            : this(new FileIndex())
+        {
+        }
+
+        public FileIndexEntryPointResolver(FileIndex index)
         {
             if (index == null)
                 throw new ArgumentNullException(nameof(index));
@@ -72,7 +77,7 @@ namespace PmlUnit
                     string baseName = functionName.Substring(0, dotIndex);
                     foreach (var extension in new string[] { ".pmlobj", ".pmlfrm", ".pmlcmd" })
                     {
-                        if (Index.Files.TryGetValue(baseName + extension, out fileName))
+                        if (Index.TryGetFile(baseName + extension, out fileName))
                         {
                             functionName = TryGetMethodName(fileName, line) ?? functionName;
                             break;
@@ -82,7 +87,7 @@ namespace PmlUnit
                 else
                 {
                     kind = EntryPointKind.Function;
-                    if (Index.Files.TryGetValue(functionName + ".pmlfnc", out fileName))
+                    if (Index.TryGetFile(functionName + ".pmlfnc", out fileName))
                     {
                         functionName = TryGetFunctionName(fileName) ?? functionName;
                     }
