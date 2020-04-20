@@ -55,6 +55,7 @@ namespace PmlUnit
             // runAllLinkLabel
             // 
             runAllLinkLabel.AutoSize = true;
+            runAllLinkLabel.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
             runAllLinkLabel.Location = new System.Drawing.Point(1, 13);
             runAllLinkLabel.Margin = new System.Windows.Forms.Padding(3);
             runAllLinkLabel.Name = "runAllLinkLabel";
@@ -67,6 +68,7 @@ namespace PmlUnit
             // refreshLinkLabel
             // 
             refreshLinkLabel.AutoSize = true;
+            refreshLinkLabel.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
             refreshLinkLabel.Location = new System.Drawing.Point(89, 13);
             refreshLinkLabel.Name = "refreshLinkLabel";
             refreshLinkLabel.Size = new System.Drawing.Size(44, 13);
@@ -176,6 +178,7 @@ namespace PmlUnit
             // RunLinkLabel
             // 
             this.RunLinkLabel.AutoSize = true;
+            this.RunLinkLabel.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
             this.RunLinkLabel.Location = new System.Drawing.Point(47, 13);
             this.RunLinkLabel.Name = "RunLinkLabel";
             this.RunLinkLabel.Size = new System.Drawing.Size(36, 13);
@@ -197,6 +200,7 @@ namespace PmlUnit
             // GroupByLinkLabel
             // 
             this.GroupByLinkLabel.AutoSize = true;
+            this.GroupByLinkLabel.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
             this.GroupByLinkLabel.Location = new System.Drawing.Point(140, 13);
             this.GroupByLinkLabel.Name = "GroupByLinkLabel";
             this.GroupByLinkLabel.Size = new System.Drawing.Size(84, 13);

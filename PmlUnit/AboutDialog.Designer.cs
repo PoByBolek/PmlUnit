@@ -71,6 +71,7 @@ namespace PmlUnit
             this.IconLicenseLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.IconLicenseLabel.LinkArea = new System.Windows.Forms.LinkArea(33, 11);
+            this.IconLicenseLabel.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
             this.IconLicenseLabel.Location = new System.Drawing.Point(146, 111);
             this.IconLicenseLabel.Margin = new System.Windows.Forms.Padding(3, 0, 3, 4);
             this.IconLicenseLabel.Name = "IconLicenseLabel";
@@ -90,6 +91,7 @@ namespace PmlUnit
             this.StatusIconLicenseLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.StatusIconLicenseLabel.LinkArea = new System.Windows.Forms.LinkArea(37, 20);
+            this.StatusIconLicenseLabel.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
             this.StatusIconLicenseLabel.Location = new System.Drawing.Point(146, 141);
             this.StatusIconLicenseLabel.Name = "StatusIconLicenseLabel";
             this.StatusIconLicenseLabel.Size = new System.Drawing.Size(332, 26);
@@ -108,6 +110,7 @@ namespace PmlUnit
             this.GithubLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.GithubLabel.LinkArea = new System.Windows.Forms.LinkArea(59, 6);
+            this.GithubLabel.LinkBehavior = System.Windows.Forms.LinkBehavior.HoverUnderline;
             this.GithubLabel.Location = new System.Drawing.Point(12, 191);
             this.GithubLabel.Name = "GithubLabel";
             this.GithubLabel.Size = new System.Drawing.Size(466, 13);

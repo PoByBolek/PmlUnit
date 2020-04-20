@@ -162,7 +162,7 @@ namespace PmlUnit
                     label.Links[0].LinkData = frame;
                     LinkToolTip.SetToolTip(label, frame.EntryPoint.FileName);
                 }
-                label.LinkBehavior = LinkBehavior.NeverUnderline;
+                label.LinkBehavior = LinkBehavior.HoverUnderline;
 
                 label.LinkClicked += OnStackTraceLabelLinkClicked;
 
