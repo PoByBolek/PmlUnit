@@ -110,6 +110,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CodeEditorTest.cs" />
     <Compile Include="ControlExtensions.cs" />
     <Compile Include="FileIndexTest.cs" />
     <Compile Include="IndexFileTest.cs" />

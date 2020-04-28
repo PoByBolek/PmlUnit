@@ -100,6 +100,7 @@
     </Compile>
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="Clock.cs" />
+    <Compile Include="CodeEditor.cs" />
     <Compile Include="CodeEditorDialog.cs">
       <SubType>Form</SubType>
     </Compile>
