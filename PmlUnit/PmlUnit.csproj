@@ -101,11 +101,14 @@
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="Clock.cs" />
     <Compile Include="CodeEditor.cs" />
-    <Compile Include="CodeEditorDialog.cs">
-      <SubType>Form</SubType>
+    <Compile Include="CodeEditorControl.cs">
+      <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="CodeEditorDialog.Designer.cs">
-      <DependentUpon>CodeEditorDialog.cs</DependentUpon>
+    <Compile Include="CodeEditorControl.Designer.cs">
+      <DependentUpon>CodeEditorControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CodeEditorDialog.cs">
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="ColorizedProgressBar.cs">
       <SubType>UserControl</SubType>
@@ -197,8 +200,8 @@
     <EmbeddedResource Include="AboutDialog.resx">
       <DependentUpon>AboutDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="CodeEditorDialog.resx">
-      <DependentUpon>CodeEditorDialog.cs</DependentUpon>
+    <EmbeddedResource Include="CodeEditorControl.resx">
+      <DependentUpon>CodeEditorControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ColorizedProgressBar.resx">
       <DependentUpon>ColorizedProgressBar.cs</DependentUpon>

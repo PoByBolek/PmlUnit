@@ -2,11 +2,9 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Windows.Forms;
 
 namespace PmlUnit
@@ -179,13 +177,15 @@ namespace PmlUnit
 
         private void OpenFile(string fileName, int lineNumber)
         {
-            if (!string.IsNullOrEmpty(fileName) && File.Exists(fileName))
+            if (string.IsNullOrEmpty(fileName) || !File.Exists(fileName))
+                return;
+
+            var result = EditorDialog.ShowDialog(this);
+            if (result == DialogResult.OK)
             {
-                var url = new StringBuilder("vscode://file/");
-                url.Append(Uri.EscapeUriString(fileName.Replace('\\', '/')));
-                if (lineNumber > 0)
-                    url.Append(':').Append(lineNumber);
-                Process.Start(url.ToString());
+                var descriptor = EditorDialog.Descriptor;
+                var editor = descriptor.ToEditor();
+                editor.OpenFile(fileName, lineNumber);
             }
         }
 

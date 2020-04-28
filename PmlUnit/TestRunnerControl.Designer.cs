@@ -36,6 +36,7 @@ namespace PmlUnit
             this.TestList = new PmlUnit.TestListView();
             this.TestDetails = new PmlUnit.TestDetailsView();
             this.TestSummary = new PmlUnit.TestSummaryView();
+            this.EditorDialog = new PmlUnit.CodeEditorDialog(this.components);
             runAllLinkLabel = new System.Windows.Forms.LinkLabel();
             refreshLinkLabel = new System.Windows.Forms.LinkLabel();
             failedTestsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -269,5 +270,6 @@ namespace PmlUnit
         private System.Windows.Forms.ContextMenuStrip GroupByMenu;
         private System.Windows.Forms.ToolStripMenuItem GroupByTestResultToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem GroupByTestCaseNameToolStripMenuItem;
+        private CodeEditorDialog EditorDialog;
     }
 }
