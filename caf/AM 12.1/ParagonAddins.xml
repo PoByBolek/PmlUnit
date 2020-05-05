@@ -10,8 +10,8 @@
   <string>AvevaNetExportConfigAddin</string>
   <string>ReportingAddin</string>
   <!--
-     You need to change this to an absolute path to the PmlUnit DLL in the
-     am-12.1\bin directory.
+    You need to change this to an absolute path to the PmlUnit DLL in the
+    am-12.1\bin directory.
   -->
   <string>..\bin\PmlUnit</string>
 </ArrayOfString>

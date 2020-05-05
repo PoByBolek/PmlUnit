@@ -4,10 +4,10 @@
     <CustomizationFile Name="Hull General" Path="AVEVA.Marine.UI.HullGeneral.uic" />
     <CustomizationFile Name="Hull Design" Path="AVEVA.Marine.UI.HullDesign.uic" />
     <CustomizationFile Name="Project" Path="$1.uic" />
-    <CustomizationFile Name="AVEVA NET" Path="AVEVA.Marine.UI.HullVNET.uic"/>
+    <CustomizationFile Name="AVEVA NET" Path="AVEVA.Marine.UI.HullVNET.uic" />
     <!--
-        You need to change the Path attribute to an absolute path to the
-        PmlUnit.uic file in the am-12.1\caf directory.
+      You need to change the Path attribute to an absolute path to the
+      PmlUnit.uic file in the am-12.1\caf directory.
     -->
     <CustomizationFile Name="PmlUnit" Path="PmlUnit.uic" />
   </UICustomizationFiles>
