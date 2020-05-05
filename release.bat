@@ -86,6 +86,33 @@ call :build "PDMS 12.1" "pdms-12.1"
 if %errorlevel% neq 0 (
     goto end
 )
+
+mkdir "%BUILD_DIR%\oh-12.1"
+if %errorlevel% neq 0 (
+    call :write_error "Failed to create oh-12.1 directory"
+    goto end
+)
+mkdir "%BUILD_DIR%\oh-12.1\bin"
+if %errorlevel% neq 0 (
+    call :write_error "Failed to create oh-12.1 binary directory"
+    goto end
+)
+mkdir "%BUILD_DIR%\oh-12.1\caf"
+if %errorlevel% neq 0 (
+    call :write_error "Failed to create oh-12.1 caf directory"
+    goto end
+)
+copy "%BUILD_DIR%\pdms-12.1\bin\*" "%BUILD_DIR%\oh-12.1\bin\"
+if %errorlevel% neq 0 (
+    call :write_error "Failed to copy pdms-12.1 binaries to oh-12.1"
+    goto end
+)
+copy "%BASE_DIR%\caf\OH 12.1\*" "%BUILD_DIR%\oh-12.1\caf\"
+if %errorlevel% neq 0 (
+    call :write_error "Failed to copy oh-12.1 CAF files"
+    goto end
+)
+
 call :build "E3D 1.1" "e3d-1.1"
 if %errorlevel% neq 0 (
     goto end

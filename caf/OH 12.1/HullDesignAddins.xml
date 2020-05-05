@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfString xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <string>ExplorerAddin</string>
+  <string>DrawListAddin</string>
+  <string>MyDataAddin</string>
+  <string>HistoryAddin</string>
+  <string>ReferenceListAddin</string>
+  <string>OutputAddin</string>
+  <string>FindAddin</string>
+  <string>AttributesUtility</string> 
+  <string>MarDraTreeAddin</string>
+  <string>LinksAddin</string>
+  <string>CatalogSearchAddin</string>
+  <string>AssemblyPlanningAddin</string>
+  <string>StatusControllerAddin</string>
+  <string>ModelChangesAddin</string>
+  <string>ManuAddin</string>
+  <string>EditElements</string>
+  <string>ReportingAddin</string>
+  <string>MCopyAddin</string>
+  <string>CopyAssistAddin</string>
+  <string>Aveva.Marine.BloDiv</string>
+  <string>AvevaNetExportConfigAddin</string> 
+  <!--
+    You need to change this to an absolute path to the PmlUnit DLL in the
+    oh-12.1\bin directory.
+  -->
+  <string>..\bin\PmlUnit</string>
+</ArrayOfString>
