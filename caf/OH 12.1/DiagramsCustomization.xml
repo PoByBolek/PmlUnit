@@ -17,7 +17,7 @@
     <CustomizationFile Name="CoreConnectionsDiagramAddin" Path="CoreConnectionsDiagramAddin.uic" />
     <!--
       You need to change the Path attribute to an absolute path to the
-      PmlUnit.uic file in the am-12.1\caf directory.
+      PmlUnit.uic file in the oh-12.1\caf directory.
     -->
     <CustomizationFile Name="PmlUnit" Path="PmlUnit.uic" />
   </UICustomizationFiles>
