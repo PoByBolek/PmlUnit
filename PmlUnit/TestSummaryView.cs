@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,9 @@ namespace PmlUnit
         public TestSummaryView()
         {
             InitializeComponent();
+
+            SummaryLabel.Font = new Font(Font.FontFamily, Font.Size * 1.5f, FontStyle.Bold);
+            ResultLabel.Font = new Font(Font, FontStyle.Bold);
         }
 
         public void UpdateSummary(ICollection<Test> tests)

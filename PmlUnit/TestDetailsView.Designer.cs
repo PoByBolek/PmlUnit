@@ -44,7 +44,6 @@ namespace PmlUnit
             // TestNameLabel
             // 
             this.TestNameLabel.AutoSize = true;
-            this.TestNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TestNameLabel.Location = new System.Drawing.Point(3, 3);
             this.TestNameLabel.Margin = new System.Windows.Forms.Padding(3);
             this.TestNameLabel.Name = "TestNameLabel";
@@ -93,7 +92,6 @@ namespace PmlUnit
             this.ErrorMessageLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.ErrorMessageLabel.AutoEllipsis = true;
-            this.ErrorMessageLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ErrorMessageLabel.Location = new System.Drawing.Point(3, 42);
             this.ErrorMessageLabel.Margin = new System.Windows.Forms.Padding(3);
             this.ErrorMessageLabel.Name = "ErrorMessageLabel";

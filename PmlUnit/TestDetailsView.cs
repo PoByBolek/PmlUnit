@@ -23,6 +23,9 @@ namespace PmlUnit
             StackTraceLabels = new List<LinkLabel>();
 
             InitializeComponent();
+
+            TestNameLabel.Font = new Font(Font.FontFamily, Font.Size * 1.5f, FontStyle.Bold);
+            ErrorMessageLabel.Font = new Font(Font, FontStyle.Bold);
         }
 
         [Browsable(false)]
