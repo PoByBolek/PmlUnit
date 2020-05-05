@@ -1,7 +1,9 @@
 # Changelog
 
-## Unreleased
+## v0.4.0 - Unreleased
 
+### Added
+- Add customization files for Hull & Outfitting 12.1. Thanks yang827!
 
 ## [v0.3.0] - 2020-01-12
 

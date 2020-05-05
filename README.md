@@ -1,7 +1,7 @@
 # PML Unit
 
 PML Unit is a test framework for the PML programming language and a test runner
-for PML code in AVEVA Everything3D, PDMS, and other products.
+for PML code in AVEVA Everything3D, PDMS, Hull & Outfitting, and other products.
 
 ![Demo](screenshots/demo.gif)
 
@@ -22,6 +22,15 @@ file to `D:\pml-unit`, you should have the following directory tree:
     |       |-- DesignCustomization.xml
     |       `-- ...
     |-- e3d-2.1
+    |   |-- bin
+    |   |   `-- PmlUnit.dll
+    |   `-- caf
+    |       |-- AdminAddins.xml
+    |       |-- AdminCustomization.xml
+    |       |-- DesignAddins.xml
+    |       |-- DesignCustomization.xml
+    |       `-- ...
+    |-- oh-12.1
     |   |-- bin
     |   |   `-- PmlUnit.dll
     |   `-- caf
@@ -54,6 +63,7 @@ environment variables in your start scripts as follows:
 
 | Platform  | `CAF_ADDINS_PATH`           | `CAF_UIC_PATH`              | `PMLLIB`             |
 | --------- | --------------------------- | --------------------------- | -------------------- |
+| OH 12.1   | `D:\pml-unit\oh-12.1\caf`   | `D:\pml-unit\oh-12.1\caf`   | `D:\pml-unit\pmllib` |
 | PDMS 12.1 | `D:\pml-unit\pdms-12.1\caf` | `D:\pml-unit\pdms-12.1\caf` | `D:\pml-unit\pmllib` |
 | E3D 1.1   | `D:\pml-unit\e3d-1.1\caf`   | `D:\pml-unit\e3d-1.1\caf`   | `D:\pml-unit\pmllib` |
 | E3D 2.1   | `D:\pml-unit\e3d-2.1\caf`   | `D:\pml-unit\e3d-2.1\caf`   | `D:\pml-unit\pmllib` |
@@ -65,13 +75,14 @@ your `custom_evars.bat` in your projects directory:
     set CAF_UIC_PATH=D:\pml-unit\e3d-2.1\caf
     set PMLLIB=%PMLLIB%;D:\pml-unit\pmllib
 
-### Note for PDMS 12.1
+### Note for PDMS and Hull & Outfitting 12.1
 
-Note that for PDMS 12.1 you will have to edit the `*Addins.xml` and
-`*Customization.xml` files in `D:\pml-unit\pdms-12.1\caf` so that they contain
-absolute paths to the `PmlUnit.dll` and `PmlUnit.uic`, respectively.
-Unfortunately, PDMS does not load addins and UIC files with path names relative
-to the `CAF_ADDINS_PATH` and `CAF_UIC_PATH` environment variables.
+Note that for PDMS and Hull & Outfitting (OH) 12.1 you will have to edit the
+`*Addins.xml` and `*Customization.xml` files in `D:\pml-unit\pdms-12.1\caf` and
+`D:\pml-unit\oh-12.1\caf` so that they contain absolute paths to the
+`PmlUnit.dll` and `PmlUnit.uic`, respectively. Unfortunately, PDMS and OH 12.1
+do not load addins and UIC files with path names relative to the `CAF_ADDINS_PATH`
+and `CAF_UIC_PATH` environment variables.
 
 For example, if you want PML Unit to show up in the PDMS Design module, you
 should edit the `D:\pml-unit\pdms-12.1\caf\DesignAddins.xml` file like this:
@@ -243,6 +254,9 @@ The solution and project files define one platform configuration for each of PML
 Unit's supported platforms: PDMS 12.1, E3D 1.1, and E3D 2.1. You can build PML
 Unit for only one platform or for all platforms at once.
 
+Note that PML Unit uses the PDMS 12.1 platform for Hull & Outfitting (OH) 12.1
+as well.
+
 ### Dependencies
 
 Copy the `Aveva.ApplicationFramework.dll`, `Aveva.ApplicationFramework.Presentation.dll`,
@@ -253,6 +267,7 @@ PDMS to their default locations, you should copy the DLLs as follows:
 
 | Platform  | Default Source                                  | Destination                 |
 | ----------| ------------------------------------------------| --------------------------- |
+| OH 12.1   | `C:\AVEVA\Marine\OH12.1.SP4`                    | `D:\pml-unit\lib\PDMS 12.1` |
 | PDMS 12.1 | `C:\AVEVA\Plant\PDMS12.1.SP4`                   | `D:\pml-unit\lib\PDMS 12.1` |
 | E3D 1.1   | `C:\Program Files (x86)\AVEVA\Plant\E3D1.1.0`   | `D:\pml-unit\lib\E3D 1.1`   |
 | E3D 2.1   | `C:\Program Files (x86)\AVEVA\Everything3D2.10` | `D:\pml-unit\lib\E3D 2.1`   |
