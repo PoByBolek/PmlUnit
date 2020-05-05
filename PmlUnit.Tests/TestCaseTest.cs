@@ -1,7 +1,7 @@
 ﻿// Copyright (c) 2019 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
-
+using System.IO;
 using NUnit.Framework;
 
 namespace PmlUnit.Tests
@@ -45,10 +45,11 @@ namespace PmlUnit.Tests
         [TestCase("C:\\absolute\\paths\\encouraged.pmlobj", "C:\\absolute\\paths\\encouraged.pmlobj")]
         [TestCase("C:/using/forward/slashes.pmlobj", "C:\\using\\forward\\slashes.pmlobj")]
         [TestCase("Y:\\extensions\\dont.matter", "Y:\\extensions\\dont.matter")]
-        [TestCase("\\relative\\to\\current\\drive.pmlobj", "C:\\relative\\to\\current\\drive.pmlobj")]
-        [TestCase("../../../../../../../../../../../relative/to/working/directory.pmlobj", "C:\\relative\\to\\working\\directory.pmlobj")]
+        [TestCase("\\relative\\to\\current\\drive.pmlobj", "\\relative\\to\\current\\drive.pmlobj")]
+        [TestCase("../../../../../../../../../../../relative/to/working/directory.pmlobj", "\\relative\\to\\working\\directory.pmlobj")]
         public void Constructor_ShouldSetFileNameProperty(string fileName, string expected)
         {
+            expected = Path.GetFullPath(expected);
             var testCase = new TestCase("HelloWorld", fileName);
             Assert.AreEqual(expected, testCase.FileName);
         }
