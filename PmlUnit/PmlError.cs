@@ -14,11 +14,11 @@ namespace PmlUnit
         {
             if (resolver == null)
                 throw new ArgumentNullException(nameof(resolver));
-            if (string.IsNullOrWhiteSpace(value))
+            if (string.IsNullOrEmpty(value))
                 return null;
 
             var lines = value.Trim().Split('\n')
-                .Where(line => !string.IsNullOrWhiteSpace(line))
+                .Where(line => !string.IsNullOrEmpty(line.Trim()))
                 .Select(line => line.TrimEnd('\r'))
                 .ToList();
             return FromList(lines, resolver);
