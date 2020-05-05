@@ -102,9 +102,9 @@ namespace PmlUnit
             if (resolver == null)
                 throw new ArgumentNullException(nameof(resolver));
 
-            var match = Regex.Match(lineInformation, @"^(?:In|Called from) line (\d+) of (.+)$");
+            var match = Regex.Match(lineInformation, @"^ *(?:In|Called from) line (\d+) of (.+)$");
             if (!match.Success)
-                throw new FormatException("Line information has an invalid format");
+                throw new FormatException("Line information has an invalid format: " + lineInformation);
 
             LineInformation = lineInformation;
             LineNumber = int.Parse(match.Groups[1].Value, CultureInfo.InvariantCulture);

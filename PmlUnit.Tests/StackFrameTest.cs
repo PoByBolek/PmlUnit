@@ -55,6 +55,18 @@ namespace PmlUnit.Tests
             Assert.That(frame.LineNumber, Is.EqualTo(lineNumber));
         }
 
+        [Test]
+        /// <summary>
+        /// PDMS prefixes its line information with at least one space (E3D doesn't).
+        /// This doesn't affect the call site though.
+        /// </summary>
+        public void AcceptsLeadingSpaces()
+        {
+            var frame = new StackFrame("  In line 123 of PML function foo", "  !!foo()", Mock.Of<EntryPointResolver>());
+            Assert.That(frame.LineNumber, Is.EqualTo(123));
+            Assert.That(frame.CallSite, Is.EqualTo("  !!foo()"));
+        }
+
         [TestCase("!!foo()", 0)]
         [TestCase("!!foo(^)", 0)]
         [TestCase("!!foo(^ ^)", 0)]
