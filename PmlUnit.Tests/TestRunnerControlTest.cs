@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-
+using System.Threading;
 using Moq;
 
 using NUnit.Framework;
@@ -14,6 +14,7 @@ namespace PmlUnit.Tests
 {
     [TestFixture]
     [TestOf(typeof(PmlTestRunner))]
+    [Apartment(ApartmentState.STA)]
     public class TestRunnerControlTest
     {
         [Test]
@@ -38,6 +39,7 @@ namespace PmlUnit.Tests
 
     [TestFixture]
     [TestOf(typeof(PmlTestRunner))]
+    [Apartment(ApartmentState.STA)]
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class TestRunnerControlProviderTest
     {
@@ -95,6 +97,7 @@ namespace PmlUnit.Tests
 
     [TestFixture]
     [TestOf(typeof(PmlTestRunner))]
+    [Apartment(ApartmentState.STA)]
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class TestRunnerControlRunTest
     {
@@ -209,6 +212,7 @@ namespace PmlUnit.Tests
 
     [TestFixture]
     [TestOf(typeof(PmlTestRunner))]
+    [Apartment(ApartmentState.STA)]
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class TestRunnerControlSelectionTest
     {

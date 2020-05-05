@@ -3,12 +3,13 @@
 using System;
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
-
+using System.Threading;
 using NUnit.Framework;
 
 namespace PmlUnit
 {
     [TestFixture]
+    [Apartment(ApartmentState.STA)]
     public static class SmokeTest
     {
         [Test]
