@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 
 namespace PmlUnit
@@ -87,7 +88,7 @@ namespace PmlUnit
     abstract class BaseCodeEditor : CodeEditor
     {
         protected readonly string FileName;
-        protected readonly string FixedArguments;
+        protected readonly IEnumerable<string> FixedArguments;
 
         protected BaseCodeEditor(string fileName, string fixedArguments)
         {
@@ -95,7 +96,7 @@ namespace PmlUnit
                 throw new ArgumentNullException(nameof(fileName));
 
             FileName = fileName;
-            FixedArguments = fixedArguments ?? "";
+            FixedArguments = SplitArguments(fixedArguments);
         }
 
         public void OpenFile(string fileName, int lineNumber)
@@ -113,10 +114,86 @@ namespace PmlUnit
             var result = new ProcessStartInfo(FileName);
             result.UseShellExecute = false;
 
-            var arguments = new StringBuilder(FixedArguments);
-            foreach (string argument in GetExtraArguments(fileName, lineNumber))
+            var arguments = new StringBuilder();
+            foreach (string argument in GetArguments(fileName, lineNumber))
                 arguments.Append(' ').Append(Escape(argument));
             result.Arguments = arguments.ToString().Trim();
+
+            return result;
+        }
+
+        protected virtual IEnumerable<string> GetArguments(string fileName, int lineNumber)
+        {
+            return FixedArguments.Concat(GetExtraArguments(fileName, lineNumber));
+        }
+
+        protected abstract IEnumerable<string> GetExtraArguments(string fileName, int lineNumber);
+
+        private static List<string> SplitArguments(string arguments)
+        {
+            var result = new List<string>();
+
+            if (arguments == null)
+                return result;
+            arguments = arguments.Trim();
+            if (string.IsNullOrEmpty(arguments))
+                return result;
+
+            // see https://docs.microsoft.com/en-us/previous-versions/17w5ykft(v=vs.85) << note the closing parenthesis
+            var argument = new StringBuilder();
+            bool backslash = false;
+            bool quote = false;
+            foreach (char c in arguments)
+            {
+                if (c == '\\')
+                {
+                    if (backslash)
+                        argument.Append('\\');
+                    backslash = !backslash;
+                    continue;
+                }
+                else if (c == '"')
+                {
+                    if (backslash)
+                    {
+                        argument.Append('"');
+                        backslash = false;
+                    }
+                    else
+                    {
+                        quote = !quote;
+                    }
+                    continue;
+                }
+
+                if (backslash)
+                {
+                    argument.Append('\\');
+                    backslash = false;
+                }
+
+                if (c == ' ' || c == '\t')
+                {
+                    if (quote)
+                    {
+                        argument.Append(c);
+                    }
+                    else if (argument.Length > 0)
+                    {
+                        result.Add(argument.ToString());
+                        argument.Remove(0, argument.Length);
+                    }
+                }
+                else
+                {
+                    argument.Append(c);
+                }
+            }
+
+            if (backslash)
+                argument.Append('\\');
+            if (argument.Length > 0)
+                result.Add(argument.ToString());
 
             return result;
         }
@@ -154,8 +231,6 @@ namespace PmlUnit
             result.Append('\\', 2 * backslashes).Append('"');
             return result.ToString();
         }
-
-        protected abstract IEnumerable<string> GetExtraArguments(string fileName, int lineNumber);
     }
 
     class AtomCodeEditor : BaseCodeEditor
@@ -250,9 +325,19 @@ namespace PmlUnit
         {
         }
 
+        protected override IEnumerable<string> GetArguments(string fileName, int lineNumber)
+        {
+            return GetExtraArguments(fileName, lineNumber);
+        }
+
         protected override IEnumerable<string> GetExtraArguments(string fileName, int lineNumber)
         {
-            throw new NotImplementedException();
+            foreach (string argument in FixedArguments)
+            {
+                yield return argument
+                    .Replace("$lineNumber", lineNumber.ToString(CultureInfo.InvariantCulture))
+                    .Replace("$fileName", fileName);
+            }
         }
     }
 }
