@@ -49,6 +49,16 @@ namespace PmlUnit
             var other = new EditorItem(CodeEditorKind.Other, "Other");
             other.SearchPaths.Add(ProgramFilesPath);
             EditorKindComboBox.Items.Add(other);
+
+            EditorKindComboBox.SelectedItem = other;
+            foreach (EditorItem item in EditorKindComboBox.Items)
+            {
+                if (!string.IsNullOrEmpty(item.TryFindFile()))
+                {
+                    EditorKindComboBox.SelectedItem = item;
+                    break;
+                }
+            }
         }
 
         private static string ProgramFilesPath
