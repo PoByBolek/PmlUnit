@@ -2,6 +2,7 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -17,31 +18,26 @@ namespace PmlUnit
 
             TooltipShown = DateTime.MinValue;
 
-            TitleLabel.Text = GetAssemblyTitle();
-            VersionLabel.Text = GetAssemblyVersion();
-            CopyrightLabel.Text = GetAssemblyCopyright();
+            TitleLabel.Font = new Font(Font.FontFamily, Font.Size * 2f, FontStyle.Bold);
+            TitleLabel.Text = GetTitle();
+            CopyrightLabel.Text = GetCopyright();
 
             IconLicenseLabel.Links[0].LinkData = "http://www.recepkutuk.com/bitsies/"; // https seems to be broken
             StatusIconLicenseLabel.Links[0].LinkData = "https://github.com/encharm/Font-Awesome-SVG-PNG";
             GithubLabel.Links[0].LinkData = "https://github.com/PoByBolek/PmlUnit";
         }
 
-        private static string GetAssemblyTitle()
+        private static string GetTitle()
         {
-            foreach (var attribute in Assembly.GetCustomAttributes<AssemblyTitleAttribute>(inherit: false))
+            foreach (var attribute in Assembly.GetCustomAttributes<AssemblyInformationalVersionAttribute>(inherit: false))
             {
-                if (!string.IsNullOrEmpty(attribute.Title))
-                    return attribute.Title;
+                if (!string.IsNullOrEmpty(attribute.InformationalVersion))
+                    return "PML Unit " + attribute.InformationalVersion;
             }
-            return "PML Unit";
+            return "PML Unit " + Assembly.GetName().Version.ToString();
         }
 
-        private static string GetAssemblyVersion()
-        {
-            return "Version " + Assembly.GetName().Version.ToString();
-        }
-
-        private static string GetAssemblyCopyright()
+        private static string GetCopyright()
         {
             foreach (var attribute in Assembly.GetCustomAttributes<AssemblyCopyrightAttribute>(inherit: false))
             {
