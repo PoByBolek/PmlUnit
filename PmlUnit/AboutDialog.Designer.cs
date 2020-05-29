@@ -127,21 +127,19 @@ namespace PmlUnit
             // TitleLabel
             // 
             this.TitleLabel.AutoSize = true;
-            this.TitleLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.TitleLabel.Location = new System.Drawing.Point(143, 12);
             this.TitleLabel.Margin = new System.Windows.Forms.Padding(0, 3, 3, 3);
             this.TitleLabel.Name = "TitleLabel";
-            this.TitleLabel.Size = new System.Drawing.Size(108, 25);
+            this.TitleLabel.Size = new System.Drawing.Size(51, 13);
             this.TitleLabel.TabIndex = 1;
             this.TitleLabel.Text = "PML Unit";
             // 
             // VersionLabel
             // 
             this.VersionLabel.AutoSize = true;
-            this.VersionLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.VersionLabel.Location = new System.Drawing.Point(146, 40);
             this.VersionLabel.Name = "VersionLabel";
-            this.VersionLabel.Size = new System.Drawing.Size(61, 16);
+            this.VersionLabel.Size = new System.Drawing.Size(42, 13);
             this.VersionLabel.TabIndex = 2;
             this.VersionLabel.Text = "Version";
             // 

@@ -23,9 +23,7 @@ namespace PmlUnit
             StackTraceLabels = new List<LinkLabel>();
 
             InitializeComponent();
-
-            TestNameLabel.Font = new Font(Font.FontFamily, Font.Size * 1.5f, FontStyle.Bold);
-            ErrorMessageLabel.Font = new Font(Font, FontStyle.Bold);
+            SetDerivedFonts();
         }
 
         [Browsable(false)]
@@ -57,6 +55,18 @@ namespace PmlUnit
                     OnTestResultChanged(TestField, EventArgs.Empty);
                 }
             }
+        }
+
+        protected override void OnFontChanged(EventArgs e)
+        {
+            base.OnFontChanged(e);
+            SetDerivedFonts();
+        }
+
+        private void SetDerivedFonts()
+        {
+            TestNameLabel.Font = new Font(Font.FontFamily, Font.Size * 1.5f, FontStyle.Bold);
+            ErrorMessageLabel.Font = new Font(Font, FontStyle.Bold);
         }
 
         private void OnTestResultChanged(object sender, EventArgs e)

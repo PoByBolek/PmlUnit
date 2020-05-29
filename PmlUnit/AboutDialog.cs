@@ -2,6 +2,7 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -14,6 +15,7 @@ namespace PmlUnit
         public AboutDialog()
         {
             InitializeComponent();
+            SetDerivedFonts();
 
             TooltipShown = DateTime.MinValue;
 
@@ -24,6 +26,18 @@ namespace PmlUnit
             IconLicenseLabel.Links[0].LinkData = "http://www.recepkutuk.com/bitsies/"; // https seems to be broken
             StatusIconLicenseLabel.Links[0].LinkData = "https://github.com/encharm/Font-Awesome-SVG-PNG";
             GithubLabel.Links[0].LinkData = "https://github.com/PoByBolek/PmlUnit";
+        }
+
+        protected override void OnFontChanged(EventArgs e)
+        {
+            base.OnFontChanged(e);
+            SetDerivedFonts();
+        }
+
+        private void SetDerivedFonts()
+        {
+            TitleLabel.Font = new Font(Font.FontFamily, Font.Size * 1.9f, FontStyle.Bold);
+            VersionLabel.Font = new Font(Font.FontFamily, Font.Size * 1.2f, FontStyle.Bold);
         }
 
         private static string GetAssemblyTitle()
