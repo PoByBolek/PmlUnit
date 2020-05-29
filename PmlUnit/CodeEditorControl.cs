@@ -160,6 +160,80 @@ namespace PmlUnit
             }
         }
 
+        public override bool ValidateChildren()
+        {
+            // We are not using the Validating events here because they don't allow us
+            // to validate one child control at a time. The base ValidateChildren() method
+            // would validate all child controls (even if the first control fails validation)
+            // which is very annyoing when we display message boxes during validation.
+            //
+            // Also, we are changing the focus in the validation methods which
+            // *MUST NOT* happen with event driven validation.
+            return ValidateEditorKind()
+                && ValidatePath()
+                && ValidateArguments();
+        }
+
+        private bool ValidateEditorKind()
+        {
+            var item = EditorKindComboBox.SelectedItem as EditorItem;
+            if (item == null)
+            {
+                MessageBox.Show(
+                    this, "Select an editor.", ParentForm.Text,
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning
+                );
+                EditorKindComboBox.Focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        private bool ValidatePath()
+        {
+            string path = PathComboBox.Text;
+            if (string.IsNullOrEmpty(path))
+            {
+                MessageBox.Show(
+                    this, "Specify a path to the editor executable.", ParentForm.Text,
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning
+                );
+                PathComboBox.Focus();
+                return false;
+            }
+            else if (!File.Exists(path))
+            {
+                var result = MessageBox.Show(
+                    this, path + "\nEditor does not exist. Do you want to use it anyway?", ParentForm.Text,
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question
+                );
+                if (result != DialogResult.Yes)
+                {
+                    PathComboBox.Focus();
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private bool ValidateArguments()
+        {
+            var item = EditorKindComboBox.SelectedItem as EditorItem;
+            if (item != null && item.Kind == CodeEditorKind.Other && !ArgumentsTextBox.Text.Contains("$fileName"))
+            {
+                MessageBox.Show(
+                    this, "Arguments must contain $fileName.", ParentForm.Text,
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning
+                );
+                ArgumentsTextBox.Focus();
+                return false;
+            }
+
+            return true;
+        }
+
         private class EditorItem
         {
             public CodeEditorKind Kind { get; }

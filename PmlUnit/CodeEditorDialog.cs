@@ -93,7 +93,7 @@ namespace PmlUnit
             return result;
         }
 
-        private static Form CreateDialog(CodeEditorControl control)
+        private Form CreateDialog(CodeEditorControl control)
         {
             var result = new Form();
             Button okButton = null;
@@ -113,6 +113,7 @@ namespace PmlUnit
                 okButton.TabIndex = 1;
                 okButton.Text = "&OK";
                 okButton.UseVisualStyleBackColor = true;
+                okButton.Click += OnOkButtonClick;
                 //
                 // cancelButton
                 //
@@ -142,6 +143,7 @@ namespace PmlUnit
                 result.MaximumSize = new Size(1920, 172);
                 result.MinimizeBox = false;
                 result.MinimumSize = new Size(395, 172);
+                result.ShowIcon = false;
                 result.ShowInTaskbar = false;
                 result.Text = "Select Editor";
                 return result;
@@ -156,6 +158,12 @@ namespace PmlUnit
                 result.Dispose();
                 throw;
             }
+        }
+
+        private void OnOkButtonClick(object sender, EventArgs e)
+        {
+            if (!Control.ValidateChildren())
+                Dialog.DialogResult = DialogResult.None;
         }
     }
 }
