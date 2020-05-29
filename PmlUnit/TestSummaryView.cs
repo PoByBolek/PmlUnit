@@ -16,9 +16,7 @@ namespace PmlUnit
         public TestSummaryView()
         {
             InitializeComponent();
-
-            SummaryLabel.Font = new Font(Font.FontFamily, Font.Size * 1.5f, FontStyle.Bold);
-            ResultLabel.Font = new Font(Font, FontStyle.Bold);
+            SetDerivedFonts();
         }
 
         public void UpdateSummary(ICollection<Test> tests)
@@ -51,6 +49,18 @@ namespace PmlUnit
             ));
             RuntimeLabel.Text = string.Format(CultureInfo.CurrentCulture, "(Total runtime: {0:c})", totalRuntime);
             RuntimeLabel.Left = ResultLabel.Right;
+        }
+
+        protected override void OnFontChanged(EventArgs e)
+        {
+            base.OnFontChanged(e);
+            SetDerivedFonts();
+        }
+
+        private void SetDerivedFonts()
+        {
+            SummaryLabel.Font = new Font(Font.FontFamily, Font.Size * 1.5f, FontStyle.Bold);
+            ResultLabel.Font = new Font(Font, FontStyle.Bold);
         }
 
         private static string Pluralize(int count, string singular)

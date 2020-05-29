@@ -15,16 +15,27 @@ namespace PmlUnit
         public AboutDialog()
         {
             InitializeComponent();
+            SetDerivedFonts();
 
             TooltipShown = DateTime.MinValue;
 
-            TitleLabel.Font = new Font(Font.FontFamily, Font.Size * 2f, FontStyle.Bold);
             TitleLabel.Text = GetTitle();
             CopyrightLabel.Text = GetCopyright();
 
             IconLicenseLabel.Links[0].LinkData = "http://www.recepkutuk.com/bitsies/"; // https seems to be broken
             StatusIconLicenseLabel.Links[0].LinkData = "https://github.com/encharm/Font-Awesome-SVG-PNG";
             GithubLabel.Links[0].LinkData = "https://github.com/PoByBolek/PmlUnit";
+        }
+
+        protected override void OnFontChanged(EventArgs e)
+        {
+            base.OnFontChanged(e);
+            SetDerivedFonts();
+        }
+
+        private void SetDerivedFonts()
+        {
+            TitleLabel.Font = new Font(Font.FontFamily, Font.Size * 2f, FontStyle.Bold);
         }
 
         private static string GetTitle()

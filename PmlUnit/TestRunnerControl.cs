@@ -27,8 +27,11 @@ namespace PmlUnit
             Runner = runner;
             Runner.TestCompleted += OnTestCompleted;
             Runner.RunCompleted += OnRunCompleted;
+
             InitializeComponent();
             ResetSplitContainerOrientation();
+
+            EditorDialog.Font = Font;
         }
 
         public void LoadTests()
@@ -46,6 +49,12 @@ namespace PmlUnit
                 Runner.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        protected override void OnFontChanged(EventArgs e)
+        {
+            base.OnFontChanged(e);
+            EditorDialog.Font = Font;
         }
 
         private void OnRunAllLinkClick(object sender, EventArgs e)
