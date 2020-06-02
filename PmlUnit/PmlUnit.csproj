@@ -110,6 +110,7 @@
     <Compile Include="CodeEditorDialog.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CodeEditorProvider.cs" />
     <Compile Include="ColorizedProgressBar.cs">
       <SubType>UserControl</SubType>
     </Compile>

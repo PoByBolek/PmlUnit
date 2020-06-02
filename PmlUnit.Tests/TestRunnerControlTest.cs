@@ -20,16 +20,22 @@ namespace PmlUnit.Tests
         [Test]
         public void Constructor_ShouldCheckForNullArguments()
         {
-            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, null));
-            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(Mock.Of<TestCaseProvider>(), null));
-            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, Mock.Of<AsyncTestRunner>()));
+            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, null, null));
+
+            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(Mock.Of<TestCaseProvider>(), null, null));
+            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, Mock.Of<AsyncTestRunner>(), null));
+            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, null, Mock.Of<CodeEditorProvider>()));
+
+            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(Mock.Of<TestCaseProvider>(), Mock.Of<AsyncTestRunner>(), null));
+            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(Mock.Of<TestCaseProvider>(), null, Mock.Of<CodeEditorProvider>()));
+            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, Mock.Of<AsyncTestRunner>(), Mock.Of<CodeEditorProvider>()));
         }
 
         [Test]
         public void Dispose_DisposesTestRunner()
         {
             var runnerMock = new Mock<AsyncTestRunner>();
-            var control = new TestRunnerControl(Mock.Of<TestCaseProvider>(), runnerMock.Object);
+            var control = new TestRunnerControl(Mock.Of<TestCaseProvider>(), runnerMock.Object, Mock.Of<CodeEditorProvider>());
             // Act
             control.Dispose();
             // Assert
@@ -65,7 +71,7 @@ namespace PmlUnit.Tests
             ProviderMock = new Mock<TestCaseProvider>();
             ProviderMock.Setup(provider => provider.GetTestCases()).Returns(TestCases);
 
-            RunnerControl = new TestRunnerControl(ProviderMock.Object, Mock.Of<AsyncTestRunner>());
+            RunnerControl = new TestRunnerControl(ProviderMock.Object, Mock.Of<AsyncTestRunner>(), Mock.Of<CodeEditorProvider>());
             TestList = RunnerControl.FindControl<TestListView>("TestList");
         }
 
@@ -123,7 +129,7 @@ namespace PmlUnit.Tests
                 .Setup(runner => runner.RunAsync(It.IsAny<IEnumerable<Test>>()))
                 .Callback((IEnumerable<Test> tests) => Tests = tests);
 
-            RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), RunnerMock.Object);
+            RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), RunnerMock.Object, Mock.Of<CodeEditorProvider>());
             TestSummary = RunnerControl.FindControl<TestSummaryView>("TestSummary");
             TestList = RunnerControl.FindControl<TestListView>("TestList");
             TestList.TestCases.Add(TestCase);
@@ -230,7 +236,7 @@ namespace PmlUnit.Tests
             TestCase.Tests.Add("one");
             TestCase.Tests.Add("two");
             TestCase.Tests.Add("three");
-            RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), Mock.Of<AsyncTestRunner>());
+            RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), Mock.Of<AsyncTestRunner>(), Mock.Of<CodeEditorProvider>());
             TestSummary = RunnerControl.FindControl<TestSummaryView>("TestSummary");
             TestDetails = RunnerControl.FindControl<TestDetailsView>("TestDetails");
             TestList = RunnerControl.FindControl<TestListView>("TestList");

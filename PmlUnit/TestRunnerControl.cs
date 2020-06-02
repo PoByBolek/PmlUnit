@@ -13,20 +13,24 @@ namespace PmlUnit
     {
         private delegate void RunDelegate(IList<Test> tests, int index);
 
-        private readonly TestCaseProvider Provider;
+        private readonly TestCaseProvider TestProvider;
         private readonly AsyncTestRunner Runner;
+        private readonly CodeEditorProvider EditorProvider;
 
-        public TestRunnerControl(TestCaseProvider provider, AsyncTestRunner runner)
+        public TestRunnerControl(TestCaseProvider testProvider, AsyncTestRunner runner, CodeEditorProvider editorProvider)
         {
-            if (provider == null)
-                throw new ArgumentNullException(nameof(provider));
+            if (testProvider == null)
+                throw new ArgumentNullException(nameof(testProvider));
             if (runner == null)
                 throw new ArgumentNullException(nameof(runner));
+            if (editorProvider == null)
+                throw new ArgumentNullException(nameof(editorProvider));
 
-            Provider = provider;
+            TestProvider = testProvider;
             Runner = runner;
             Runner.TestCompleted += OnTestCompleted;
             Runner.RunCompleted += OnRunCompleted;
+            EditorProvider = editorProvider;
 
             InitializeComponent();
             ResetSplitContainerOrientation();
@@ -37,7 +41,7 @@ namespace PmlUnit
         public void LoadTests()
         {
             TestList.TestCases.Clear();
-            TestList.TestCases.AddRange(Provider.GetTestCases());
+            TestList.TestCases.AddRange(TestProvider.GetTestCases());
             TestSummary.UpdateSummary(TestList.AllTests);
         }
 
@@ -127,7 +131,7 @@ namespace PmlUnit
         {
             Runner.RefreshIndex();
             TestList.TestCases.Clear();
-            TestList.TestCases.AddRange(Provider.GetTestCases().Select(Reload));
+            TestList.TestCases.AddRange(TestProvider.GetTestCases().Select(Reload));
         }
 
         private TestCase Reload(TestCase testCase)
@@ -189,13 +193,23 @@ namespace PmlUnit
             if (string.IsNullOrEmpty(fileName) || !File.Exists(fileName))
                 return;
 
-            var result = EditorDialog.ShowDialog(this);
-            if (result == DialogResult.OK)
+            var descriptor = EditorProvider.LoadDescriptor();
+            if (descriptor == null)
             {
-                var descriptor = EditorDialog.Descriptor;
-                var editor = descriptor.ToEditor();
-                editor.OpenFile(fileName, lineNumber);
+                var result = EditorDialog.ShowDialog(this);
+                if (result == DialogResult.OK)
+                {
+                    descriptor = EditorDialog.Descriptor;
+                    EditorProvider.SaveDescriptor(descriptor);
+                }
+                else
+                {
+                    return;
+                }
             }
+
+            var editor = descriptor.ToEditor();
+            editor.OpenFile(fileName, lineNumber);
         }
 
         private void OnSplitContainerSizeChanged(object sender, EventArgs e)

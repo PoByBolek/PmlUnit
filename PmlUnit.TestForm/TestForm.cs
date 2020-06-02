@@ -27,7 +27,7 @@ namespace PmlUnit
                 proxy = new StubObjectProxy();
                 runner = new PmlTestRunner(proxy, new ControlMethodInvoker(this), new StubClock(), Index);
                 proxy = null;
-                control = new TestRunnerControl(Index, runner);
+                control = new TestRunnerControl(Index, runner, new RegistryCodeEditorProvider());
                 RunnerControl = control;
                 runner = null;
                 control.Dock = DockStyle.Fill;

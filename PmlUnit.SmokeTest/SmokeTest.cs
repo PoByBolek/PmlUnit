@@ -27,7 +27,7 @@ namespace PmlUnit
                 runner = new PmlTestRunner(proxy, new StubMethodInvoker());
                 proxy = null;
                 var provider = new FileIndexTestCaseProvider();
-                control = new TestRunnerControl(provider, runner);
+                control = new TestRunnerControl(provider, runner, new RegistryCodeEditorProvider());
                 runner = null;
             }
             finally

@@ -37,7 +37,7 @@ namespace PmlUnit
                     new FileIndexEntryPointResolver(index)
                 );
                 TestCaseProvider = new FileIndexTestCaseProvider(index);
-                TestRunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner);
+                TestRunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner, new RegistryCodeEditorProvider());
                 TestRunnerControl.Font = font;
                 AboutDialog = new AboutDialog();
                 AboutDialog.Font = font;
@@ -56,20 +56,22 @@ namespace PmlUnit
             }
         }
 
-        internal PmlUnitAddin(TestCaseProvider provider, AsyncTestRunner runner)
+        internal PmlUnitAddin(TestCaseProvider testProvider, AsyncTestRunner runner, CodeEditorProvider editorProvider)
         {
-            if (provider == null)
-                throw new ArgumentNullException(nameof(provider));
+            if (testProvider == null)
+                throw new ArgumentNullException(nameof(testProvider));
             if (runner == null)
                 throw new ArgumentNullException(nameof(runner));
+            if (runner == null)
+                throw new ArgumentNullException(nameof(editorProvider));
 
             Font font = null;
-            TestCaseProvider = provider;
+            TestCaseProvider = testProvider;
             TestRunner = runner;
             try
             {
                 font = GetDefaultFont();
-                TestRunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner);
+                TestRunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner, editorProvider);
                 TestRunnerControl.Font = font;
                 AboutDialog = new AboutDialog();
                 AboutDialog.Font = font;

@@ -48,7 +48,7 @@ namespace PmlUnit.Tests
             TestCaseProviderMock.Setup(provider => provider.GetTestCases())
                 .Returns(new List<TestCase>());
             TestRunnerMock = new Mock<AsyncTestRunner>();
-            Addin = new PmlUnitAddin(TestCaseProviderMock.Object, TestRunnerMock.Object);
+            Addin = new PmlUnitAddin(TestCaseProviderMock.Object, TestRunnerMock.Object, Mock.Of<CodeEditorProvider>());
         }
 
         [TearDown]
