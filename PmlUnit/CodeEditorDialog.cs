@@ -80,9 +80,7 @@ namespace PmlUnit
             {
                 result.Anchor = AnchorStyles.Left | AnchorStyles.Top | AnchorStyles.Right;
                 result.Location = new Point(12, 12);
-                result.MinimumSize = new Size(346, 72);
                 result.Name = "CodeEditorControl";
-                result.Size = new Size(481, 72);
                 result.TabIndex = 0;
             }
             catch
@@ -106,7 +104,7 @@ namespace PmlUnit
                 okButton = new Button();
                 okButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
                 okButton.DialogResult = DialogResult.OK;
-                okButton.Location = new Point(337, 97);
+                okButton.Location = new Point(306, 114);
                 okButton.Margin = new Padding(3, 10, 3, 3);
                 okButton.Name = "okButton";
                 okButton.Size = new Size(75, 23);
@@ -120,7 +118,7 @@ namespace PmlUnit
                 cancelButton = new Button();
                 cancelButton.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
                 cancelButton.DialogResult = DialogResult.Cancel;
-                cancelButton.Location = new Point(418, 97);
+                cancelButton.Location = new Point(387, 114);
                 cancelButton.Margin = new Padding(3, 10, 3, 3);
                 cancelButton.Name = "cancelButton";
                 cancelButton.Size = new Size(75, 23);
@@ -134,15 +132,15 @@ namespace PmlUnit
                 result.AutoScaleDimensions = new SizeF(6F, 13F);
                 result.AutoScaleMode = AutoScaleMode.Font;
                 result.CancelButton = cancelButton;
-                result.ClientSize = new Size(505, 132);
+                result.ClientSize = new Size(474, 149);
                 result.Controls.Add(cancelButton);
                 result.Controls.Add(okButton);
                 result.Controls.Add(control);
                 result.Name = "Dialog";
                 result.MaximizeBox = false;
-                result.MaximumSize = new Size(1920, 172);
+                result.MaximumSize = new Size(1920, 189);
                 result.MinimizeBox = false;
-                result.MinimumSize = new Size(395, 172);
+                result.MinimumSize = new Size(389, 189);
                 result.ShowIcon = false;
                 result.ShowInTaskbar = false;
                 result.Text = "Select Editor";

@@ -124,9 +124,17 @@ namespace PmlUnit
             if (item != null)
             {
                 if (item.Kind == CodeEditorKind.Other)
+                {
+                    ArgumentsLabel.Text = "Arguments:";
+                    ArgumentsHintLabel.Visible = true;
                     FileDialog.Title = "Find executable";
+                }
                 else
+                {
+                    ArgumentsLabel.Text = "Extra Arguments:";
+                    ArgumentsHintLabel.Visible = false;
                     FileDialog.Title = "Find " + item.Name;
+                }
 
                 string path = item.TryFindFile();
                 if (string.IsNullOrEmpty(path))

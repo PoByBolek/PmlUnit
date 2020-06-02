@@ -33,15 +33,15 @@ namespace PmlUnit
             System.Windows.Forms.Label editorKindLabel;
             System.Windows.Forms.Button browseButton;
             System.Windows.Forms.Label pathLabel;
-            System.Windows.Forms.Label argumentsLabel;
+            this.ArgumentsLabel = new System.Windows.Forms.Label();
             this.EditorKindComboBox = new System.Windows.Forms.ComboBox();
             this.PathComboBox = new System.Windows.Forms.ComboBox();
             this.ArgumentsTextBox = new System.Windows.Forms.TextBox();
             this.FileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.ArgumentsHintLabel = new System.Windows.Forms.Label();
             editorKindLabel = new System.Windows.Forms.Label();
             browseButton = new System.Windows.Forms.Button();
             pathLabel = new System.Windows.Forms.Label();
-            argumentsLabel = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // editorKindLabel
@@ -76,15 +76,15 @@ namespace PmlUnit
             pathLabel.TabIndex = 2;
             pathLabel.Text = "Path:";
             // 
-            // argumentsLabel
+            // ArgumentsLabel
             // 
-            argumentsLabel.AutoSize = true;
-            argumentsLabel.Location = new System.Drawing.Point(0, 55);
-            argumentsLabel.Margin = new System.Windows.Forms.Padding(0, 0, 3, 4);
-            argumentsLabel.Name = "argumentsLabel";
-            argumentsLabel.Size = new System.Drawing.Size(87, 13);
-            argumentsLabel.TabIndex = 5;
-            argumentsLabel.Text = "Extra Arguments:";
+            this.ArgumentsLabel.AutoSize = true;
+            this.ArgumentsLabel.Location = new System.Drawing.Point(0, 55);
+            this.ArgumentsLabel.Margin = new System.Windows.Forms.Padding(0, 0, 3, 4);
+            this.ArgumentsLabel.Name = "ArgumentsLabel";
+            this.ArgumentsLabel.Size = new System.Drawing.Size(87, 13);
+            this.ArgumentsLabel.TabIndex = 5;
+            this.ArgumentsLabel.Text = "Extra Arguments:";
             // 
             // EditorKindComboBox
             // 
@@ -124,20 +124,30 @@ namespace PmlUnit
             this.FileDialog.DefaultExt = "exe";
             this.FileDialog.Filter = "Executable files (*.exe)|*.exe|All files (*.*)|*.*";
             // 
+            // ArgumentsHintLabel
+            // 
+            this.ArgumentsHintLabel.AutoSize = true;
+            this.ArgumentsHintLabel.Location = new System.Drawing.Point(90, 76);
+            this.ArgumentsHintLabel.Name = "ArgumentsHintLabel";
+            this.ArgumentsHintLabel.Size = new System.Drawing.Size(249, 13);
+            this.ArgumentsHintLabel.TabIndex = 7;
+            this.ArgumentsHintLabel.Text = "Use the $fileName and $lineNumber variables here.";
+            // 
             // CodeEditorControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.ArgumentsHintLabel);
             this.Controls.Add(this.ArgumentsTextBox);
-            this.Controls.Add(argumentsLabel);
+            this.Controls.Add(this.ArgumentsLabel);
             this.Controls.Add(browseButton);
             this.Controls.Add(this.PathComboBox);
             this.Controls.Add(pathLabel);
             this.Controls.Add(this.EditorKindComboBox);
             this.Controls.Add(editorKindLabel);
-            this.MinimumSize = new System.Drawing.Size(340, 72);
+            this.MinimumSize = new System.Drawing.Size(340, 89);
             this.Name = "CodeEditorControl";
-            this.Size = new System.Drawing.Size(450, 72);
+            this.Size = new System.Drawing.Size(450, 89);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -148,5 +158,7 @@ namespace PmlUnit
         private System.Windows.Forms.TextBox ArgumentsTextBox;
         private System.Windows.Forms.OpenFileDialog FileDialog;
         private System.Windows.Forms.ComboBox EditorKindComboBox;
+        private System.Windows.Forms.Label ArgumentsLabel;
+        private System.Windows.Forms.Label ArgumentsHintLabel;
     }
 }
