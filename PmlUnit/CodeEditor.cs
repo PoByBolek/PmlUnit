@@ -320,6 +320,9 @@ namespace PmlUnit
 
     class OtherCodeEditor : BaseCodeEditor
     {
+        public const string FileNameVariable = "$fileName";
+        public const string LineNumberVariable = "$lineNumber";
+
         public OtherCodeEditor(string fileName, string arguments)
             : base(fileName, arguments)
         {
@@ -335,8 +338,8 @@ namespace PmlUnit
             foreach (string argument in FixedArguments)
             {
                 yield return argument
-                    .Replace("$lineNumber", lineNumber.ToString(CultureInfo.InvariantCulture))
-                    .Replace("$fileName", fileName);
+                    .Replace(LineNumberVariable, lineNumber.ToString(CultureInfo.InvariantCulture))
+                    .Replace(FileNameVariable, fileName);
             }
         }
     }

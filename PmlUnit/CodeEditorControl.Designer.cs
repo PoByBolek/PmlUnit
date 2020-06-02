@@ -129,9 +129,9 @@ namespace PmlUnit
             this.ArgumentsHintLabel.AutoSize = true;
             this.ArgumentsHintLabel.Location = new System.Drawing.Point(90, 76);
             this.ArgumentsHintLabel.Name = "ArgumentsHintLabel";
-            this.ArgumentsHintLabel.Size = new System.Drawing.Size(249, 13);
+            this.ArgumentsHintLabel.Size = new System.Drawing.Size(171, 13);
             this.ArgumentsHintLabel.TabIndex = 7;
-            this.ArgumentsHintLabel.Text = "Use the $fileName and $lineNumber variables here.";
+            this.ArgumentsHintLabel.Text = "Use the {0} and {1} variables here.";
             // 
             // CodeEditorControl
             // 

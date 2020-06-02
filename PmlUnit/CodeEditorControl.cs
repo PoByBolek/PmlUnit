@@ -17,6 +17,8 @@ namespace PmlUnit
         {
             InitializeComponent();
 
+            ArgumentsHintLabel.Text = string.Format(ArgumentsHintLabel.Text, OtherCodeEditor.FileNameVariable, OtherCodeEditor.LineNumberVariable);
+
             InitialFilter = FileDialog.Filter;
 
             var atom = new EditorItem(CodeEditorKind.Atom, "Atom", "atom.exe");
@@ -229,10 +231,10 @@ namespace PmlUnit
         private bool ValidateArguments()
         {
             var item = EditorKindComboBox.SelectedItem as EditorItem;
-            if (item != null && item.Kind == CodeEditorKind.Other && !ArgumentsTextBox.Text.Contains("$fileName"))
+            if (item != null && item.Kind == CodeEditorKind.Other && !ArgumentsTextBox.Text.Contains(OtherCodeEditor.FileNameVariable))
             {
                 MessageBox.Show(
-                    this, "Arguments must contain $fileName.", ParentForm.Text,
+                    this, string.Format("Arguments must contain {0}.", OtherCodeEditor.FileNameVariable), ParentForm.Text,
                     MessageBoxButtons.OK, MessageBoxIcon.Warning
                 );
                 ArgumentsTextBox.Focus();
