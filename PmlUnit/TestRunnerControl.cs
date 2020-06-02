@@ -15,26 +15,27 @@ namespace PmlUnit
 
         private readonly TestCaseProvider TestProvider;
         private readonly AsyncTestRunner Runner;
-        private readonly CodeEditorProvider EditorProvider;
+        private readonly SettingsProvider Settings;
 
-        public TestRunnerControl(TestCaseProvider testProvider, AsyncTestRunner runner, CodeEditorProvider editorProvider)
+        public TestRunnerControl(TestCaseProvider testProvider, AsyncTestRunner runner, SettingsProvider settings)
         {
             if (testProvider == null)
                 throw new ArgumentNullException(nameof(testProvider));
             if (runner == null)
                 throw new ArgumentNullException(nameof(runner));
-            if (editorProvider == null)
-                throw new ArgumentNullException(nameof(editorProvider));
+            if (settings == null)
+                throw new ArgumentNullException(nameof(settings));
 
             TestProvider = testProvider;
             Runner = runner;
             Runner.TestCompleted += OnTestCompleted;
             Runner.RunCompleted += OnRunCompleted;
-            EditorProvider = editorProvider;
+            Settings = settings;
 
             InitializeComponent();
             ResetSplitContainerOrientation();
 
+            TestList.Grouping = settings.TestGrouping;
             EditorDialog.Font = Font;
         }
 
@@ -166,6 +167,7 @@ namespace PmlUnit
 
         private void OnTestListGroupingChanged(object sender, EventArgs e)
         {
+            Settings.TestGrouping = TestList.Grouping;
             GroupByTestResultToolStripMenuItem.Checked = TestList.Grouping == TestListGrouping.Result;
             GroupByTestCaseNameToolStripMenuItem.Checked = TestList.Grouping == TestListGrouping.TestCase;
         }
@@ -193,14 +195,14 @@ namespace PmlUnit
             if (string.IsNullOrEmpty(fileName) || !File.Exists(fileName))
                 return;
 
-            var descriptor = EditorProvider.LoadDescriptor();
+            var descriptor = Settings.CodeEditor;
             if (descriptor == null)
             {
                 var result = EditorDialog.ShowDialog(this);
                 if (result == DialogResult.OK)
                 {
                     descriptor = EditorDialog.Descriptor;
-                    EditorProvider.SaveDescriptor(descriptor);
+                    Settings.CodeEditor = descriptor;
                 }
                 else
                 {

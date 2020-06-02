@@ -110,7 +110,6 @@
     <Compile Include="CodeEditorDialog.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="CodeEditorProvider.cs" />
     <Compile Include="ColorizedProgressBar.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -147,6 +146,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="ServiceProvider.cs" />
+    <Compile Include="SettingsProvider.cs" />
     <Compile Include="ShowAboutDialogCommand.cs" />
     <Compile Include="ShowTestRunnerCommand.cs" />
     <Compile Include="StackTrace.cs" />
