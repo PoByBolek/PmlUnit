@@ -106,7 +106,11 @@ namespace PmlUnit
             if (lineNumber < 0)
                 throw new ArgumentOutOfRangeException(nameof(lineNumber));
 
-            Process.Start(BuildStartInfo(fileName, lineNumber));
+            using (var process = new Process())
+            {
+                process.StartInfo = BuildStartInfo(fileName, lineNumber);
+                process.Start();
+            }
         }
 
         protected ProcessStartInfo BuildStartInfo(string fileName, int lineNumber)
