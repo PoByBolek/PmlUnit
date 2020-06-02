@@ -145,6 +145,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="RegistryExtensions.cs" />
     <Compile Include="ServiceProvider.cs" />
     <Compile Include="SettingsProvider.cs" />
     <Compile Include="ShowAboutDialogCommand.cs" />

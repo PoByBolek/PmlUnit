@@ -1,6 +1,5 @@
 ﻿// Copyright (c) 2020 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
-using System;
 using Microsoft.Win32;
 
 namespace PmlUnit
@@ -28,7 +27,7 @@ namespace PmlUnit
                 using (var key = OpenRead())
                 {
                     TestListGrouping result;
-                    if (key == null || !TryGetEnum(key, TestGroupingValueName, out result))
+                    if (key == null || !key.TryGetEnum(TestGroupingValueName, out result))
                         result = TestListGrouping.Result;
                     return result;
                 }
@@ -55,15 +54,15 @@ namespace PmlUnit
                         return null;
 
                     CodeEditorKind kind;
-                    if (!TryGetEnum(key, KindValueName, out kind))
+                    if (!key.TryGetEnum(KindValueName, out kind))
                         return null;
 
                     string path;
-                    if (!TryGetString(key, PathValueName, out path) || string.IsNullOrEmpty(path))
+                    if (!key.TryGetString(PathValueName, out path) || string.IsNullOrEmpty(path))
                         return null;
 
                     string arguments;
-                    if (!TryGetString(key, ArgumentsValueName, out arguments))
+                    if (!key.TryGetString(ArgumentsValueName, out arguments))
                         return null;
 
                     return new CodeEditorDescriptor(kind, path, arguments);
@@ -92,35 +91,14 @@ namespace PmlUnit
             }
         }
 
-        private RegistryKey OpenRead()
+        private static RegistryKey OpenRead()
         {
             return Registry.CurrentUser.OpenSubKey(KeyPath);
         }
 
-        private RegistryKey OpenWrite()
+        private static RegistryKey OpenWrite()
         {
             return Registry.CurrentUser.CreateSubKey(KeyPath);
-        }
-
-        private bool TryGetEnum<T>(RegistryKey key, string name, out T result) where T : struct
-        {
-            var value = key.GetValue(name);
-            if (value is int && Enum.IsDefined(typeof(T), value))
-            {
-                result = (T)value;
-                return true;
-            }
-            else
-            {
-                result = default(T);
-                return false;
-            }
-        }
-
-        private bool TryGetString(RegistryKey key, string name, out string result)
-        {
-            result = key.GetValue(name) as string;
-            return result != null;
         }
     }
 
