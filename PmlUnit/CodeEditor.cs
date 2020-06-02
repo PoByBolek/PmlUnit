@@ -23,7 +23,7 @@ namespace PmlUnit
 
         public CodeEditorDescriptor(CodeEditorKind kind, string fileName, string arguments)
         {
-            if (string.IsNullOrEmpty(fileName))
+            if (fileName == null)
                 throw new ArgumentNullException(nameof(fileName));
             if (arguments == null)
                 throw new ArgumentNullException(nameof(arguments));
@@ -38,7 +38,7 @@ namespace PmlUnit
             get { return FileNameField; }
             set
             {
-                if (string.IsNullOrEmpty(value))
+                if (value == null)
                     throw new ArgumentNullException(nameof(value));
                 FileNameField = value;
             }
@@ -57,6 +57,9 @@ namespace PmlUnit
 
         public CodeEditor ToEditor()
         {
+            if (string.IsNullOrEmpty(FileNameField))
+                throw new InvalidOperationException("FileName must not be empty.");
+
             switch (Kind)
             {
                 case CodeEditorKind.Atom:
