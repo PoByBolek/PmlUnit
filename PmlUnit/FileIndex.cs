@@ -33,7 +33,11 @@ namespace PmlUnit
                 {
                     Indices.Add(IndexFile.FromDirectory(path));
                 }
-                catch (FileNotFoundException)
+                catch (IOException)
+                {
+                    continue;
+                }
+                catch (NotSupportedException)
                 {
                     continue;
                 }

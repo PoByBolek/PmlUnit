@@ -2,7 +2,7 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Collections.Generic;
-
+using System.IO;
 using NUnit.Framework;
 
 namespace PmlUnit.Tests
@@ -76,6 +76,36 @@ namespace PmlUnit.Tests
 
             Assert.That(!index.TryGetFile("non-existent.pmlobj", out result));
             Assert.That(result, Is.Null);
+        }
+
+        [Test]
+        public void IgnoresMissingDirectories()
+        {
+            var guid = Guid.NewGuid();
+            Environment.SetEnvironmentVariable("PML_UNIT_FILE_INDEX_TEST_1", "C:\\some\\path\\that\\does\\not\\exist\\" + guid);
+            try
+            {
+                new FileIndex("PML_UNIT_FILE_INDEX_TEST_1");
+            }
+            catch (DirectoryNotFoundException)
+            {
+                Assert.Fail("FileIndex should handle DirectoryNotFoundExceptions");
+            }
+        }
+
+        [Test]
+        public void IgnoresMissingFiles()
+        {
+            var guid = Guid.NewGuid();
+            Environment.SetEnvironmentVariable("PML_UNIT_FILE_INDEX_TEST_2", "C:\\Windows\\System32");
+            try
+            {
+                new FileIndex("PML_UNIT_FILE_INDEX_TEST_2");
+            }
+            catch (FileNotFoundException)
+            {
+                Assert.Fail("FileIndex should handle FileNotFoundException");
+            }
         }
     }
 }
