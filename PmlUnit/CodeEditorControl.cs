@@ -52,15 +52,7 @@ namespace PmlUnit
             other.SearchPaths.Add(ProgramFilesPath);
             EditorKindComboBox.Items.Add(other);
 
-            EditorKindComboBox.SelectedItem = other;
-            foreach (EditorItem item in EditorKindComboBox.Items)
-            {
-                if (!string.IsNullOrEmpty(item.TryFindFile()))
-                {
-                    EditorKindComboBox.SelectedItem = item;
-                    break;
-                }
-            }
+            SelectDefaultEditor();
         }
 
         private static string ProgramFilesPath
@@ -118,6 +110,44 @@ namespace PmlUnit
 
                 return new CodeEditorDescriptor(item.Kind, PathComboBox.Text, ArgumentsTextBox.Text);
             }
+            set
+            {
+                if (value == null)
+                {
+                    SelectDefaultEditor();
+                }
+                else
+                {
+                    foreach (EditorItem item in EditorKindComboBox.Items)
+                    {
+                        if (item.Kind == value.Kind)
+                        {
+                            EditorKindComboBox.SelectedItem = item;
+                            break;
+                        }
+                    }
+                    PathComboBox.Text = value.FileName;
+                    ArgumentsTextBox.Text = value.FixedArguments;
+                }
+            }
+        }
+
+        private void SelectDefaultEditor()
+        {
+            EditorItem other = null;
+            foreach (EditorItem item in EditorKindComboBox.Items)
+            {
+                if (item.Kind == CodeEditorKind.Other)
+                    other = item;
+
+                if (!string.IsNullOrEmpty(item.TryFindFile()))
+                {
+                    EditorKindComboBox.SelectedItem = item;
+                    return;
+                }
+            }
+
+            EditorKindComboBox.SelectedItem = other;
         }
 
         private void OnEditorKindChanged(object sender, EventArgs e)

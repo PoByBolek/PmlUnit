@@ -61,7 +61,11 @@ namespace PmlUnit
             set { Dialog.Font = value; }
         }
 
-        public CodeEditorDescriptor Descriptor => Control.Descriptor;
+        public CodeEditorDescriptor Descriptor
+        {
+            get { return Control.Descriptor; }
+            set { Control.Descriptor = value; }
+        }
 
         public DialogResult ShowDialog()
         {
