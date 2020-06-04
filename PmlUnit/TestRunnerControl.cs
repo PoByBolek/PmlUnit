@@ -210,8 +210,15 @@ namespace PmlUnit
                 }
             }
 
-            var editor = descriptor.ToEditor();
-            editor.OpenFile(fileName, lineNumber);
+            try
+            {
+                var editor = descriptor.ToEditor();
+                editor.OpenFile(fileName, lineNumber);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.ToString(), "Failed to open file", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void OnSplitContainerSizeChanged(object sender, EventArgs e)
