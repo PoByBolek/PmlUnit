@@ -63,6 +63,28 @@ namespace PmlUnit
             set { Dialog.Font = value; }
         }
 
+        /// <summary>
+        /// Tells the Visual Studio Forms Designer whether the Font property should be serialized in the generated code.
+        /// </summary>
+        /// <remarks>
+        /// See https://docs.microsoft.com/en-us/dotnet/framework/winforms/controls/defining-default-values-with-the-shouldserialize-and-reset-methods
+        /// </remarks>
+        private bool ShouldSerializeFont()
+        {
+            return !Dialog.Font.Equals(System.Windows.Forms.Control.DefaultFont);
+        }
+
+        /// <summary>
+        /// Used by the Visual Studio Forms Designer to reset the Font property to its default value.
+        /// </summary>
+        /// <remarks>
+        /// See https://docs.microsoft.com/en-us/dotnet/framework/winforms/controls/defining-default-values-with-the-shouldserialize-and-reset-methods
+        /// </remarks>
+        private void ResetFont()
+        {
+            Dialog.Font = System.Windows.Forms.Control.DefaultFont;
+        }
+
         [DefaultValue(DefaultText)]
         public string Text
         {
