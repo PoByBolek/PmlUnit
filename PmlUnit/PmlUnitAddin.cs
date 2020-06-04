@@ -48,8 +48,9 @@ namespace PmlUnit
                 AboutDialog = new AboutDialog();
                 AboutDialog.Font = font;
             }
-            catch
+            catch (Exception e)
             {
+                Console.Error.WriteLine("Failed to load PML Unit addin: " + e);
                 if (font != null)
                     font.Dispose();
                 if (TestRunner != null)
@@ -163,8 +164,9 @@ namespace PmlUnit
                     commandManager.Commands.Add(new ShowAboutDialogCommand(windowManager, AboutDialog));
                 }
             }
-            catch
+            catch (Exception e)
             {
+                Console.Error.WriteLine("Failed to start PML Unit addin: " + e);
                 Dispose();
                 throw;
             }
