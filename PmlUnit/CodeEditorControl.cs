@@ -37,9 +37,9 @@ namespace PmlUnit
 
             var ultradEdit = new EditorItem(CodeEditorKind.UltraEdit, "UltraEdit", "uedit64.exe");
             ultradEdit.FileNames.Add("uedit32.exe");
-            ultradEdit.SearchPaths.AddPath(ProgramFilesPath, "IDM Computer Soltions", "UltraEdit");
-            ultradEdit.SearchPaths.AddPath(ProgramFiles32BitPath, "IDM Computer Soltions", "UltraEdit");
-            ultradEdit.SearchPaths.AddPath(DocumentsPath, "IDM Computer Soltions", "UltraEdit");
+            ultradEdit.SearchPaths.AddPath(ProgramFilesPath, "IDM Computer Solutions", "UltraEdit");
+            ultradEdit.SearchPaths.AddPath(ProgramFiles32BitPath, "IDM Computer Solutions", "UltraEdit");
+            ultradEdit.SearchPaths.AddPath(DocumentsPath, "IDM Computer Solutions", "UltraEdit");
             EditorKindComboBox.Items.Add(ultradEdit);
 
             var vsCode = new EditorItem(CodeEditorKind.VisualStudioCode, "Visual Studio Code", "Code.exe");
