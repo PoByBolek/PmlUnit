@@ -327,8 +327,8 @@ namespace PmlUnit
 
     class OtherCodeEditor : BaseCodeEditor
     {
-        public const string FileNameVariable = "$fileName";
-        public const string LineNumberVariable = "$lineNumber";
+        public const string FileNameVariable = "!fileName";
+        public const string LineNumberVariable = "!lineNumber";
 
         public OtherCodeEditor(string fileName, string arguments)
             : base(fileName, arguments)

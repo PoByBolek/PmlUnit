@@ -88,14 +88,14 @@ namespace PmlUnit.Tests
         [TestCase(typeof(VisualStudioCodeCodeEditor), "", @"C:\path\to\file.pmlobj", 0, @"C:\path\to\file.pmlobj")]
         [TestCase(typeof(VisualStudioCodeCodeEditor), "", @"C:\path to\file.pmlobj", 1234, "--goto \"C:\\path to\\file.pmlobj:1234\"")]
         [TestCase(typeof(VisualStudioCodeCodeEditor), "", @"C:\path to\file.pmlobj", 0, "\"C:\\path to\\file.pmlobj\"")]
-        [TestCase(typeof(OtherCodeEditor), "$fileName $lineNumber", @"C:\path\to\file.pmlobj", 12345, @"C:\path\to\file.pmlobj 12345")]
-        [TestCase(typeof(OtherCodeEditor), "$fileName $lineNumber", @"C:\path\to\file.pmlobj", 0, @"C:\path\to\file.pmlobj 0")]
-        [TestCase(typeof(OtherCodeEditor), "$fileName $lineNumber", @"C:\path to\file.pmlobj", 1234, "\"C:\\path to\\file.pmlobj\" 1234")]
-        [TestCase(typeof(OtherCodeEditor), "$fileName $lineNumber", @"C:\path to\file.pmlobj", 0, "\"C:\\path to\\file.pmlobj\" 0")]
-        [TestCase(typeof(OtherCodeEditor), "\"$fileName\" $lineNumber", @"C:\path\to\file.pmlobj", 12345, @"C:\path\to\file.pmlobj 12345")]
-        [TestCase(typeof(OtherCodeEditor), "\"$fileName\" $lineNumber", @"C:\path\to\file.pmlobj", 0, @"C:\path\to\file.pmlobj 0")]
-        [TestCase(typeof(OtherCodeEditor), "\"$fileName\" $lineNumber", @"C:\path to\file.pmlobj", 1234, "\"C:\\path to\\file.pmlobj\" 1234")]
-        [TestCase(typeof(OtherCodeEditor), "\"$fileName\" $lineNumber", @"C:\path to\file.pmlobj", 0, "\"C:\\path to\\file.pmlobj\" 0")]
+        [TestCase(typeof(OtherCodeEditor), "!fileName !lineNumber", @"C:\path\to\file.pmlobj", 12345, @"C:\path\to\file.pmlobj 12345")]
+        [TestCase(typeof(OtherCodeEditor), "!fileName !lineNumber", @"C:\path\to\file.pmlobj", 0, @"C:\path\to\file.pmlobj 0")]
+        [TestCase(typeof(OtherCodeEditor), "!fileName !lineNumber", @"C:\path to\file.pmlobj", 1234, "\"C:\\path to\\file.pmlobj\" 1234")]
+        [TestCase(typeof(OtherCodeEditor), "!fileName !lineNumber", @"C:\path to\file.pmlobj", 0, "\"C:\\path to\\file.pmlobj\" 0")]
+        [TestCase(typeof(OtherCodeEditor), "\"!fileName\" !lineNumber", @"C:\path\to\file.pmlobj", 12345, @"C:\path\to\file.pmlobj 12345")]
+        [TestCase(typeof(OtherCodeEditor), "\"!fileName\" !lineNumber", @"C:\path\to\file.pmlobj", 0, @"C:\path\to\file.pmlobj 0")]
+        [TestCase(typeof(OtherCodeEditor), "\"!fileName\" !lineNumber", @"C:\path to\file.pmlobj", 1234, "\"C:\\path to\\file.pmlobj\" 1234")]
+        [TestCase(typeof(OtherCodeEditor), "\"!fileName\" !lineNumber", @"C:\path to\file.pmlobj", 0, "\"C:\\path to\\file.pmlobj\" 0")]
         public void BuildsProcessStartInfoCorrectly(Type editorType, string fixedArguments, string fileName, int lineNumber, string expectedArguments)
         {
             var constructor = editorType.GetConstructor(new Type[] { typeof(string), typeof(string) });
