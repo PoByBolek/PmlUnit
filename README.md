@@ -244,6 +244,52 @@ anyway ;-).
 
 ----------------
 
+## Opening Files
+
+When you double click on a test or click on a link in the test details view,
+PML Unit tries to open the test file with your configured editor. When you do
+that for the first time, PML Unit asks you which editor it should use. It has
+built-in support for the following editors:
+
+- [Atom] ([command line reference][atom-commands])
+- [Notepad++] ([command line reference][notepad-commands])
+- [Sublime Text 3] ([command line reference][sublime-commands])
+- [UltraEdit] ([command line reference][ultraedit-commands])
+- [Visual Studio Code] ([command line reference][vscode-commands])
+
+PML Unit searches for these editors in their default install locations but you
+may also specify another location if you have installed your favorite editor to
+a custom path.
+
+You may also choose a completely different editor by selecting `Other` in the
+code editor dialog. In that case you have to specify the path to your editor
+executable and the full command line arguments. PML Unit will replace the
+`!fileName` and `!lineNumber` variables in the command line arguments with the
+name of the file and the line number you want to open. For example
+`--open !fileName --at !lineNumber` will be turned into something like
+`--open "C:\Users\Alice\Documents and Settings\pmllib\exampletest.pmlobj" --at 123`.
+
+With the five already supported editors you may specify some additional command
+line arguments (but you don't have to specify the `!fileName` and `!lineNumber`
+variables with these). Look at the command line reference of your favorite editor
+to see if there is anything you need.
+
+PML Unit stores these settings in the Windows registry under `HKEY_CURRENT_USER\Software\PML Unit`.
+
+
+  [Atom]: https://atom.io/
+  [atom-commands]: https://flight-manual.atom.io/getting-started/sections/atom-basics/
+  [Notepad++]: https://notepad-plus-plus.org/
+  [notepad-commands]: https://npp-user-manual.org/docs/command-prompt/
+  [Sublime Text 3]: https://www.sublimetext.com/
+  [sublime-commands]: https://sublime-text-unofficial-documentation.readthedocs.io/en/latest/command_line/command_line.html
+  [UltraEdit]: https://www.ultraedit.com/
+  [ultraedit-commands]: https://www.ultraedit.com/wiki/Command_line_parameters
+  [Visual Studio Code]: https://code.visualstudio.com/
+  [vscode-commands]: https://code.visualstudio.com/docs/editor/command-line
+
+----------------
+
 ## Building
 
 Download the source code to a directory of your choice. The examples in the
@@ -296,13 +342,13 @@ Visual Studio command prompt:
 
 PML Unit is licensed under the MIT license.
 
-The test status icons are taken from [Font-Awesome-SVG-PNG][fa-svg], which is
+The test status icons are taken from [Font-Awesome-SVG-PNG], which is
 licensed under the MIT license.
 
-The [test runner icon][iconfinder] was created by [Recep Kütük][recep-kutuk] and
+The [test runner icon] was created by [Recep Kütük] and
 is free for personal and commercial use.
 
 
-  [fa-svg]: https://github.com/encharm/Font-Awesome-SVG-PNG
-  [iconfinder]: https://www.iconfinder.com/icons/728987/chemistry_experiment_lab_laboratory_research_science_test_icon
-  [recep-kutuk]: http://www.recepkutuk.com/bitsies/
+  [Font-Awesome-SVG-PNG]: https://github.com/encharm/Font-Awesome-SVG-PNG
+  [test runner icon]: https://www.iconfinder.com/icons/728987/chemistry_experiment_lab_laboratory_research_science_test_icon
+  [Recep Kütük]: http://www.recepkutuk.com/bitsies/
