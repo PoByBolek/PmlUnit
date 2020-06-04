@@ -57,18 +57,7 @@ namespace PmlUnit
 
         public int Count => Tests.Count;
 
-        public Test this[string name]
-        {
-            get { return Tests[name]; }
-            set
-            {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
-                if (value.TestCase != TestCase)
-                    throw new ArgumentException("Test does not belong to test case", nameof(value));
-                Tests[value.Name] = value;
-            }
-        }
+        public Test this[string name] => Tests[name];
 
         public Test Add(string name)
         {

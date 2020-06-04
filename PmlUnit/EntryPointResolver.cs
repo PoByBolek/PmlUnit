@@ -19,6 +19,8 @@ namespace PmlUnit
         {
             if (string.IsNullOrEmpty(value))
                 throw new ArgumentNullException(value);
+            if (line < 0)
+                throw new ArgumentOutOfRangeException(nameof(line), line, "line number must not be negative");
 
             if (value.StartsWith("Macro ", StringComparison.OrdinalIgnoreCase))
             {
@@ -59,6 +61,11 @@ namespace PmlUnit
 
         public EntryPoint Resolve(string value, int line)
         {
+            if (string.IsNullOrEmpty(value))
+                throw new ArgumentNullException(nameof(value));
+            if (line < 0)
+                throw new ArgumentOutOfRangeException(nameof(line), line, "line number must not be negative");
+
             if (value.StartsWith("Macro ", StringComparison.OrdinalIgnoreCase))
             {
                 var fileName = Path.GetFullPath(value.Substring(6));

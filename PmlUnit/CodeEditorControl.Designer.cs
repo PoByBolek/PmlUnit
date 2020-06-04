@@ -1,5 +1,7 @@
 ﻿// Copyright (c) 2020 Florian Zimmermann.
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
+using System.CodeDom.Compiler;
+
 namespace PmlUnit
 {
     partial class CodeEditorControl
@@ -28,6 +30,7 @@ namespace PmlUnit
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
+        [GeneratedCode("Windows Form Designer generated code", "1.0")]
         private void InitializeComponent()
         {
             System.Windows.Forms.Label editorKindLabel;

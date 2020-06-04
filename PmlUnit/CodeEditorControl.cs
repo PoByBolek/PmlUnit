@@ -301,12 +301,12 @@ namespace PmlUnit
 
             public string DefaultFileName
             {
-                get { return FileNames.Count > 0 ? FileNames[0] : ""; }
+                get { return FileNames.Default; }
             }
 
             public string DefaultDirectory
             {
-                get { return SearchPaths.Count > 0 ? SearchPaths[0] : ""; }
+                get { return SearchPaths.Default; }
             }
 
             public string FileNameFilter
@@ -347,15 +347,9 @@ namespace PmlUnit
 
             bool ICollection<string>.IsReadOnly => false;
 
-            public string this[int index]
+            public string Default
             {
-                get { return Paths[index]; }
-                set
-                {
-                    if (string.IsNullOrEmpty(value))
-                        throw new ArgumentNullException(nameof(value));
-                    Paths[index] = value;
-                }
+                get { return Paths.Count > 0 ? Paths[0] : ""; }
             }
 
             /// <summary>
