@@ -9,6 +9,8 @@ namespace PmlUnit
 {
     class CodeEditorDialog : Component
     {
+        private const string DefaultText = "Select Editor";
+
         private readonly Form Dialog;
         private readonly CodeEditorControl Control;
 
@@ -61,6 +63,15 @@ namespace PmlUnit
             set { Dialog.Font = value; }
         }
 
+        [DefaultValue(DefaultText)]
+        public string Text
+        {
+            get { return Dialog.Text; }
+            set { Dialog.Text = value; }
+        }
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public CodeEditorDescriptor Descriptor
         {
             get { return Control.Descriptor; }
@@ -147,7 +158,7 @@ namespace PmlUnit
                 result.MinimumSize = new Size(389, 189);
                 result.ShowIcon = false;
                 result.ShowInTaskbar = false;
-                result.Text = "Select Editor";
+                result.Text = DefaultText;
                 return result;
             }
             catch

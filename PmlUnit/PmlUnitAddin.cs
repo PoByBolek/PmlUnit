@@ -21,7 +21,9 @@ namespace PmlUnit
     {
         private readonly AsyncTestRunner TestRunner;
         private readonly TestCaseProvider TestCaseProvider;
+        private readonly SettingsProvider Settings;
         private readonly TestRunnerControl TestRunnerControl;
+        private readonly CodeEditorDialog EditorDialog;
         private readonly AboutDialog AboutDialog;
 
         public PmlUnitAddin()
@@ -37,8 +39,12 @@ namespace PmlUnit
                     new FileIndexEntryPointResolver(index)
                 );
                 TestCaseProvider = new FileIndexTestCaseProvider(index);
-                TestRunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner, new RegistrySettingsProvider());
+                Settings = new RegistrySettingsProvider();
+                TestRunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner, Settings);
                 TestRunnerControl.Font = font;
+                EditorDialog = new CodeEditorDialog();
+                EditorDialog.Text = "PML Unit Settings";
+                EditorDialog.Font = font;
                 AboutDialog = new AboutDialog();
                 AboutDialog.Font = font;
             }
@@ -50,6 +56,8 @@ namespace PmlUnit
                     TestRunner.Dispose();
                 if (TestRunnerControl != null)
                     TestRunnerControl.Dispose();
+                if (EditorDialog != null)
+                    EditorDialog.Dispose();
                 if (AboutDialog != null)
                     AboutDialog.Dispose();
                 throw;
@@ -68,11 +76,15 @@ namespace PmlUnit
             Font font = null;
             TestCaseProvider = testProvider;
             TestRunner = runner;
+            Settings = settings;
             try
             {
                 font = GetDefaultFont();
-                TestRunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner, settings);
+                TestRunnerControl = new TestRunnerControl(TestCaseProvider, TestRunner, Settings);
                 TestRunnerControl.Font = font;
+                EditorDialog = new CodeEditorDialog();
+                EditorDialog.Text = "PML Unit Settings";
+                EditorDialog.Font = font;
                 AboutDialog = new AboutDialog();
                 AboutDialog.Font = font;
             }
@@ -82,6 +94,8 @@ namespace PmlUnit
                     font.Dispose();
                 if (TestRunnerControl != null)
                     TestRunnerControl.Dispose();
+                if (EditorDialog != null)
+                    EditorDialog.Dispose();
                 if (AboutDialog != null)
                     AboutDialog.Dispose();
                 throw;
@@ -105,6 +119,7 @@ namespace PmlUnit
             {
                 TestRunner.Dispose();
                 TestRunnerControl.Dispose();
+                EditorDialog.Dispose();
                 AboutDialog.Dispose();
             }
         }
@@ -144,6 +159,7 @@ namespace PmlUnit
                 if (windowManager != null && commandManager != null)
                 {
                     commandManager.Commands.Add(new ShowTestRunnerCommand(windowManager, TestRunnerControl));
+                    commandManager.Commands.Add(new ShowSettingsDialogCommand(windowManager, EditorDialog, Settings));
                     commandManager.Commands.Add(new ShowAboutDialogCommand(windowManager, AboutDialog));
                 }
             }
@@ -158,6 +174,7 @@ namespace PmlUnit
         {
             // PDMS crashes if we also dispose the TestRunnerControl here
             TestRunner.Dispose();
+            EditorDialog.Dispose();
             AboutDialog.Dispose();
         }
 

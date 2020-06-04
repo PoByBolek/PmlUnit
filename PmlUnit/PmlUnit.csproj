@@ -149,6 +149,7 @@
     <Compile Include="ServiceProvider.cs" />
     <Compile Include="SettingsProvider.cs" />
     <Compile Include="ShowAboutDialogCommand.cs" />
+    <Compile Include="ShowSettingsDialogCommand.cs" />
     <Compile Include="ShowTestRunnerCommand.cs" />
     <Compile Include="StackTrace.cs" />
     <Compile Include="Test.cs" />

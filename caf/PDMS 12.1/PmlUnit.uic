@@ -13,6 +13,15 @@
       <Caption>Test Runner...</Caption>
       <DisplayStyle>Default</DisplayStyle>
     </StateButtonTool>
+    <ButtonTool Name="PmlUnit.ShowSettingsDialogButton">
+      <Command>
+        <Type>Instance</Type>
+        <Key>PmlUnit.ShowSettingsDialogCommand</Key>
+        <Arguments />
+      </Command>
+      <Caption>Settings...</Caption>
+      <DisplayStyle>Default</DisplayStyle>
+    </ButtonTool>
     <ButtonTool Name="PmlUnit.ShowAboutDialogButton">
       <Command>
         <Type>Instance</Type>
@@ -29,6 +38,7 @@
       <DisplayStyle>Default</DisplayStyle>
       <Tools>
         <Tool Name="PmlUnit.ShowTestRunnerButton" />
+        <Tool Name="PmlUnit.ShowSettingsDialogButton" />
         <Tool Name="PmlUnit.ShowAboutDialogButton" IsFirstInGroup="True" />
       </Tools>
       <IsContextMenu>false</IsContextMenu>
