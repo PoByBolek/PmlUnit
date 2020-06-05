@@ -1,7 +1,7 @@
 # PML Unit
 
 PML Unit is a test framework for the PML programming language and a test runner
-for PML code in AVEVA Everything3D, PDMS, and other products.
+for PML code in AVEVA Everything3D, PDMS, Hull & Outfitting, and other products.
 
 ![Demo](screenshots/demo.gif)
 
@@ -22,6 +22,15 @@ file to `D:\pml-unit`, you should have the following directory tree:
     |       |-- DesignCustomization.xml
     |       `-- ...
     |-- e3d-2.1
+    |   |-- bin
+    |   |   `-- PmlUnit.dll
+    |   `-- caf
+    |       |-- AdminAddins.xml
+    |       |-- AdminCustomization.xml
+    |       |-- DesignAddins.xml
+    |       |-- DesignCustomization.xml
+    |       `-- ...
+    |-- oh-12.1
     |   |-- bin
     |   |   `-- PmlUnit.dll
     |   `-- caf
@@ -54,6 +63,7 @@ environment variables in your start scripts as follows:
 
 | Platform  | `CAF_ADDINS_PATH`           | `CAF_UIC_PATH`              | `PMLLIB`             |
 | --------- | --------------------------- | --------------------------- | -------------------- |
+| OH 12.1   | `D:\pml-unit\oh-12.1\caf`   | `D:\pml-unit\oh-12.1\caf`   | `D:\pml-unit\pmllib` |
 | PDMS 12.1 | `D:\pml-unit\pdms-12.1\caf` | `D:\pml-unit\pdms-12.1\caf` | `D:\pml-unit\pmllib` |
 | E3D 1.1   | `D:\pml-unit\e3d-1.1\caf`   | `D:\pml-unit\e3d-1.1\caf`   | `D:\pml-unit\pmllib` |
 | E3D 2.1   | `D:\pml-unit\e3d-2.1\caf`   | `D:\pml-unit\e3d-2.1\caf`   | `D:\pml-unit\pmllib` |
@@ -65,13 +75,14 @@ your `custom_evars.bat` in your projects directory:
     set CAF_UIC_PATH=D:\pml-unit\e3d-2.1\caf
     set PMLLIB=%PMLLIB%;D:\pml-unit\pmllib
 
-### Note for PDMS 12.1
+### Note for PDMS and Hull & Outfitting 12.1
 
-Note that for PDMS 12.1 you will have to edit the `*Addins.xml` and
-`*Customization.xml` files in `D:\pml-unit\pdms-12.1\caf` so that they contain
-absolute paths to the `PmlUnit.dll` and `PmlUnit.uic`, respectively.
-Unfortunately, PDMS does not load addins and UIC files with path names relative
-to the `CAF_ADDINS_PATH` and `CAF_UIC_PATH` environment variables.
+Note that for PDMS and Hull & Outfitting (OH) 12.1 you will have to edit the
+`*Addins.xml` and `*Customization.xml` files in `D:\pml-unit\pdms-12.1\caf` and
+`D:\pml-unit\oh-12.1\caf` so that they contain absolute paths to the
+`PmlUnit.dll` and `PmlUnit.uic`, respectively. Unfortunately, PDMS and OH 12.1
+do not load addins and UIC files with path names relative to the `CAF_ADDINS_PATH`
+and `CAF_UIC_PATH` environment variables.
 
 For example, if you want PML Unit to show up in the PDMS Design module, you
 should edit the `D:\pml-unit\pdms-12.1\caf\DesignAddins.xml` file like this:
@@ -233,6 +244,52 @@ anyway ;-).
 
 ----------------
 
+## Opening Files
+
+When you double click on a test or click on a link in the test details view,
+PML Unit tries to open the test file with your configured editor. When you do
+that for the first time, PML Unit asks you which editor it should use. It has
+built-in support for the following editors:
+
+- [Atom] ([command line reference][atom-commands])
+- [Notepad++] ([command line reference][notepad-commands])
+- [Sublime Text 3] ([command line reference][sublime-commands])
+- [UltraEdit] ([command line reference][ultraedit-commands])
+- [Visual Studio Code] ([command line reference][vscode-commands])
+
+PML Unit searches for these editors in their default install locations but you
+may also specify another location if you have installed your favorite editor to
+a custom path.
+
+You may also choose a completely different editor by selecting `Other` in the
+code editor dialog. In that case you have to specify the path to your editor
+executable and the full command line arguments. PML Unit will replace the
+`!fileName` and `!lineNumber` variables in the command line arguments with the
+name of the file and the line number you want to open. For example
+`--open !fileName --at !lineNumber` will be turned into something like
+`--open "C:\Users\Alice\Documents and Settings\pmllib\exampletest.pmlobj" --at 123`.
+
+With the five already supported editors you may specify some additional command
+line arguments (but you don't have to specify the `!fileName` and `!lineNumber`
+variables with these). Look at the command line reference of your favorite editor
+to see if there is anything you need.
+
+PML Unit stores these settings in the Windows registry under `HKEY_CURRENT_USER\Software\PML Unit`.
+
+
+  [Atom]: https://atom.io/
+  [atom-commands]: https://flight-manual.atom.io/getting-started/sections/atom-basics/
+  [Notepad++]: https://notepad-plus-plus.org/
+  [notepad-commands]: https://npp-user-manual.org/docs/command-prompt/
+  [Sublime Text 3]: https://www.sublimetext.com/
+  [sublime-commands]: https://sublime-text-unofficial-documentation.readthedocs.io/en/latest/command_line/command_line.html
+  [UltraEdit]: https://www.ultraedit.com/
+  [ultraedit-commands]: https://www.ultraedit.com/wiki/Command_line_parameters
+  [Visual Studio Code]: https://code.visualstudio.com/
+  [vscode-commands]: https://code.visualstudio.com/docs/editor/command-line
+
+----------------
+
 ## Building
 
 Download the source code to a directory of your choice. The examples in the
@@ -242,6 +299,9 @@ following sections assume that the root directory of the source code is at
 The solution and project files define one platform configuration for each of PML
 Unit's supported platforms: PDMS 12.1, E3D 1.1, and E3D 2.1. You can build PML
 Unit for only one platform or for all platforms at once.
+
+Note that PML Unit uses the PDMS 12.1 platform for Hull & Outfitting (OH) 12.1
+as well.
 
 ### Dependencies
 
@@ -253,6 +313,7 @@ PDMS to their default locations, you should copy the DLLs as follows:
 
 | Platform  | Default Source                                  | Destination                 |
 | ----------| ------------------------------------------------| --------------------------- |
+| OH 12.1   | `C:\AVEVA\Marine\OH12.1.SP4`                    | `D:\pml-unit\lib\PDMS 12.1` |
 | PDMS 12.1 | `C:\AVEVA\Plant\PDMS12.1.SP4`                   | `D:\pml-unit\lib\PDMS 12.1` |
 | E3D 1.1   | `C:\Program Files (x86)\AVEVA\Plant\E3D1.1.0`   | `D:\pml-unit\lib\E3D 1.1`   |
 | E3D 2.1   | `C:\Program Files (x86)\AVEVA\Everything3D2.10` | `D:\pml-unit\lib\E3D 2.1`   |
@@ -281,13 +342,13 @@ Visual Studio command prompt:
 
 PML Unit is licensed under the MIT license.
 
-The test status icons are taken from [Font-Awesome-SVG-PNG][fa-svg], which is
+The test status icons are taken from [Font-Awesome-SVG-PNG], which is
 licensed under the MIT license.
 
-The [test runner icon][iconfinder] was created by [Recep Kütük][recep-kutuk] and
+The [test runner icon] was created by [Recep Kütük] and
 is free for personal and commercial use.
 
 
-  [fa-svg]: https://github.com/encharm/Font-Awesome-SVG-PNG
-  [iconfinder]: https://www.iconfinder.com/icons/728987/chemistry_experiment_lab_laboratory_research_science_test_icon
-  [recep-kutuk]: http://www.recepkutuk.com/bitsies/
+  [Font-Awesome-SVG-PNG]: https://github.com/encharm/Font-Awesome-SVG-PNG
+  [test runner icon]: https://www.iconfinder.com/icons/728987/chemistry_experiment_lab_laboratory_research_science_test_icon
+  [Recep Kütük]: http://www.recepkutuk.com/bitsies/

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
-
+using System.Threading;
 using Moq;
 
 using NUnit.Framework;
@@ -14,21 +14,28 @@ namespace PmlUnit.Tests
 {
     [TestFixture]
     [TestOf(typeof(PmlTestRunner))]
+    [Apartment(ApartmentState.STA)]
     public class TestRunnerControlTest
     {
         [Test]
         public void Constructor_ShouldCheckForNullArguments()
         {
-            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, null));
-            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(Mock.Of<TestCaseProvider>(), null));
-            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, Mock.Of<AsyncTestRunner>()));
+            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, null, null));
+
+            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(Mock.Of<TestCaseProvider>(), null, null));
+            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, Mock.Of<AsyncTestRunner>(), null));
+            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, null, Mock.Of<SettingsProvider>()));
+
+            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(Mock.Of<TestCaseProvider>(), Mock.Of<AsyncTestRunner>(), null));
+            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(Mock.Of<TestCaseProvider>(), null, Mock.Of<SettingsProvider>()));
+            Assert.Throws<ArgumentNullException>(() => new TestRunnerControl(null, Mock.Of<AsyncTestRunner>(), Mock.Of<SettingsProvider>()));
         }
 
         [Test]
         public void Dispose_DisposesTestRunner()
         {
             var runnerMock = new Mock<AsyncTestRunner>();
-            var control = new TestRunnerControl(Mock.Of<TestCaseProvider>(), runnerMock.Object);
+            var control = new TestRunnerControl(Mock.Of<TestCaseProvider>(), runnerMock.Object, Mock.Of<SettingsProvider>());
             // Act
             control.Dispose();
             // Assert
@@ -38,6 +45,7 @@ namespace PmlUnit.Tests
 
     [TestFixture]
     [TestOf(typeof(PmlTestRunner))]
+    [Apartment(ApartmentState.STA)]
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class TestRunnerControlProviderTest
     {
@@ -50,11 +58,11 @@ namespace PmlUnit.Tests
         public void Setup()
         {
             TestCases = new List<TestCase>();
-            var first = new TestCase("Foo");
+            var first = new TestCase("Foo", "foo.pmlobj");
             first.Tests.Add("one");
             first.Tests.Add("two");
             TestCases.Add(first);
-            var second = new TestCase("Bar");
+            var second = new TestCase("Bar", "bar.pmlobj");
             second.Tests.Add("three");
             second.Tests.Add("four");
             second.Tests.Add("five");
@@ -63,7 +71,7 @@ namespace PmlUnit.Tests
             ProviderMock = new Mock<TestCaseProvider>();
             ProviderMock.Setup(provider => provider.GetTestCases()).Returns(TestCases);
 
-            RunnerControl = new TestRunnerControl(ProviderMock.Object, Mock.Of<AsyncTestRunner>());
+            RunnerControl = new TestRunnerControl(ProviderMock.Object, Mock.Of<AsyncTestRunner>(), Mock.Of<SettingsProvider>());
             TestList = RunnerControl.FindControl<TestListView>("TestList");
         }
 
@@ -95,6 +103,7 @@ namespace PmlUnit.Tests
 
     [TestFixture]
     [TestOf(typeof(PmlTestRunner))]
+    [Apartment(ApartmentState.STA)]
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class TestRunnerControlRunTest
     {
@@ -109,9 +118,9 @@ namespace PmlUnit.Tests
         [SetUp]
         public void Setup()
         {
-            TestCase = new TestCase("TestCase");
+            TestCase = new TestCase("TestCase", "testcase.pmlobj");
             TestCase.Tests.Add("one").Result = new TestResult(TimeSpan.FromSeconds(1));
-            TestCase.Tests.Add("two").Result = new TestResult(TimeSpan.FromSeconds(1), new PmlException("error"));
+            TestCase.Tests.Add("two").Result = new TestResult(TimeSpan.FromSeconds(1), new PmlError("error"));
             TestCase.Tests.Add("three").Result = new TestResult(TimeSpan.FromSeconds(1));
             TestCase.Tests.Add("four");
 
@@ -120,7 +129,7 @@ namespace PmlUnit.Tests
                 .Setup(runner => runner.RunAsync(It.IsAny<IEnumerable<Test>>()))
                 .Callback((IEnumerable<Test> tests) => Tests = tests);
 
-            RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), RunnerMock.Object);
+            RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), RunnerMock.Object, Mock.Of<SettingsProvider>());
             TestSummary = RunnerControl.FindControl<TestSummaryView>("TestSummary");
             TestList = RunnerControl.FindControl<TestListView>("TestList");
             TestList.TestCases.Add(TestCase);
@@ -209,6 +218,7 @@ namespace PmlUnit.Tests
 
     [TestFixture]
     [TestOf(typeof(PmlTestRunner))]
+    [Apartment(ApartmentState.STA)]
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     public class TestRunnerControlSelectionTest
     {
@@ -222,11 +232,11 @@ namespace PmlUnit.Tests
         [SetUp]
         public void Setup()
         {
-            TestCase = new TestCase("Test");
+            TestCase = new TestCase("Test", "test.pmlobj");
             TestCase.Tests.Add("one");
             TestCase.Tests.Add("two");
             TestCase.Tests.Add("three");
-            RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), Mock.Of<AsyncTestRunner>());
+            RunnerControl = new TestRunnerControl(Mock.Of<TestCaseProvider>(), Mock.Of<AsyncTestRunner>(), Mock.Of<SettingsProvider>());
             TestSummary = RunnerControl.FindControl<TestSummaryView>("TestSummary");
             TestDetails = RunnerControl.FindControl<TestDetailsView>("TestDetails");
             TestList = RunnerControl.FindControl<TestListView>("TestList");

@@ -3,6 +3,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 
 namespace PmlUnit
@@ -11,20 +12,24 @@ namespace PmlUnit
     {
         internal static readonly Regex NameRegex = new Regex("^[a-z][a-z0-9]*$", RegexOptions.IgnoreCase);
 
+        public string FileName { get; }
         public string Name { get; }
         public TestCollection Tests { get; }
 
         public bool HasSetUp { get; set; }
         public bool HasTearDown { get; set; }
 
-        public TestCase(string name)
+        public TestCase(string name, string fileName)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException(nameof(name));
             if (!NameRegex.IsMatch(name))
                 throw new ArgumentException("Test case names must start with a letter and only contain letters and digits.", nameof(name));
+            if (string.IsNullOrEmpty(fileName))
+                throw new ArgumentNullException(nameof(fileName));
 
             Name = name;
+            FileName = Path.GetFullPath(fileName);
             Tests = new TestCollection(this);
             HasSetUp = false;
             HasTearDown = false;
@@ -52,22 +57,16 @@ namespace PmlUnit
 
         public int Count => Tests.Count;
 
-        public Test this[string name]
-        {
-            get { return Tests[name]; }
-            set
-            {
-                if (value == null)
-                    throw new ArgumentNullException(nameof(value));
-                if (value.TestCase != TestCase)
-                    throw new ArgumentException("Test does not belong to test case", nameof(value));
-                Tests[value.Name] = value;
-            }
-        }
+        public Test this[string name] => Tests[name];
 
         public Test Add(string name)
         {
-            var result = new Test(TestCase, name);
+            return Add(name, 0);
+        }
+
+        public Test Add(string name, int lineNumber)
+        {
+            var result = new Test(TestCase, name, lineNumber);
             Add(result);
             return result;
         }

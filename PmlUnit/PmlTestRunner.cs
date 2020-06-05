@@ -19,48 +19,68 @@ namespace PmlUnit
 
         private readonly MethodInvoker Invoker;
         private readonly Clock Clock;
+        private readonly EntryPointResolver Resolver;
         private ObjectProxy RunnerProxy;
 
         public PmlTestRunner(MethodInvoker invoker)
-            : this(new SystemClock(), invoker)
+            : this(invoker, new SystemClock())
         {
         }
 
-        public PmlTestRunner(Clock clock, MethodInvoker invoker)
+        public PmlTestRunner(MethodInvoker invoker, EntryPointResolver resolver)
+            : this(invoker, new SystemClock(), resolver)
         {
-            if (clock == null)
-                throw new ArgumentNullException(nameof(clock));
+        }
+
+        public PmlTestRunner(MethodInvoker invoker, Clock clock)
+            : this(invoker, clock, new SimpleEntryPointResolver())
+        {
+        }
+
+        public PmlTestRunner(MethodInvoker invoker, Clock clock, EntryPointResolver resolver)
+        {
             if (invoker == null)
                 throw new ArgumentNullException(nameof(invoker));
+            if (clock == null)
+                throw new ArgumentNullException(nameof(clock));
+            if (resolver == null)
+                throw new ArgumentNullException(nameof(resolver));
 
             Invoker = invoker;
             Clock = clock;
+            Resolver = resolver;
             RunnerProxy = new PmlObjectProxy("PmlTestRunner");
         }
 
         public PmlTestRunner(ObjectProxy proxy, MethodInvoker invoker)
+            : this(proxy, invoker, new SystemClock())
         {
-            if (proxy == null)
-                throw new ArgumentNullException(nameof(proxy));
-            if (invoker == null)
-                throw new ArgumentNullException(nameof(invoker));
-
-            Invoker = invoker;
-            Clock = new SystemClock();
-            RunnerProxy = proxy;
         }
 
-        public PmlTestRunner(ObjectProxy proxy, Clock clock, MethodInvoker invoker)
+        public PmlTestRunner(ObjectProxy proxy, MethodInvoker invoker, EntryPointResolver resolver)
+            : this(proxy, invoker, new SystemClock(), resolver)
+        {
+        }
+
+        public PmlTestRunner(ObjectProxy proxy, MethodInvoker invoker, Clock clock)
+            : this(proxy, invoker, clock, new SimpleEntryPointResolver())
+        {
+        }
+
+        public PmlTestRunner(ObjectProxy proxy, MethodInvoker invoker, Clock clock, EntryPointResolver resolver)
         {
             if (proxy == null)
                 throw new ArgumentNullException(nameof(proxy));
-            if (clock == null)
-                throw new ArgumentNullException(nameof(clock));
             if (invoker == null)
                 throw new ArgumentNullException(nameof(invoker));
+            if (clock == null)
+                throw new ArgumentNullException(nameof(clock));
+            if (resolver == null)
+                throw new ArgumentNullException(nameof(resolver));
 
-            Invoker = invoker;
             Clock = clock;
+            Invoker = invoker;
+            Resolver = resolver;
             RunnerProxy = proxy;
         }
 
@@ -88,7 +108,9 @@ namespace PmlUnit
 
         public void RefreshIndex()
         {
-            InvokePmlMethod("refreshIndex");
+            var error = InvokePmlMethod("refreshIndex");
+            if (error != null)
+                throw new PmlException("Failed to refresh index", error);
         }
 
         public void Reload(TestCase testCase)
@@ -96,7 +118,9 @@ namespace PmlUnit
             if (testCase == null)
                 throw new ArgumentNullException(nameof(testCase));
 
-            InvokePmlMethod("reload", testCase.Name);
+            var error = InvokePmlMethod("reload", testCase.Name);
+            if (error != null)
+                throw new PmlException("Failed to reload test case " + testCase.Name, error);
         }
 
         public void Run(TestCase testCase)
@@ -138,6 +162,7 @@ namespace PmlUnit
             finally
             {
                 IsBusy = false;
+                CancellationPending = false;
             }
 
             OnTestRunCompleted(tests, null);
@@ -165,6 +190,7 @@ namespace PmlUnit
             catch
             {
                 IsBusy = false;
+                CancellationPending = false;
                 throw;
             }
         }
@@ -214,6 +240,7 @@ namespace PmlUnit
         private void OnTestRunCompleted(IEnumerable<Test> tests, Exception error)
         {
             IsBusy = false;
+            CancellationPending = false;
             RunCompleted?.Invoke(this, new TestRunCompletedEventArgs(tests, error));
         }
 
@@ -228,40 +255,25 @@ namespace PmlUnit
         private void RunInternal(Test test)
         {
             var start = Clock.CurrentInstant;
-            try
-            {
-                var testCase = test.TestCase;
-                var result = RunnerProxy.Invoke(
-                    "run", testCase.Name, test.Name, testCase.HasSetUp, testCase.HasTearDown
-                );
-                var elapsed = Clock.CurrentInstant - start;
-                test.Result = new TestResult(elapsed, UnmarshalException(result));
-            }
-            catch (PmlException error)
-            {
-                var elapsed = Clock.CurrentInstant - start;
-                test.Result = new TestResult(elapsed, error);
-            }
+            var testCase = test.TestCase;
+            var error = InvokePmlMethod(
+                "run", testCase.Name, test.Name, testCase.HasSetUp, testCase.HasTearDown
+            );
+            var elapsed = Clock.CurrentInstant - start;
+            test.Result = new TestResult(elapsed, error);
 
             TestCompleted?.Invoke(this, new TestCompletedEventArgs(test));
         }
 
-        private void InvokePmlMethod(string method, params object[] arguments)
+        private PmlError InvokePmlMethod(string method, params object[] arguments)
         {
             if (RunnerProxy == null)
                 throw new ObjectDisposedException(nameof(PmlTestRunner));
 
             var result = RunnerProxy.Invoke(method, arguments);
-            var exception = UnmarshalException(result);
-            if (exception != null)
-                throw exception;
-        }
-
-        private static PmlException UnmarshalException(object result)
-        {
             var stackTrace = result as Hashtable;
-            if (stackTrace != null && stackTrace.Count > 0)
-                return new PmlException(stackTrace);
+            if (stackTrace != null)
+                return PmlError.FromHashTable(stackTrace, Resolver);
 
             var disposable = result as IDisposable;
             if (disposable != null)

@@ -100,6 +100,16 @@
     </Compile>
     <Compile Include="AssemblyExtensions.cs" />
     <Compile Include="Clock.cs" />
+    <Compile Include="CodeEditor.cs" />
+    <Compile Include="CodeEditorControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="CodeEditorControl.Designer.cs">
+      <DependentUpon>CodeEditorControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CodeEditorDialog.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ColorizedProgressBar.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -107,17 +117,24 @@
       <DependentUpon>ColorizedProgressBar.cs</DependentUpon>
     </Compile>
     <Compile Include="ControlMethodInvoker.cs" />
-    <Compile Include="EnvironmentVariableTestCaseProvider.cs" />
+    <Compile Include="CustomLinkLabel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="EntryPoint.cs" />
+    <Compile Include="EntryPointResolver.cs" />
+    <Compile Include="FileIndex.cs" />
+    <Compile Include="FileIndexTestCaseProvider.cs" />
     <Compile Include="IconLabel.cs">
       <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="IconLabel.Designer.cs">
       <DependentUpon>IconLabel.cs</DependentUpon>
     </Compile>
-    <Compile Include="IndexFileTestCaseProvider.cs" />
+    <Compile Include="IndexFile.cs" />
     <Compile Include="MethodInvoker.cs" />
     <Compile Include="ObjectProxy.cs" />
     <Compile Include="ParserException.cs" />
+    <Compile Include="PmlError.cs" />
     <Compile Include="PmlException.cs" />
     <Compile Include="PmlObjectProxy.cs" />
     <Compile Include="PmlTestRunner.cs" />
@@ -128,9 +145,13 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="RegistryExtensions.cs" />
     <Compile Include="ServiceProvider.cs" />
+    <Compile Include="SettingsProvider.cs" />
     <Compile Include="ShowAboutDialogCommand.cs" />
+    <Compile Include="ShowSettingsDialogCommand.cs" />
     <Compile Include="ShowTestRunnerCommand.cs" />
+    <Compile Include="StackTrace.cs" />
     <Compile Include="Test.cs" />
     <Compile Include="TestCase.cs" />
     <Compile Include="TestCaseCollection.cs" />
@@ -181,6 +202,9 @@
   <ItemGroup>
     <EmbeddedResource Include="AboutDialog.resx">
       <DependentUpon>AboutDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CodeEditorControl.resx">
+      <DependentUpon>CodeEditorControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="ColorizedProgressBar.resx">
       <DependentUpon>ColorizedProgressBar.cs</DependentUpon>

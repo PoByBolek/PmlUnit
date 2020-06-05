@@ -13,6 +13,16 @@
       <Caption>Test Runner</Caption>
       <DisplayStyle>Default</DisplayStyle>
     </StateButtonTool>
+    <ButtonTool Name="PmlUnit.ShowSettingsDialogButton">
+      <Command>
+        <Type>Instance</Type>
+        <Key>PmlUnit.ShowSettingsDialogCommand</Key>
+        <Arguments />
+      </Command>
+      <ImageResourceId>AvevaSharedIcons:ID_DEFAULTS</ImageResourceId>
+      <Caption>Settings</Caption>
+      <DisplayStyle>Default</DisplayStyle>
+    </ButtonTool>
     <ButtonTool Name="PmlUnit.ShowAboutDialogButton">
       <Command>
         <Type>Instance</Type>
@@ -51,6 +61,7 @@
         </Group>
         <Group Name="PmlUnit.HelpGroup">
           <Tools>
+            <Tool Name="PmlUnit.ShowSettingsDialogButton" LargeImage="True" ImageOnly="False" />
             <Tool Name="PmlUnit.ShowAboutDialogButton" />
           </Tools>
           <Caption>Help</Caption>

@@ -2,6 +2,7 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using System.Windows.Forms;
 using Aveva.ApplicationFramework.Presentation;
 using Moq;
@@ -16,6 +17,7 @@ namespace PmlUnit.Tests
 {
     [TestFixture]
     [TestOf(typeof(PmlUnitAddin))]
+    [Apartment(ApartmentState.STA)]
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     class PmlUnitAddinTest
     {
@@ -46,7 +48,7 @@ namespace PmlUnit.Tests
             TestCaseProviderMock.Setup(provider => provider.GetTestCases())
                 .Returns(new List<TestCase>());
             TestRunnerMock = new Mock<AsyncTestRunner>();
-            Addin = new PmlUnitAddin(TestCaseProviderMock.Object, TestRunnerMock.Object);
+            Addin = new PmlUnitAddin(TestCaseProviderMock.Object, TestRunnerMock.Object, Mock.Of<SettingsProvider>());
         }
 
         [TearDown]

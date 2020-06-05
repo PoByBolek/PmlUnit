@@ -31,28 +31,26 @@ namespace PmlUnit
         [GeneratedCode("Windows Form Designer generated code", "1.0")]
         private void InitializeComponent()
         {
-            System.Windows.Forms.Label summaryLabel;
             System.Windows.Forms.FlowLayoutPanel testCountPanel;
+            this.SummaryLabel = new System.Windows.Forms.Label();
             this.ResultLabel = new System.Windows.Forms.Label();
             this.RuntimeLabel = new System.Windows.Forms.Label();
             this.FailedTestCountLabel = new PmlUnit.IconLabel();
             this.PassedTestCountLabel = new PmlUnit.IconLabel();
             this.NotExecutedTestCountLabel = new PmlUnit.IconLabel();
-            summaryLabel = new System.Windows.Forms.Label();
             testCountPanel = new System.Windows.Forms.FlowLayoutPanel();
             testCountPanel.SuspendLayout();
             this.SuspendLayout();
             // 
-            // summaryLabel
+            // SummaryLabel
             // 
-            summaryLabel.AutoSize = true;
-            summaryLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            summaryLabel.Location = new System.Drawing.Point(3, 3);
-            summaryLabel.Margin = new System.Windows.Forms.Padding(3);
-            summaryLabel.Name = "summaryLabel";
-            summaryLabel.Size = new System.Drawing.Size(83, 20);
-            summaryLabel.TabIndex = 0;
-            summaryLabel.Text = "Summary";
+            this.SummaryLabel.AutoSize = true;
+            this.SummaryLabel.Location = new System.Drawing.Point(3, 3);
+            this.SummaryLabel.Margin = new System.Windows.Forms.Padding(3);
+            this.SummaryLabel.Name = "SummaryLabel";
+            this.SummaryLabel.Size = new System.Drawing.Size(50, 13);
+            this.SummaryLabel.TabIndex = 0;
+            this.SummaryLabel.Text = "Summary";
             // 
             // testCountPanel
             // 
@@ -72,11 +70,10 @@ namespace PmlUnit
             // ResultLabel
             // 
             this.ResultLabel.AutoSize = true;
-            this.ResultLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ResultLabel.Location = new System.Drawing.Point(3, 29);
             this.ResultLabel.Margin = new System.Windows.Forms.Padding(3, 3, 0, 3);
             this.ResultLabel.Name = "ResultLabel";
-            this.ResultLabel.Size = new System.Drawing.Size(148, 13);
+            this.ResultLabel.Size = new System.Drawing.Size(106, 13);
             this.ResultLabel.TabIndex = 1;
             this.ResultLabel.Text = "Last test run: Passed";
             // 
@@ -113,7 +110,7 @@ namespace PmlUnit
             this.PassedTestCountLabel.Margin = new System.Windows.Forms.Padding(0);
             this.PassedTestCountLabel.MinimumSize = new System.Drawing.Size(16, 16);
             this.PassedTestCountLabel.Name = "PassedTestCountLabel";
-            this.PassedTestCountLabel.Size = new System.Drawing.Size(107, 17);
+            this.PassedTestCountLabel.Size = new System.Drawing.Size(91, 17);
             this.PassedTestCountLabel.TabIndex = 1;
             this.PassedTestCountLabel.Text = "0 passed tests";
             this.PassedTestCountLabel.Visible = false;
@@ -139,7 +136,7 @@ namespace PmlUnit
             this.Controls.Add(testCountPanel);
             this.Controls.Add(this.RuntimeLabel);
             this.Controls.Add(this.ResultLabel);
-            this.Controls.Add(summaryLabel);
+            this.Controls.Add(this.SummaryLabel);
             this.Name = "TestSummaryView";
             this.Size = new System.Drawing.Size(301, 150);
             testCountPanel.ResumeLayout(false);
@@ -151,6 +148,7 @@ namespace PmlUnit
 
         #endregion
 
+        private System.Windows.Forms.Label SummaryLabel;
         private System.Windows.Forms.Label ResultLabel;
         private System.Windows.Forms.Label RuntimeLabel;
         private IconLabel FailedTestCountLabel;

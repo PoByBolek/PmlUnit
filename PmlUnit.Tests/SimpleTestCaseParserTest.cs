@@ -12,12 +12,14 @@ namespace PmlUnit.Tests
     public class SimpleTestCaseParserTest
     {
         [Test]
-        public void Parse_ShouldCheckForNullReader()
+        public void Parse_ShouldCheckForNullArguments()
         {
             var parser = new SimpleTestCaseParser();
-            Assert.Throws<ArgumentNullException>(() => parser.Parse((TextReader)null));
-            Assert.Throws<ArgumentNullException>(() => parser.Parse((string)null));
+            Assert.Throws<ArgumentNullException>(() => parser.Parse(null));
             Assert.Throws<ArgumentNullException>(() => parser.Parse(""));
+            Assert.Throws<ArgumentNullException>(() => parser.Parse(null, TextReader.Null));
+            Assert.Throws<ArgumentNullException>(() => parser.Parse("", TextReader.Null));
+            Assert.Throws<ArgumentNullException>(() => parser.Parse("dummy.pmlobj", null));
         }
 
         [Test]
@@ -26,6 +28,15 @@ namespace PmlUnit.Tests
             var testCase = Parse(@"define object TestCase
 endobject");
             Assert.That(testCase.Name, Is.EqualTo("TestCase"));
+        }
+
+        public void Parse_UsesSpecifiedFileNameAsTestCaseFileName()
+        {
+            var testCase = Parse(
+                "C:\\temp\\foobar\\hello\\world.random",
+                @"define object TestCase
+endobject");
+            Assert.That(testCase.FileName, Is.EqualTo("C:\\temp\\foobar\\hello\\world.random"));
         }
 
         [Test]
@@ -178,10 +189,15 @@ endmethod");
 
         private static TestCase Parse(string objectDefinition)
         {
+            return Parse("dummy.pmlobj", objectDefinition);
+        }
+
+        private static TestCase Parse(string fileName, string objectDefinition)
+        {
             var parser = new SimpleTestCaseParser();
             using (var reader = new StringReader(objectDefinition))
             {
-                return parser.Parse(reader);
+                return parser.Parse(fileName, reader);
             }
         }
     }

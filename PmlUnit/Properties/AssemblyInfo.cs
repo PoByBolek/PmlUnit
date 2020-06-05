@@ -9,15 +9,15 @@ using System.Runtime.InteropServices;
 // Allgemeine Informationen über eine Assembly werden über die folgenden 
 // Attribute gesteuert. Ändern Sie diese Attributwerte, um die Informationen zu ändern,
 // die einer Assembly zugeordnet sind.
-[assembly: AssemblyDescription("Test framework and test runner for PML code in AVEVA PDMS, Everything3D, and other products.")]
+[assembly: AssemblyDescription("Test framework and test runner for PML code in AVEVA PDMS, Hull & Outfitting, Everything3D, and other products.")]
 
 #if PDMS_121
 
-[assembly: AssemblyTitle("PML Unit for PDMS 12.1")]
+[assembly: AssemblyTitle("PML Unit for PDMS and Hull & Outfitting 12.1")]
 #if DEBUG
-[assembly: AssemblyConfiguration("PDMS 12.1 Debug")]
+[assembly: AssemblyConfiguration("PDMS and Hull & Outfitting 12.1 Debug")]
 #else
-[assembly: AssemblyConfiguration("PDMS 12.1 Release")]
+[assembly: AssemblyConfiguration("PDMS and Hull & Outfitting 12.1 Release")]
 #endif
 
 #elif E3D_11
@@ -70,6 +70,6 @@ using System.Runtime.InteropServices;
 // Sie können alle Werte angeben oder die standardmäßigen Build- und Revisionsnummern 
 // übernehmen, indem Sie "*" eingeben:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.3.0.0")]
-[assembly: AssemblyFileVersion("0.3.0.0")]
-[assembly: AssemblyInformationalVersion("0.3.0")]
+[assembly: AssemblyVersion("0.4.0.0")]
+[assembly: AssemblyFileVersion("0.4.0.0")]
+[assembly: AssemblyInformationalVersion("0.4.0")]

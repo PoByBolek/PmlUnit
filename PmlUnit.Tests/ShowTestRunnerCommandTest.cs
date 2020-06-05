@@ -2,6 +2,7 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 using System.Windows.Forms;
 using Aveva.ApplicationFramework.Presentation;
 using Moq;
@@ -11,6 +12,7 @@ namespace PmlUnit.Tests
 {
     [TestFixture]
     [TestOf(typeof(ShowTestRunnerCommand))]
+    [Apartment(ApartmentState.STA)]
     [SuppressMessage("Microsoft.Design", "CA1001:TypesThatOwnDisposableFieldsShouldBeDisposable")]
     class ShowTestRunnerCommandTest
     {
@@ -32,7 +34,7 @@ namespace PmlUnit.Tests
                 return WindowMock.Object;
             });
 
-            Control = new TestRunnerControl(Mock.Of<TestCaseProvider>(), Mock.Of<AsyncTestRunner>());
+            Control = new TestRunnerControl(Mock.Of<TestCaseProvider>(), Mock.Of<AsyncTestRunner>(), Mock.Of<SettingsProvider>());
             Command = new ShowTestRunnerCommand(WindowManagerMock.Object, Control);
         }
 

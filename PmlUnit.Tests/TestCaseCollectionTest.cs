@@ -20,8 +20,8 @@ namespace PmlUnit.Tests
         public void Setup()
         {
             Collection = new TestCaseCollection();
-            First = new TestCase("First");
-            Second = new TestCase("Second");
+            First = new TestCase("First", "first.pmlobj");
+            Second = new TestCase("Second", "second.pmlobj");
         }
 
         [Test]
@@ -35,8 +35,8 @@ namespace PmlUnit.Tests
         {
             Collection.Add(First);
             Assert.Throws<ArgumentException>(() => Collection.Add(First));
-            Assert.Throws<ArgumentException>(() => Collection.Add(new TestCase("first")));
-            Assert.Throws<ArgumentException>(() => Collection.Add(new TestCase("FIRST")));
+            Assert.Throws<ArgumentException>(() => Collection.Add(new TestCase("first", "first.pmlobj")));
+            Assert.Throws<ArgumentException>(() => Collection.Add(new TestCase("FIRST", "first.pmlobj")));
         }
 
         [Test]
@@ -105,17 +105,17 @@ namespace PmlUnit.Tests
         {
             var duplicateList = new List<TestCase>()
             {
-                new TestCase("FoO"),
-                new TestCase("bar"),
-                new TestCase("fOo"),
+                new TestCase("FoO", "foo.pmlobj"),
+                new TestCase("bar", "bar.pmlobj"),
+                new TestCase("fOo", "foo.pmlobj"),
             };
             Assert.Throws<ArgumentException>(() => Collection.AddRange(duplicateList));
 
-            Collection.Add(new TestCase("bAr"));
+            Collection.Add(new TestCase("bAr", "bar.pmlobj"));
             var duplicateCollection = new List<TestCase>()
             {
-                new TestCase("foo"),
-                new TestCase("BaR"),
+                new TestCase("foo", "foo.pmlobj"),
+                new TestCase("BaR", "bar.pmlobj"),
             };
             Assert.Throws<ArgumentException>(() => Collection.AddRange(duplicateCollection));
         }
@@ -127,8 +127,8 @@ namespace PmlUnit.Tests
             var list = new List<TestCase>()
             {
                 Second,
-                new TestCase("First"),
-                new TestCase("Third"),
+                new TestCase("First", "first.pmlobj"),
+                new TestCase("Third", "third.pmlobj"),
             };
             Assert.Throws<ArgumentException>(() => Collection.AddRange(list));
             Assert.That(Collection.Count, Is.EqualTo(1));
@@ -136,10 +136,10 @@ namespace PmlUnit.Tests
 
             list = new List<TestCase>()
             {
-                new TestCase("Fourth"),
-                new TestCase("Fifth"),
-                new TestCase("Fifth"),
-                new TestCase("Sixth"),
+                new TestCase("Fourth", "fourth.pmlobj"),
+                new TestCase("Fifth", "fifth.pmlobj"),
+                new TestCase("Fifth", "fifth.pmlobj"),
+                new TestCase("Sixth", "sixth.pmlobj"),
             };
             Assert.Throws<ArgumentException>(() => Collection.AddRange(list));
             Assert.That(Collection.Count, Is.EqualTo(1));
@@ -151,7 +151,7 @@ namespace PmlUnit.Tests
         {
             var list = new List<TestCase>()
             {
-                First, Second, new TestCase("Third"),
+                First, Second, new TestCase("Third", "third.pmlobj"),
             };
             Collection.AddRange(list);
 
@@ -166,7 +166,7 @@ namespace PmlUnit.Tests
         {
             var list = new List<TestCase>()
             {
-                First, Second, new TestCase("Third"),
+                First, Second, new TestCase("Third", "third.pmlobj"),
             };
             int raised = 0;
             Collection.Changed += (sender, e) =>
@@ -203,7 +203,7 @@ namespace PmlUnit.Tests
         {
             Assert.Throws<KeyNotFoundException>(() => { var foo = Collection["foo"]; });
 
-            Collection.Add(new TestCase("foo"));
+            Collection.Add(new TestCase("foo", "foo.pmlobj"));
             var x = Collection["foo"];
 
             Assert.Throws<KeyNotFoundException>(() => { var foo = Collection["bar"]; });
@@ -214,17 +214,17 @@ namespace PmlUnit.Tests
         {
             Assert.Throws<ArgumentNullException>(() => Collection[null] = null);
             Assert.Throws<ArgumentNullException>(() => Collection["foo"] = null);
-            Assert.Throws<ArgumentNullException>(() => Collection[null] = new TestCase("foo"));
+            Assert.Throws<ArgumentNullException>(() => Collection[null] = new TestCase("foo", "foo.pmlobj"));
         }
 
         [Test]
         public void SetItem_ChecksThatKeyAndNameMatch()
         {
-            Assert.Throws<ArgumentException>(() => Collection["foo"] = new TestCase("bar"));
-            Collection["foo"] = new TestCase("foo");
-            Collection["FoO"] = new TestCase("Foo");
-            Collection["fOo"] = new TestCase("FoO");
-            Collection["foo"] = new TestCase("FOO");
+            Assert.Throws<ArgumentException>(() => Collection["foo"] = new TestCase("bar", "bar.pmlobj"));
+            Collection["foo"] = new TestCase("foo", "foo.pmlobj");
+            Collection["FoO"] = new TestCase("Foo", "foo.pmlobj");
+            Collection["fOo"] = new TestCase("FoO", "foo.pmlobj");
+            Collection["foo"] = new TestCase("FOO", "foo.pmlobj");
         }
 
         [Test]
@@ -250,12 +250,12 @@ namespace PmlUnit.Tests
                 }
             };
 
-            expectedAdd = new TestCase("key");
+            expectedAdd = new TestCase("key", "key.pmlobj");
             Collection["key"] = expectedAdd;
             Assert.That(raised, Is.EqualTo(1));
 
             expectedRemove = expectedAdd;
-            expectedAdd = new TestCase("Key");
+            expectedAdd = new TestCase("Key", "key.pmlobj");
             Collection["key"] = expectedAdd;
             Assert.That(raised, Is.EqualTo(2));
 
@@ -272,7 +272,7 @@ namespace PmlUnit.Tests
         [Test]
         public void Contains_WorksWithEmptyCollection()
         {
-            Assert.That(Collection.Contains(new TestCase("Foo")), Is.False);
+            Assert.That(Collection.Contains(new TestCase("Foo", "foo.pmlobj")), Is.False);
         }
 
         [Test]
@@ -283,8 +283,8 @@ namespace PmlUnit.Tests
 
             Assert.That(Collection.Contains(First));
             Assert.That(Collection.Contains(Second));
-            Assert.That(Collection.Contains(new TestCase("First")), Is.False);
-            Assert.That(Collection.Contains(new TestCase("Second")), Is.False);
+            Assert.That(Collection.Contains(new TestCase("First", "first.pmlobj")), Is.False);
+            Assert.That(Collection.Contains(new TestCase("Second", "second.pmlobj")), Is.False);
         }
 
         [Test]
@@ -310,7 +310,7 @@ namespace PmlUnit.Tests
         [Test]
         public void Remove_WorksWithEmptyCollection()
         {
-            Assert.That(Collection.Remove(new TestCase("foo")), Is.False);
+            Assert.That(Collection.Remove(new TestCase("foo", "foo.pmlobj")), Is.False);
         }
 
         [Test]
@@ -319,7 +319,7 @@ namespace PmlUnit.Tests
             Collection.Add(First);
             Collection.Add(Second);
 
-            Assert.That(Collection.Remove(new TestCase("Second")), Is.False);
+            Assert.That(Collection.Remove(new TestCase("Second", "second.pmlobj")), Is.False);
             Assert.That(Collection.Count, Is.EqualTo(2));
             Assert.That(Collection, Contains.Item(First));
             Assert.That(Collection, Contains.Item(Second));
@@ -347,7 +347,7 @@ namespace PmlUnit.Tests
             Collection.Remove(First);
             Assert.That(raised, Is.EqualTo(1));
 
-            Collection.Remove(new TestCase("Second"));
+            Collection.Remove(new TestCase("Second", "second.pmlobj"));
             Assert.That(raised, Is.EqualTo(1));
 
             expected = Second;
@@ -361,8 +361,8 @@ namespace PmlUnit.Tests
         [Test]
         public void Clear_ClearsTheCollection()
         {
-            Collection.Add(new TestCase("First"));
-            Collection.Add(new TestCase("Second"));
+            Collection.Add(new TestCase("First", "first.pmlobj"));
+            Collection.Add(new TestCase("Second", "second.pmlobj"));
             Collection.Clear();
             Assert.That(Collection, Is.Empty);
         }
@@ -370,8 +370,8 @@ namespace PmlUnit.Tests
         [Test]
         public void Clear_RaisesChangedEvent()
         {
-            var first = new TestCase("First");
-            var second = new TestCase("Second");
+            var first = new TestCase("First", "first.pmlobj");
+            var second = new TestCase("Second", "second.pmlobj");
             int raised = 0;
             Collection.Add(first);
             Collection.Add(second);

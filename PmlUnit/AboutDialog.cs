@@ -2,6 +2,7 @@
 // Licensed under the MIT License: https://opensource.org/licenses/MIT
 using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
 
@@ -9,35 +10,45 @@ namespace PmlUnit
 {
     partial class AboutDialog : Form
     {
+        private DateTime TooltipShown;
+
         public AboutDialog()
         {
             InitializeComponent();
-            
-            TitleLabel.Text = GetAssemblyTitle();
-            VersionLabel.Text = GetAssemblyVersion();
-            CopyrightLabel.Text = GetAssemblyCopyright();
+            SetDerivedFonts();
+
+            TooltipShown = DateTime.MinValue;
+
+            TitleLabel.Text = GetTitle();
+            CopyrightLabel.Text = GetCopyright();
 
             IconLicenseLabel.Links[0].LinkData = "http://www.recepkutuk.com/bitsies/"; // https seems to be broken
             StatusIconLicenseLabel.Links[0].LinkData = "https://github.com/encharm/Font-Awesome-SVG-PNG";
             GithubLabel.Links[0].LinkData = "https://github.com/PoByBolek/PmlUnit";
         }
 
-        private static string GetAssemblyTitle()
+        protected override void OnFontChanged(EventArgs e)
         {
-            foreach (var attribute in Assembly.GetCustomAttributes<AssemblyTitleAttribute>(inherit: false))
+            base.OnFontChanged(e);
+            SetDerivedFonts();
+        }
+
+        private void SetDerivedFonts()
+        {
+            TitleLabel.Font = new Font(Font.FontFamily, Font.Size * 2f, FontStyle.Bold);
+        }
+
+        private static string GetTitle()
+        {
+            foreach (var attribute in Assembly.GetCustomAttributes<AssemblyInformationalVersionAttribute>(inherit: false))
             {
-                if (!string.IsNullOrEmpty(attribute.Title))
-                    return attribute.Title;
+                if (!string.IsNullOrEmpty(attribute.InformationalVersion))
+                    return "PML Unit " + attribute.InformationalVersion;
             }
-            return "PML Unit";
+            return "PML Unit " + Assembly.GetName().Version.ToString();
         }
 
-        private static string GetAssemblyVersion()
-        {
-            return "Version " + Assembly.GetName().Version.ToString();
-        }
-
-        private static string GetAssemblyCopyright()
+        private static string GetCopyright()
         {
             foreach (var attribute in Assembly.GetCustomAttributes<AssemblyCopyrightAttribute>(inherit: false))
             {
@@ -65,6 +76,33 @@ namespace PmlUnit
             {
                 Close();
             }
+        }
+        
+
+        private void OnLinkHover(object sender, LinkHoverEventArgs e)
+        {
+            var url = e.Link.LinkData as string;
+            if (string.IsNullOrEmpty(url))
+            {
+                return;
+            }
+            else if (url.StartsWith("http://", StringComparison.Ordinal) || url.StartsWith("https://", StringComparison.Ordinal))
+            {
+                LinkToolTip.Show(url, this, PointToClient(MousePosition));
+                TooltipShown = DateTime.Now;
+            }
+        }
+
+        private void OnLinkLabelMouseMove(object sender, MouseEventArgs e)
+        {
+            var delay = TimeSpan.FromMilliseconds(LinkToolTip.InitialDelay);
+            if (DateTime.Now > TooltipShown + delay)
+                LinkToolTip.Hide(this);
+        }
+
+        private void OnLinkLabelMouseLeave(object sender, EventArgs e)
+        {
+            LinkToolTip.Hide(this);
         }
     }
 }

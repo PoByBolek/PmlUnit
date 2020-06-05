@@ -29,6 +29,9 @@ namespace PmlUnit
         [Category("Behavior")]
         public event EventHandler GroupingChanged;
 
+        [Category("Behavior")]
+        public event EventHandler<TestEventArgs> TestActivate;
+
         public int EntryHeight => 20;
 
         public int EntryPadding => 2;
@@ -52,6 +55,7 @@ namespace PmlUnit
 
             Controller = new TestListViewController(Model, this);
             Controller.SelectionChanged += OnControllerSelectionChanged;
+            Controller.TestActivate += OnControllerTestActivate;
 
             InitializeComponent();
 
@@ -144,6 +148,11 @@ namespace PmlUnit
         {
             Invalidate();
             SelectionChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OnControllerTestActivate(object sender, TestEventArgs e)
+        {
+            TestActivate?.Invoke(this, e);
         }
 
         protected override void OnPaint(PaintEventArgs e)

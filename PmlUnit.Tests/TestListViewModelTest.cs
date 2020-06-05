@@ -18,13 +18,13 @@ namespace PmlUnit.Tests
         [SetUp]
         public void Setup()
         {
-            var testCase = new TestCase("Test");
+            var testCase = new TestCase("Test", "test.pmlobj");
             testCase.Tests.Add("first");
             testCase.Tests.Add("second");
             Model = new TestListViewModel();
             Model.TestCases.Add(testCase);
 
-            TestCase = new TestCase("TestCase");
+            TestCase = new TestCase("TestCase", "testcase.pmlobj");
             TestCase.Tests.Add("third");
             TestCase.Tests.Add("fourth");
         }
@@ -42,7 +42,7 @@ namespace PmlUnit.Tests
         public void AddingTestCaseAddsEntries()
         {
             // Arrange
-            var testCase = new TestCase("Test");
+            var testCase = new TestCase("Test", "test.pmlobj");
             var firstTest = testCase.Tests.Add("first");
             var secondTest = testCase.Tests.Add("second");
             var model = new TestListViewModel();
@@ -285,7 +285,7 @@ namespace PmlUnit.Tests
             // Arrange
             var entries = Model.Entries.ToList();
             var visibleEntries = Model.VisibleEntries.ToList();
-            var testCase = new TestCase("OtherTest");
+            var testCase = new TestCase("OtherTest", "othertest.pmlobj");
             testCase.Tests.Add("foo");
             testCase.Tests.Add("bar");
             Model.TestCases.Add(testCase);
