@@ -66,6 +66,8 @@ namespace PmlUnit
                     return new AtomCodeEditor(FileNameField, FixedArgumentsField);
                 case CodeEditorKind.NotepadPlusPlus:
                     return new NotepadPlusPlusCodeEditor(FileNameField, FixedArgumentsField);
+                case CodeEditorKind.PMLStudio:
+                    return new PMLStudioCodeEditor(FileNameField, FixedArgumentsField);
                 case CodeEditorKind.SublimeText:
                     return new SublimeTextCodeEditor(FileNameField, FixedArgumentsField);
                 case CodeEditorKind.UltraEdit:
@@ -83,6 +85,7 @@ namespace PmlUnit
         Other = 0,
         Atom = 0x41544f4d, // ATOM
         NotepadPlusPlus = 0x4e502b2b, // NP++
+        PMLStudio = 0x504d4c53, // PMLS
         SublimeText = 0x5355424c, // SUBL
         UltraEdit = 0x55454454, // UEDT
         VisualStudioCode = 0x56534344, // VSCD
@@ -269,6 +272,22 @@ namespace PmlUnit
             // see https://npp-user-manual.org/docs/command-prompt/
             if (lineNumber > 0)
                 return new string[] { "-n" + lineNumber.ToString(CultureInfo.InvariantCulture), fileName };
+            else
+                return new string[] { fileName };
+        }
+    }
+
+    class PMLStudioCodeEditor : BaseCodeEditor
+    {
+        public PMLStudioCodeEditor(string fileName, string arguments)
+            : base(fileName, arguments)
+        {
+        }
+
+        protected override IEnumerable<string> GetExtraArguments(string fileName, int lineNumber)
+        {
+            if (lineNumber > 0)
+                return new string[] { fileName };
             else
                 return new string[] { fileName };
         }
