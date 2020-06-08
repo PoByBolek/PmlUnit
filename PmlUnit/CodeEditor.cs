@@ -286,10 +286,7 @@ namespace PmlUnit
 
         protected override IEnumerable<string> GetExtraArguments(string fileName, int lineNumber)
         {
-            if (lineNumber > 0)
-                return new string[] { fileName };
-            else
-                return new string[] { fileName };
+            return new string[] { fileName };
         }
     }
 
