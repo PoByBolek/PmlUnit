@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace PmlUnit
@@ -105,7 +107,7 @@ namespace PmlUnit
             FixedArguments = SplitArguments(fixedArguments);
         }
 
-        public void OpenFile(string fileName, int lineNumber)
+        public virtual void OpenFile(string fileName, int lineNumber)
         {
             if (string.IsNullOrEmpty(fileName))
                 throw new ArgumentNullException(nameof(fileName));
@@ -284,14 +286,89 @@ namespace PmlUnit
         {
         }
 
+        public override void OpenFile(string fileName, int lineNumber)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                throw new ArgumentNullException(nameof(fileName));
+            if (lineNumber < 0)
+                throw new ArgumentOutOfRangeException(nameof(lineNumber));
+
+            object studio;
+            try
+            {
+                // PML Studio uses the Visual Studio 2010 Isolated Shell which only allows to move
+                // the cursor to a specific line in a file from the command line when we start a
+                // new instance. But we can communicate with a running PML Studio instance via COM
+                // and use the DTE COM interface to open files and move the cursor.
+                //
+                // see https://stackoverflow.com/questions/350323/open-a-file-in-visual-studio-at-a-specific-line-number
+                studio = Marshal.GetActiveObject("PMLStudio.DTE.1.1");
+            }
+            catch (COMException)
+            {
+                studio = null;
+            }
+
+            if (studio == null)
+            {
+                // PML Studio is not running. Start a new instance instead.
+                base.OpenFile(fileName, lineNumber);
+                return;
+            }
+            else
+            {
+                try
+                {
+                    OpenFileViaCOM(studio, fileName, lineNumber);
+                }
+                finally
+                {
+                    Marshal.ReleaseComObject(studio);
+                }
+            }
+        }
+
         protected override IEnumerable<string> GetExtraArguments(string fileName, int lineNumber)
         {
-            // see https://docs.microsoft.com/en-us/visualstudio/ide/reference/go-to-command?view=vs-2019
+            // This will always start a new instance of PML Studio. We could use the /Edit switch
+            // to reuse an existing instance but then executing the Edit.Goto command doesn't work.
             if (lineNumber > 0)
-                return new string[] { fileName, "/command", "edit.goto " + lineNumber.ToString(CultureInfo.InvariantCulture) };
+                return new string[] { fileName, "/Command", "Edit.Goto " + lineNumber.ToString(CultureInfo.InvariantCulture) };
             else
                 return new string[] { fileName };
         }
+
+        private void OpenFileViaCOM(object studio, string fileName, int lineNumber)
+        {
+            // Using the Visual Studio Interop Assemblies to make five method calls seems a bit overkill.
+            // So we use reflection instead.
+            var studioType = studio.GetType();
+            // see https://docs.microsoft.com/en-us/dotnet/api/envdte._dte.executecommand
+            // see https://docs.microsoft.com/en-us/visualstudio/ide/reference/open-file-command
+            studioType.InvokeMember("ExecuteCommand", BindingFlags.InvokeMethod, null, studio, new object[] { "File.OpenFile", fileName });
+            if (lineNumber > 0)
+                studioType.InvokeMember("ExecuteCommand", BindingFlags.InvokeMethod, null, studio, new object[] { "Edit.Goto", lineNumber.ToString(CultureInfo.InvariantCulture) });
+
+            object window = studioType.InvokeMember("MainWindow", BindingFlags.GetProperty, null, studio, null);
+            if (window != null)
+            {
+                try
+                {
+                    var windowType = window.GetType();
+                    windowType.InvokeMember("Visible", BindingFlags.SetProperty, null, window, new object[] { true });
+                    windowType.InvokeMember("Activate", BindingFlags.InvokeMethod, null, window, null);
+                    var handle = new IntPtr((int)windowType.InvokeMember("HWnd", BindingFlags.GetProperty, null, window, null));
+                    SetForegroundWindow(handle);
+                }
+                finally
+                {
+                    Marshal.ReleaseComObject(window);
+                }
+            }
+        }
+
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
     }
 
     class SublimeTextCodeEditor : BaseCodeEditor
