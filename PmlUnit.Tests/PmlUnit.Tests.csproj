@@ -69,11 +69,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Aveva.ApplicationFramework, Version=$(ApplicationFrameworkVersion), Culture=neutral, PublicKeyToken=17c64733a9775004">
-      <HintPath>..\lib\$(Platform)\Aveva.ApplicationFramework.dll</HintPath>
+      <HintPath>C:\AVEVA\Marine\OH12.1.SP4\Aveva.ApplicationFramework.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Aveva.ApplicationFramework.Presentation, Version=$(ApplicationFrameworkPresentationVersion), Culture=neutral, PublicKeyToken=17c64733a9775004">
-      <HintPath>..\lib\$(Platform)\Aveva.ApplicationFramework.Presentation.dll</HintPath>
+      <HintPath>C:\AVEVA\Marine\OH12.1.SP4\Aveva.ApplicationFramework.Presentation.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Castle.Core, Version=4.0.0.0, Culture=neutral, PublicKeyToken=407dd0808d44fbdc, processorArchitecture=MSIL">
@@ -89,7 +89,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="PMLNet, Version=$(PmlNetVersion), Culture=neutral, PublicKeyToken=17c64733a9775004">
-      <HintPath>..\lib\$(Platform)\PMLNet.dll</HintPath>
+      <HintPath>C:\AVEVA\Marine\OH12.1.SP4\PMLNet.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

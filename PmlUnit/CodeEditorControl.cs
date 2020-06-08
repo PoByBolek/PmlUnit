@@ -30,7 +30,7 @@ namespace PmlUnit
             notepad.SearchPaths.AddPath(ProgramFiles32BitPath, "Notepad++");
             EditorKindComboBox.Items.Add(notepad);
 
-            var pmlStudio = new EditorItem(CodeEditorKind.PMLStudio, "PML Studio", "PMLStudio.exe");
+            var pmlStudio = new EditorItem(CodeEditorKind.PmlStudio, "PML Studio", "PMLStudio.exe");
             pmlStudio.SearchPaths.AddPath(ProgramFilesPath, "AVEVA", "AVEVA PML Studio 1.1");
             pmlStudio.SearchPaths.AddPath(ProgramFiles32BitPath, "AVEVA", "AVEVA PML Studio 1.1");
             EditorKindComboBox.Items.Add(pmlStudio);

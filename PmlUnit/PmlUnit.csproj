@@ -52,6 +52,7 @@
     <PmlNetVersion>1.2.0.0</PmlNetVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|PDMS 12.1' ">
+    <OutputPath>C:\AVEVA\Marine\OH12.1.SP4\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|E3D 1.1' ">
   </PropertyGroup>
@@ -71,16 +72,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Aveva.ApplicationFramework, Version=$(ApplicationFrameworkVersion), Culture=neutral, PublicKeyToken=17c64733a9775004">
-      <HintPath>..\lib\$(Platform)\Aveva.ApplicationFramework.dll</HintPath>
+      <HintPath>C:\AVEVA\Marine\OH12.1.SP4\Aveva.ApplicationFramework.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Aveva.ApplicationFramework.Presentation, Version=$(ApplicationFrameworkPresentationVersion), Culture=neutral, PublicKeyToken=17c64733a9775004">
-      <HintPath>..\lib\$(Platform)\Aveva.ApplicationFramework.Presentation.dll</HintPath>
+      <HintPath>C:\AVEVA\Marine\OH12.1.SP4\Aveva.ApplicationFramework.Presentation.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="PMLNet, Version=$(PmlNetVersion), Culture=neutral, PublicKeyToken=17c64733a9775004">
-      <HintPath>..\lib\$(Platform)\PMLNet.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="PMLNet">
+      <HintPath>C:\AVEVA\Marine\OH12.1.SP4\PMLNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
