@@ -253,6 +253,7 @@ built-in support for the following editors:
 
 - [Atom] ([command line reference][atom-commands])
 - [Notepad++] ([command line reference][notepad-commands])
+- PML Studio
 - [Sublime Text 3] ([command line reference][sublime-commands])
 - [UltraEdit] ([command line reference][ultraedit-commands])
 - [Visual Studio Code] ([command line reference][vscode-commands])
@@ -269,7 +270,7 @@ name of the file and the line number you want to open. For example
 `--open !fileName --at !lineNumber` will be turned into something like
 `--open "C:\Users\Alice\Documents and Settings\pmllib\exampletest.pmlobj" --at 123`.
 
-With the five already supported editors you may specify some additional command
+With the six already supported editors you may specify some additional command
 line arguments (but you don't have to specify the `!fileName` and `!lineNumber`
 variables with these). Look at the command line reference of your favorite editor
 to see if there is anything you need.
